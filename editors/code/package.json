@@ -70,12 +70,7 @@
         "typescript": "^5.1.6"
     },
     "activationEvents": [
-        "workspaceContains:Cargo.toml",
-        "workspaceContains:*/Cargo.toml",
-        "workspaceContains:rust-project.json",
-        "workspaceContains:*/rust-project.json",
-        "workspaceContains:.rust-project.json",
-        "workspaceContains:*/.rust-project.json"
+        "workspaceContains:*.bsv"
     ],
     "main": "./out/main",
     "contributes": {
@@ -2698,13 +2693,13 @@
                 ]
             },
             {
-                "id": "rust",
+                "id": "bluespec",
                 "extensions": [
-                    ".rs"
+                    ".bsv"
                 ],
                 "aliases": [
-                    "Rust",
-                    "rs"
+                    "Bluespec SystmeVerilog",
+                    "bsv"
                 ],
                 "configuration": "language-configuration.json"
             }
@@ -3028,61 +3023,61 @@
         ],
         "semanticTokenScopes": [
             {
-                "language": "rust",
+                "language": "bluespec",
                 "scopes": {
                     "attribute": [
                         "meta.attribute.rust"
                     ],
                     "boolean": [
-                        "constant.language.boolean.rust"
+                        "constant.language.boolean.bluespec"
                     ],
                     "builtinType": [
-                        "support.type.primitive.rust"
+                        "support.type.primitive.bluespec"
                     ],
                     "constParameter": [
-                        "constant.other.caps.rust"
+                        "constant.other.caps.bluespec"
                     ],
                     "enum": [
-                        "entity.name.type.enum.rust"
+                        "entity.name.type.enum.bluespec"
                     ],
                     "formatSpecifier": [
-                        "punctuation.section.embedded.rust"
+                        "punctuation.section.embedded.bluespec"
                     ],
                     "function": [
-                        "entity.name.function.rust"
+                        "entity.name.function.bluespec"
                     ],
                     "interface": [
-                        "entity.name.type.trait.rust"
+                        "entity.name.type.trait.bluespec"
                     ],
                     "keyword": [
-                        "keyword.other.rust"
+                        "keyword.other.bluespec"
                     ],
                     "keyword.controlFlow": [
-                        "keyword.control.rust"
+                        "keyword.control.bluespec"
                     ],
                     "lifetime": [
-                        "storage.modifier.lifetime.rust"
+                        "storage.modifier.lifetime.bluespec"
                     ],
                     "macroBang": [
-                        "entity.name.function.macro.rust"
+                        "entity.name.function.macro.bluespec"
                     ],
                     "method": [
-                        "entity.name.function.rust"
+                        "entity.name.function.bluespec"
                     ],
                     "struct": [
-                        "entity.name.type.struct.rust"
+                        "entity.name.type.struct.bluespec"
                     ],
                     "typeAlias": [
-                        "entity.name.type.declaration.rust"
+                        "entity.name.type.declaration.bluespec"
                     ],
                     "union": [
-                        "entity.name.type.union.rust"
+                        "entity.name.type.union.bluespec"
                     ],
                     "variable": [
-                        "variable.other.rust"
+                        "variable.other.bluespec"
                     ],
                     "variable.constant": [
-                        "variable.other.constant.rust"
+                        "variable.other.constant.bluespec"
                     ],
                     "*.mutable": [
                         "markup.underline"
@@ -3196,8 +3191,8 @@
         "views": {
             "explorer": [
                 {
-                    "id": "rustDependencies",
-                    "name": "Rust Dependencies",
+                    "id": "bsvDependencies",
+                    "name": "Bluespec Dependencies",
                     "when": "inBsvProject && config.bsv-analyzer.showDependenciesExplorer"
                 }
             ]
@@ -3230,13 +3225,13 @@
                     {
                         "id": "docs",
                         "title": "Visit the docs!",
-                        "description": "Confused about configurations? Want to learn more about bsv-analyzer? Visit the [User Manual](https://bsv-analyzer.github.io/manual.html)!",
+                        "description": "Confused about configurations? Want to learn more about rust-analyzer? Visit the [User Manual](https://rust-analyzer.github.io/manual.html)! The Bluespec specific features are still a work in progress.",
                         "media": {
                             "image": "./icon.png",
                             "altText": "bsv-analyzer logo"
                         },
                         "completionEvents": [
-                            "onLink:https://bsv-analyzer.github.io/manual.html"
+                            "onLink:https://rust-analyzer.github.io/manual.html"
                         ]
                     },
                     {
