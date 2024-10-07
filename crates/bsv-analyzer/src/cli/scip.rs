@@ -23,7 +23,7 @@ impl flags::Scip {
         eprintln!("Generating SCIP start...");
         let now = Instant::now();
 
-        let no_progress = &|s| (eprintln!("rust-analyzer: Loading {s}"));
+        let no_progress = &|s| (eprintln!("bsv_analyzer: Loading {s}"));
         let root =
             vfs::AbsPathBuf::assert_utf8(std::env::current_dir()?.join(&self.path)).normalize();
 
@@ -73,7 +73,7 @@ impl flags::Scip {
         let metadata = scip_types::Metadata {
             version: scip_types::ProtocolVersion::UnspecifiedProtocolVersion.into(),
             tool_info: Some(scip_types::ToolInfo {
-                name: "rust-analyzer".to_owned(),
+                name: "bsv_analyzer".to_owned(),
                 version: format!("{}", crate::version::version()),
                 arguments: vec![],
                 special_fields: Default::default(),
@@ -322,7 +322,7 @@ fn moniker_to_symbol(moniker: &MonikerResult) -> scip_types::Symbol {
         .collect();
 
     scip_types::Symbol {
-        scheme: "rust-analyzer".into(),
+        scheme: "bsv_analyzer".into(),
         package: Some(scip_types::Package {
             manager: "cargo".to_owned(),
             name: package_name,
@@ -407,7 +407,7 @@ pub mod example_mod {
     pub fn func() {}
 }
 "#,
-            "rust-analyzer cargo foo 0.1.0 example_mod/func().",
+            "bsv_analyzer cargo foo 0.1.0 example_mod/func().",
         );
     }
 
@@ -422,7 +422,7 @@ pub mod module {
     }
 }
 "#,
-            "rust-analyzer cargo foo 0.1.0 module/MyTrait#func().",
+            "bsv_analyzer cargo foo 0.1.0 module/MyTrait#func().",
         );
     }
 
@@ -437,7 +437,7 @@ pub mod module {
     pub trait MyTraitAlias$0 = MyTrait;
 }
 "#,
-            "rust-analyzer cargo foo 0.1.0 module/MyTraitAlias#",
+            "bsv_analyzer cargo foo 0.1.0 module/MyTraitAlias#",
         );
     }
 
@@ -452,7 +452,7 @@ pub mod module {
         }
     }
     "#,
-            "rust-analyzer cargo foo 0.1.0 module/MyTrait#MY_CONST.",
+            "bsv_analyzer cargo foo 0.1.0 module/MyTrait#MY_CONST.",
         );
     }
 
@@ -468,7 +468,7 @@ pub mod module {
     }
     "#,
             // "foo::module::MyTrait::MyType",
-            "rust-analyzer cargo foo 0.1.0 module/MyTrait#[MyType]",
+            "bsv_analyzer cargo foo 0.1.0 module/MyTrait#[MyType]",
         );
     }
 
@@ -490,7 +490,7 @@ pub mod module {
     }
     "#,
             // "foo::module::MyStruct::MyTrait::func",
-            "rust-analyzer cargo foo 0.1.0 module/MyStruct#MyTrait#func().",
+            "bsv_analyzer cargo foo 0.1.0 module/MyStruct#MyTrait#func().",
         );
     }
 
@@ -508,7 +508,7 @@ pub mod module {
         pub a: i32,
     }
     "#,
-            "rust-analyzer cargo foo 0.1.0 St#a.",
+            "bsv_analyzer cargo foo 0.1.0 St#a.",
         );
     }
 
@@ -526,7 +526,7 @@ pub mod example_mod {
     pub fn func(x$0: usize) {}
 }
 "#,
-            "rust-analyzer cargo foo 0.1.0 example_mod/func().(x)",
+            "bsv_analyzer cargo foo 0.1.0 example_mod/func().(x)",
         );
     }
 
@@ -546,7 +546,7 @@ pub mod example_mod {
     }
 }
 "#,
-            "rust-analyzer cargo foo 0.1.0 example_mod/func().(x)",
+            "bsv_analyzer cargo foo 0.1.0 example_mod/func().(x)",
         );
     }
 
@@ -585,7 +585,7 @@ pub mod example_mod {
         pub i: i32,
     }
     "#,
-            "rust-analyzer cargo main . foo/Bar#",
+            "bsv_analyzer cargo main . foo/Bar#",
         );
     }
 
@@ -604,7 +604,7 @@ pub mod example_mod {
         pub i: i32,
     }
     "#,
-            "rust-analyzer cargo main . foo/Bar#",
+            "bsv_analyzer cargo main . foo/Bar#",
         );
     }
 
@@ -615,7 +615,7 @@ pub mod example_mod {
     //- /workspace/lib.rs crate:main
     pub type MyTypeAlias$0 = u8;
     "#,
-            "rust-analyzer cargo main . MyTypeAlias#",
+            "bsv_analyzer cargo main . MyTypeAlias#",
         );
     }
 

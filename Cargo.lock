@@ -106,6 +106,67 @@ dependencies = [
 ]
 
 [[package]]
+name = "bsv-analyzer"
+version = "0.0.0"
+dependencies = [
+ "always-assert",
+ "anyhow",
+ "cargo_metadata",
+ "cfg",
+ "crossbeam-channel",
+ "dirs",
+ "dissimilar",
+ "expect-test",
+ "hir",
+ "hir-def",
+ "hir-ty",
+ "ide",
+ "ide-db",
+ "ide-ssr",
+ "intern",
+ "itertools",
+ "load-cargo",
+ "lsp-server 0.7.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lsp-types",
+ "memchr",
+ "mimalloc",
+ "nohash-hasher",
+ "num_cpus",
+ "oorandom",
+ "parking_lot",
+ "parser",
+ "paths",
+ "proc-macro-api",
+ "process-wrap",
+ "profile",
+ "project-model",
+ "rayon",
+ "rustc-hash",
+ "scip",
+ "semver",
+ "serde",
+ "serde_json",
+ "stdx",
+ "syntax",
+ "syntax-bridge",
+ "test-fixture",
+ "test-utils",
+ "tikv-jemallocator",
+ "toml",
+ "toolchain",
+ "tracing",
+ "tracing-subscriber",
+ "tracing-tree",
+ "triomphe",
+ "vfs",
+ "vfs-notify",
+ "walkdir",
+ "windows-sys 0.52.0",
+ "xflags",
+ "xshell",
+]
+
+[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1479,9 +1540,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.36"
+version = "1.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fa76aaf39101c457836aec0ce2316dbdc3ab723cdda1c6bd4e6ad4208acaca7"
+checksum = "b5b9d34b8991d19d98081b46eacdd8eb58c6f2b201139f7c5f643cc155a633af"
 dependencies = [
  "proc-macro2",
 ]
@@ -1633,67 +1694,6 @@ dependencies = [
  "memoffset",
  "rustc-hash",
  "text-size",
-]
-
-[[package]]
-name = "rust-analyzer"
-version = "0.0.0"
-dependencies = [
- "always-assert",
- "anyhow",
- "cargo_metadata",
- "cfg",
- "crossbeam-channel",
- "dirs",
- "dissimilar",
- "expect-test",
- "hir",
- "hir-def",
- "hir-ty",
- "ide",
- "ide-db",
- "ide-ssr",
- "intern",
- "itertools",
- "load-cargo",
- "lsp-server 0.7.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "lsp-types",
- "memchr",
- "mimalloc",
- "nohash-hasher",
- "num_cpus",
- "oorandom",
- "parking_lot",
- "parser",
- "paths",
- "proc-macro-api",
- "process-wrap",
- "profile",
- "project-model",
- "rayon",
- "rustc-hash",
- "scip",
- "semver",
- "serde",
- "serde_json",
- "stdx",
- "syntax",
- "syntax-bridge",
- "test-fixture",
- "test-utils",
- "tikv-jemallocator",
- "toml",
- "toolchain",
- "tracing",
- "tracing-subscriber",
- "tracing-tree",
- "triomphe",
- "vfs",
- "vfs-notify",
- "walkdir",
- "windows-sys 0.52.0",
- "xflags",
- "xshell",
 ]
 
 [[package]]

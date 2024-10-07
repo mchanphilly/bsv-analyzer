@@ -82,7 +82,7 @@ fn run() -> io::Result<()> {
                 msg::SpanMode::Id => {
                     msg::Response::ExpandMacro(srv.expand(*task).map(|(it, _)| it))
                 }
-                msg::SpanMode::RustAnalyzer => msg::Response::ExpandMacroExtended(
+                msg::SpanMode::BsvAnalyzer => msg::Response::ExpandMacroExtended(
                     srv.expand(*task).map(|(tree, span_data_table)| msg::ExpandMacroExtended {
                         tree,
                         span_data_table,

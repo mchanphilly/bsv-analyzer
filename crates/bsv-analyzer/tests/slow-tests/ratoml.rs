@@ -8,8 +8,8 @@ use lsp_types::{
 };
 use paths::Utf8PathBuf;
 
-use rust_analyzer::config::Config;
-use rust_analyzer::lsp::ext::{
+use bsv_analyzer::config::Config;
+use bsv_analyzer::lsp::ext::{
     InternalTestingFetchConfig, InternalTestingFetchConfigOption, InternalTestingFetchConfigParams,
     InternalTestingFetchConfigResponse,
 };
@@ -216,7 +216,7 @@ enum Value {
 /// FIXME @alibektas : This test is atm not valid.
 /// Asking for client config from the client is a 2 way communication
 /// which we cannot imitate with the current slow-tests infrastructure.
-/// See rust-analyzer::handlers::notifications#197
+/// See bsv-analyzer::handlers::notifications#197
 //     #[test]
 //     fn client_config_update() {
 //         setup();
@@ -266,7 +266,7 @@ enum Value {
 // edition = "2021"
 // "#,
 //                 r#"
-// //- /p1/rust-analyzer.toml
+// //- /p1/bsv-analyzer.toml
 // assist.emitMustUse = true
 // "#,
 //                 r#"
@@ -294,7 +294,7 @@ fn ratoml_user_config_detected() {
     let server = RatomlTest::new(
         vec![
             r#"
-//- /$$CONFIG_DIR$$/rust-analyzer/rust-analyzer.toml
+//- /$$CONFIG_DIR$$/bsv-analyzer/bsv-analyzer.toml
 assist.emitMustUse = true
 "#,
             r#"
@@ -354,7 +354,7 @@ enum Value {
         InternalTestingFetchConfigResponse::AssistEmitMustUse(false),
     );
     server.create(
-        "//- /$$CONFIG_DIR$$/rust-analyzer/rust-analyzer.toml",
+        "//- /$$CONFIG_DIR$$/bsv-analyzer/bsv-analyzer.toml",
         RatomlTest::EMIT_MUST_USE.to_owned(),
     );
     server.query(
@@ -386,7 +386,7 @@ enum Value {
     Text(String),
 }"#,
             r#"
-//- /$$CONFIG_DIR$$/rust-analyzer/rust-analyzer.toml
+//- /$$CONFIG_DIR$$/bsv-analyzer/bsv-analyzer.toml
 assist.emitMustUse = true"#,
         ],
         vec!["p1"],
@@ -428,7 +428,7 @@ enum Value {
     Text(String),
 }"#,
             r#"
-//- /$$CONFIG_DIR$$/rust-analyzer/rust-analyzer.toml
+//- /$$CONFIG_DIR$$/bsv-analyzer/bsv-analyzer.toml
 assist.emitMustUse = true"#,
         ],
         vec!["p1"],
@@ -465,7 +465,7 @@ version = "0.1.0"
 edition = "2021"
 "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 assist.emitMustUse = true
 "#,
             r#"
@@ -516,7 +516,7 @@ version = "0.1.0"
 edition = "2021"
 "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 assist.emitMustUse = false
 "#,
             r#"
@@ -573,7 +573,7 @@ version = "0.1.0"
 edition = "2021"
 "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 assist.emitMustUse = true
 "#,
             r#"
@@ -630,7 +630,7 @@ version = "0.1.0"
 edition = "2021"
 "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 assist.emitMustUse = true
 "#,
             r#"
@@ -662,7 +662,7 @@ pub fn add(left: usize, right: usize) -> usize {
         3,
         InternalTestingFetchConfigResponse::AssistEmitMustUse(true),
     );
-    server.create("//- /p1/p2/rust-analyzer.toml", RatomlTest::EMIT_MUST_NOT_USE.to_owned());
+    server.create("//- /p1/p2/bsv-analyzer.toml", RatomlTest::EMIT_MUST_NOT_USE.to_owned());
     server.query(
         InternalTestingFetchConfigOption::AssistEmitMustUse,
         3,
@@ -688,7 +688,7 @@ version = "0.1.0"
 edition = "2021"
 "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 assist.emitMustUse = true
 "#,
             r#"
@@ -745,7 +745,7 @@ version = "0.1.0"
 edition = "2021"
 "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 assist.emitMustUse = true
 "#,
             r#"
@@ -800,11 +800,11 @@ fn ratoml_multiple_ratoml_in_single_source_root() {
         edition = "2021"
         "#,
             r#"
-        //- /p1/rust-analyzer.toml
+        //- /p1/bsv-analyzer.toml
         assist.emitMustUse = true
         "#,
             r#"
-        //- /p1/src/rust-analyzer.toml
+        //- /p1/src/bsv-analyzer.toml
         assist.emitMustUse = false
         "#,
             r#"
@@ -880,7 +880,7 @@ fn ratoml_multiple_ratoml_in_single_source_root() {
 // [dependencies]
 // "#,
 //                 r#"
-// //- /p2/rust-analyzer.toml
+// //- /p2/bsv-analyzer.toml
 // # DEF
 // assist.emitMustUse = true
 // "#,
@@ -914,7 +914,7 @@ version = "0.1.0"
 edition = "2021"
         "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 check.workspace = false
         "#,
             r#"
@@ -950,7 +950,7 @@ version = "0.1.0"
 edition = "2021"
         "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 check.workspace = false
     "#,
             r#"
@@ -992,7 +992,7 @@ version = "0.1.0"
 edition = "2021"
         "#,
             r#"
-//- /p1/rust-analyzer.toml
+//- /p1/bsv-analyzer.toml
 check.workspace = false
        "#,
             r#"

@@ -8,7 +8,7 @@ use syntax::{algo::ancestors_at_offset, ast, AstNode, TextRange};
 // |===
 // | Editor  | Action Name
 //
-// | VS Code | **rust-analyzer: Interpret Function**
+// | VS Code | **bsv-analyzer: Interpret Function**
 // |===
 pub(crate) fn interpret_function(db: &RootDatabase, position: FilePosition) -> String {
     let start_time = Instant::now();

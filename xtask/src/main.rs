@@ -44,12 +44,12 @@ fn main() -> anyhow::Result<()> {
         flags::XtaskCmd::Codegen(cmd) => cmd.run(sh),
         flags::XtaskCmd::Bb(cmd) => {
             {
-                let _d = sh.push_dir("./crates/rust-analyzer");
+                let _d = sh.push_dir("./crates/bsv-analyzer");
                 cmd!(sh, "cargo build --release --features jemalloc").run()?;
             }
             sh.copy_file(
-                "./target/release/rust-analyzer",
-                format!("./target/rust-analyzer-{}", cmd.suffix),
+                "./target/release/bsv-analyzer",
+                format!("./target/bsv-analyzer-{}", cmd.suffix),
             )?;
             Ok(())
         }

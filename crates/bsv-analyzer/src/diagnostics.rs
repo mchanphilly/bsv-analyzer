@@ -181,7 +181,7 @@ pub(crate) fn fetch_native_diagnostics(
             code_description: Some(lsp_types::CodeDescription {
                 href: lsp_types::Url::parse(&d.code.url()).unwrap(),
             }),
-            source: Some("rust-analyzer".to_owned()),
+            source: Some("bsv_analyzer".to_owned()),
             message: d.message,
             related_information: None,
             tags: d.unused.then(|| vec![lsp_types::DiagnosticTag::UNNECESSARY]),

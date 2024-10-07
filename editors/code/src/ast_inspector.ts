@@ -1,22 +1,22 @@
 import * as vscode from "vscode";
 
 import type { Ctx, Disposable } from "./ctx";
-import { type RustEditor, isRustEditor, unwrapUndefinable } from "./util";
+import { type BsvEditor, isBsvEditor, unwrapUndefinable } from "./util";
 
 // FIXME: consider implementing this via the Tree View API?
 // https://code.visualstudio.com/api/extension-guides/tree-view
 export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProvider, Disposable {
     private readonly astDecorationType = vscode.window.createTextEditorDecorationType({
-        borderColor: new vscode.ThemeColor("rust_analyzer.syntaxTreeBorder"),
+        borderColor: new vscode.ThemeColor("bsv_analyzer.syntaxTreeBorder"),
         borderStyle: "solid",
         borderWidth: "2px",
     });
-    private rustEditor: undefined | RustEditor;
+    private BsvEditor: undefined | BsvEditor;
 
     // Lazy rust token range -> syntax tree file range.
     private readonly rust2Ast = new Lazy(() => {
         const astEditor = this.findAstTextEditor();
-        if (!this.rustEditor || !astEditor) return undefined;
+        if (!this.BsvEditor || !astEditor) return undefined;
 
         const buf: [vscode.Range, vscode.Range][] = [];
         for (let i = 0; i < astEditor.document.lineCount; ++i) {
@@ -26,7 +26,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
             const isTokenNode = astLine.text.lastIndexOf('"') >= 0;
             if (!isTokenNode) continue;
 
-            const rustRange = this.parseRustTextRange(this.rustEditor.document, astLine.text);
+            const rustRange = this.parseRustTextRange(this.BsvEditor.document, astLine.text);
             if (!rustRange) continue;
 
             buf.push([rustRange, this.findAstNodeRange(astLine)]);
@@ -36,7 +36,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
 
     constructor(ctx: Ctx) {
         ctx.pushExtCleanup(
-            vscode.languages.registerHoverProvider({ scheme: "rust-analyzer" }, this),
+            vscode.languages.registerHoverProvider({ scheme: "bsv-analyzer" }, this),
         );
         ctx.pushExtCleanup(vscode.languages.registerDefinitionProvider({ language: "rust" }, this));
         vscode.workspace.onDidCloseTextDocument(
@@ -56,44 +56,44 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
         );
     }
     dispose() {
-        this.setRustEditor(undefined);
+        this.setBsvEditor(undefined);
     }
 
     private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
         if (
-            this.rustEditor &&
-            event.document.uri.toString() === this.rustEditor.document.uri.toString()
+            this.BsvEditor &&
+            event.document.uri.toString() === this.BsvEditor.document.uri.toString()
         ) {
             this.rust2Ast.reset();
         }
     }
 
     private onDidCloseTextDocument(doc: vscode.TextDocument) {
-        if (this.rustEditor && doc.uri.toString() === this.rustEditor.document.uri.toString()) {
-            this.setRustEditor(undefined);
+        if (this.BsvEditor && doc.uri.toString() === this.BsvEditor.document.uri.toString()) {
+            this.setBsvEditor(undefined);
         }
     }
 
     private onDidChangeVisibleTextEditors(editors: readonly vscode.TextEditor[]) {
         if (!this.findAstTextEditor()) {
-            this.setRustEditor(undefined);
+            this.setBsvEditor(undefined);
             return;
         }
-        this.setRustEditor(editors.find(isRustEditor));
+        this.setBsvEditor(editors.find(isBsvEditor));
     }
 
     private findAstTextEditor(): undefined | vscode.TextEditor {
         return vscode.window.visibleTextEditors.find(
-            (it) => it.document.uri.scheme === "rust-analyzer",
+            (it) => it.document.uri.scheme === "bsv-analyzer",
         );
     }
 
-    private setRustEditor(newRustEditor: undefined | RustEditor) {
-        if (this.rustEditor && this.rustEditor !== newRustEditor) {
-            this.rustEditor.setDecorations(this.astDecorationType, []);
+    private setBsvEditor(newBsvEditor: undefined | BsvEditor) {
+        if (this.BsvEditor && this.BsvEditor !== newBsvEditor) {
+            this.BsvEditor.setDecorations(this.astDecorationType, []);
             this.rust2Ast.reset();
         }
-        this.rustEditor = newRustEditor;
+        this.BsvEditor = newBsvEditor;
     }
 
     // additional positional params are omitted
@@ -101,7 +101,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
         doc: vscode.TextDocument,
         pos: vscode.Position,
     ): vscode.ProviderResult<vscode.DefinitionLink[]> {
-        if (!this.rustEditor || doc.uri.toString() !== this.rustEditor.document.uri.toString()) {
+        if (!this.BsvEditor || doc.uri.toString() !== this.BsvEditor.document.uri.toString()) {
             return;
         }
 
@@ -133,17 +133,17 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
         doc: vscode.TextDocument,
         hoverPosition: vscode.Position,
     ): vscode.ProviderResult<vscode.Hover> {
-        if (!this.rustEditor) return;
+        if (!this.BsvEditor) return;
 
         const astFileLine = doc.lineAt(hoverPosition.line);
 
-        const rustFileRange = this.parseRustTextRange(this.rustEditor.document, astFileLine.text);
+        const rustFileRange = this.parseRustTextRange(this.BsvEditor.document, astFileLine.text);
         if (!rustFileRange) return;
 
-        this.rustEditor.setDecorations(this.astDecorationType, [rustFileRange]);
-        this.rustEditor.revealRange(rustFileRange);
+        this.BsvEditor.setDecorations(this.astDecorationType, [rustFileRange]);
+        this.BsvEditor.revealRange(rustFileRange);
 
-        const rustSourceCode = this.rustEditor.document.getText(rustFileRange);
+        const rustSourceCode = this.BsvEditor.document.getText(rustFileRange);
         const astFileRange = this.findAstNodeRange(astFileLine);
 
         return new vscode.Hover(["```rust\n" + rustSourceCode + "\n```"], astFileRange);

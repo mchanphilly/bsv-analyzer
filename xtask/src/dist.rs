@@ -98,7 +98,7 @@ fn dist_server(
 
     let target_name = &target.name;
     let features = allocator.to_features();
-    cmd!(sh, "cargo build --manifest-path ./crates/rust-analyzer/Cargo.toml --bin rust-analyzer --target {target_name} {features...} --release").run()?;
+    cmd!(sh, "cargo build --manifest-path ./crates/bsv-analyzer/Cargo.toml --bin bsv-analyzer --target {target_name} {features...} --release").run()?;
 
     let dst = Path::new("dist").join(&target.artifact_name);
     gzip(&target.server_path, &dst.with_extension("gz"))?;
@@ -182,8 +182,8 @@ impl Target {
         } else {
             (String::new(), None)
         };
-        let server_path = out_path.join(format!("rust-analyzer{exe_suffix}"));
-        let artifact_name = format!("rust-analyzer-{name}{exe_suffix}");
+        let server_path = out_path.join(format!("bsv-analyzer{exe_suffix}"));
+        let artifact_name = format!("bsv-analyzer-{name}{exe_suffix}");
         Self { name, server_path, symbols_path, artifact_name }
     }
 }

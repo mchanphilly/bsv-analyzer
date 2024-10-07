@@ -150,7 +150,7 @@ fn test_deserialization() {
     assert!(matches!(message, DiscoverProjectData::Error { .. }));
 
     let message = r#"
-    {"kind": "finished", "project": {"sysroot": "foo", "crates": [], "runnables": []}, "buildfile":"rust-analyzer/BUILD"}
+    {"kind": "finished", "project": {"sysroot": "foo", "crates": [], "runnables": []}, "buildfile":"bsv-analyzer/BUILD"}
     "#;
 
     let message: DiscoverProjectData =

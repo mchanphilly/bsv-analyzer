@@ -6,11 +6,11 @@ import { Config, prepareVSCodeConfig } from "./config";
 import { createClient } from "./client";
 import {
     isDocumentInWorkspace,
-    isRustDocument,
-    isRustEditor,
+    isBsvDocument,
+    isBsvEditor,
     LazyOutputChannel,
     log,
-    type RustEditor,
+    type BsvEditor,
 } from "./util";
 import type { ServerStatusParams } from "./lsp_ext";
 import {
@@ -25,7 +25,7 @@ import { bootstrap } from "./bootstrap";
 import { prepareTestExplorer } from "./test_explorer";
 import { spawn } from "node:child_process";
 import { text } from "node:stream/consumers";
-import type { RustAnalyzerExtensionApi } from "./main";
+import type { BsvAnalyzerExtensionApi } from "./main";
 
 // We only support local folders, not eg. Live Share (`vlsl:` scheme), so don't activate if
 // only those are in use. We use "Empty" to represent these scenarios
@@ -46,7 +46,7 @@ export function fetchWorkspace(): Workspace {
         (folder) => folder.uri.scheme === "file",
     );
     const rustDocuments = vscode.workspace.textDocuments.filter((document) =>
-        isRustDocument(document),
+        isBsvDocument(document),
     );
 
     return folders.length === 0
@@ -68,7 +68,7 @@ export type CtxInit = Ctx & {
     readonly client: lc.LanguageClient;
 };
 
-export class Ctx implements RustAnalyzerExtensionApi {
+export class Ctx implements BsvAnalyzerExtensionApi {
     readonly statusBar: vscode.StatusBarItem;
     readonly config: Config;
     readonly workspace: Workspace;
@@ -121,8 +121,8 @@ export class Ctx implements RustAnalyzerExtensionApi {
         this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         if (this.config.testExplorer) {
             this.testController = vscode.tests.createTestController(
-                "rustAnalyzerTestController",
-                "Rust Analyzer test controller",
+                "BsvAnalyzerTestController",
+                "BSV Analyzer test controller",
             );
         }
         this.workspace = workspace;
@@ -177,11 +177,11 @@ export class Ctx implements RustAnalyzerExtensionApi {
         }
 
         if (!this.traceOutputChannel) {
-            this.traceOutputChannel = new LazyOutputChannel("Rust Analyzer Language Server Trace");
+            this.traceOutputChannel = new LazyOutputChannel("BSV Analyzer Language Server Trace");
             this.pushExtCleanup(this.traceOutputChannel);
         }
         if (!this.outputChannel) {
-            this.outputChannel = vscode.window.createOutputChannel("Rust Analyzer Language Server");
+            this.outputChannel = vscode.window.createOutputChannel("BSV Analyzer Language Server");
             this.pushExtCleanup(this.outputChannel);
         }
 
@@ -189,7 +189,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             this._serverPath = await this.bootstrap();
             text(spawn(this._serverPath, ["--version"]).stdout.setEncoding("utf-8")).then(
                 (data) => {
-                    const prefix = `rust-analyzer `;
+                    const prefix = `bsv-analyzer `;
                     this._serverVersion = data
                         .slice(data.startsWith(prefix) ? prefix.length : 0)
                         .trim();
@@ -210,7 +210,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 debug: run,
             };
 
-            let rawInitializationOptions = vscode.workspace.getConfiguration("rust-analyzer");
+            let rawInitializationOptions = vscode.workspace.getConfiguration("bsv-analyzer");
 
             if (this.workspace.kind === "Detached Files") {
                 rawInitializationOptions = {
@@ -311,10 +311,10 @@ export class Ctx implements RustAnalyzerExtensionApi {
         });
     }
 
-    private shouldRevealDependency(e: vscode.TextEditor | undefined): e is RustEditor {
+    private shouldRevealDependency(e: vscode.TextEditor | undefined): e is BsvEditor {
         return (
             e !== undefined &&
-            isRustEditor(e) &&
+            isBsvEditor(e) &&
             !isDocumentInWorkspace(e.document) &&
             (this.treeView?.visible || false)
         );
@@ -352,9 +352,9 @@ export class Ctx implements RustAnalyzerExtensionApi {
         this._client = undefined;
     }
 
-    get activeRustEditor(): RustEditor | undefined {
+    get activeBsvEditor(): BsvEditor | undefined {
         const editor = vscode.window.activeTextEditor;
-        return editor && isRustEditor(editor) ? editor : undefined;
+        return editor && isBsvEditor(editor) ? editor : undefined;
     }
 
     get extensionPath(): string {
@@ -375,7 +375,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
         };
 
         for (const [name, factory] of Object.entries(this.commandFactories)) {
-            const fullName = `rust-analyzer.${name}`;
+            const fullName = `bsv-analyzer.${name}`;
             let callback;
             if (isClientRunning(this)) {
                 // we asserted that `client` is defined
@@ -385,7 +385,7 @@ export class Ctx implements RustAnalyzerExtensionApi {
             } else {
                 callback = () =>
                     vscode.window.showErrorMessage(
-                        `command ${fullName} failed: rust-analyzer server is not running`,
+                        `command ${fullName} failed: bsv-analyzer server is not running`,
                     );
             }
 
@@ -412,9 +412,9 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 statusBar.color = undefined;
                 statusBar.backgroundColor = undefined;
                 if (this.config.statusBarClickAction === "stopServer") {
-                    statusBar.command = "rust-analyzer.stopServer";
+                    statusBar.command = "bsv-analyzer.stopServer";
                 } else {
-                    statusBar.command = "rust-analyzer.openLogs";
+                    statusBar.command = "bsv-analyzer.openLogs";
                 }
                 this.dependencies?.refresh();
                 break;
@@ -423,26 +423,26 @@ export class Ctx implements RustAnalyzerExtensionApi {
                 statusBar.backgroundColor = new vscode.ThemeColor(
                     "statusBarItem.warningBackground",
                 );
-                statusBar.command = "rust-analyzer.openLogs";
+                statusBar.command = "bsv-analyzer.openLogs";
                 icon = "$(warning) ";
                 break;
             case "error":
                 statusBar.color = new vscode.ThemeColor("statusBarItem.errorForeground");
                 statusBar.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
-                statusBar.command = "rust-analyzer.openLogs";
+                statusBar.command = "bsv-analyzer.openLogs";
                 icon = "$(error) ";
                 break;
             case "stopped":
                 statusBar.tooltip.appendText("Server is stopped");
                 statusBar.tooltip.appendMarkdown(
-                    "\n\n[Start server](command:rust-analyzer.startServer)",
+                    "\n\n[Start server](command:bsv-analyzer.startServer)",
                 );
                 statusBar.color = new vscode.ThemeColor("statusBarItem.warningForeground");
                 statusBar.backgroundColor = new vscode.ThemeColor(
                     "statusBarItem.warningBackground",
                 );
-                statusBar.command = "rust-analyzer.startServer";
-                statusBar.text = "$(stop-circle) rust-analyzer";
+                statusBar.command = "bsv-analyzer.startServer";
+                statusBar.text = "$(stop-circle) bsv-analyzer";
                 return;
         }
         if (status.message) {
@@ -454,22 +454,22 @@ export class Ctx implements RustAnalyzerExtensionApi {
 
         const toggleCheckOnSave = this.config.checkOnSave ? "Disable" : "Enable";
         statusBar.tooltip.appendMarkdown(
-            `[Extension Info](command:rust-analyzer.serverVersion "Show version and server binary info"): Version ${this.version}, Server Version ${this._serverVersion}` +
+            `[Extension Info](command:bsv-analyzer.serverVersion "Show version and server binary info"): Version ${this.version}, Server Version ${this._serverVersion}` +
                 "\n\n---\n\n" +
-                '[$(terminal) Open Logs](command:rust-analyzer.openLogs "Open the server logs")' +
+                '[$(terminal) Open Logs](command:bsv-analyzer.openLogs "Open the server logs")' +
                 "\n\n" +
-                `[$(settings) ${toggleCheckOnSave} Check on Save](command:rust-analyzer.toggleCheckOnSave "Temporarily ${toggleCheckOnSave.toLowerCase()} check on save functionality")` +
+                `[$(settings) ${toggleCheckOnSave} Check on Save](command:bsv-analyzer.toggleCheckOnSave "Temporarily ${toggleCheckOnSave.toLowerCase()} check on save functionality")` +
                 "\n\n" +
-                '[$(refresh) Reload Workspace](command:rust-analyzer.reloadWorkspace "Reload and rediscover workspaces")' +
+                '[$(refresh) Reload Workspace](command:bsv-analyzer.reloadWorkspace "Reload and rediscover workspaces")' +
                 "\n\n" +
-                '[$(symbol-property) Rebuild Build Dependencies](command:rust-analyzer.rebuildProcMacros "Rebuild build scripts and proc-macros")' +
+                '[$(symbol-property) Rebuild Build Dependencies](command:bsv-analyzer.rebuildProcMacros "Rebuild build scripts and proc-macros")' +
                 "\n\n" +
-                '[$(stop-circle) Stop server](command:rust-analyzer.stopServer "Stop the server")' +
+                '[$(stop-circle) Stop server](command:bsv-analyzer.stopServer "Stop the server")' +
                 "\n\n" +
-                '[$(debug-restart) Restart server](command:rust-analyzer.restartServer "Restart the server")',
+                '[$(debug-restart) Restart server](command:bsv-analyzer.restartServer "Restart the server")',
         );
         if (!status.quiescent) icon = "$(loading~spin) ";
-        statusBar.text = `${icon}rust-analyzer`;
+        statusBar.text = `${icon}bsv-analyzer`;
     }
 
     pushExtCleanup(d: Disposable) {

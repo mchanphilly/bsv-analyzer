@@ -1,4 +1,4 @@
-//! Conversion of rust-analyzer specific types to lsp_types equivalents.
+//! Conversion of bsv-analyzer (using rust-analyzer) specific types to lsp_types equivalents.
 use std::{
     iter::once,
     mem,
@@ -1734,7 +1734,7 @@ pub(crate) mod command {
 
         lsp_types::Command {
             title,
-            command: "rust-analyzer.showReferences".into(),
+            command: "bsv-analyzer.showReferences".into(),
             arguments: Some(vec![
                 to_value(uri).unwrap(),
                 to_value(position).unwrap(),
@@ -1746,7 +1746,7 @@ pub(crate) mod command {
     pub(crate) fn run_single(runnable: &lsp_ext::Runnable, title: &str) -> lsp_types::Command {
         lsp_types::Command {
             title: title.to_owned(),
-            command: "rust-analyzer.runSingle".into(),
+            command: "bsv-analyzer.runSingle".into(),
             arguments: Some(vec![to_value(runnable).unwrap()]),
         }
     }
@@ -1754,7 +1754,7 @@ pub(crate) mod command {
     pub(crate) fn debug_single(runnable: &lsp_ext::Runnable) -> lsp_types::Command {
         lsp_types::Command {
             title: "Debug".into(),
-            command: "rust-analyzer.debugSingle".into(),
+            command: "bsv-analyzer.debugSingle".into(),
             arguments: Some(vec![to_value(runnable).unwrap()]),
         }
     }
@@ -1762,7 +1762,7 @@ pub(crate) mod command {
     pub(crate) fn interpret_single(_runnable: &lsp_ext::Runnable) -> lsp_types::Command {
         lsp_types::Command {
             title: "Interpret".into(),
-            command: "rust-analyzer.interpretFunction".into(),
+            command: "bsv-analyzer.interpretFunction".into(),
             // FIXME: use the `_runnable` here.
             arguments: Some(vec![]),
         }
@@ -1783,7 +1783,7 @@ pub(crate) mod command {
 
         Some(lsp_types::Command {
             title: nav.name.to_string(),
-            command: "rust-analyzer.gotoLocation".into(),
+            command: "bsv-analyzer.gotoLocation".into(),
             arguments: Some(vec![value]),
         })
     }
@@ -1791,7 +1791,7 @@ pub(crate) mod command {
     pub(crate) fn trigger_parameter_hints() -> lsp_types::Command {
         lsp_types::Command {
             title: "triggerParameterHints".into(),
-            command: "rust-analyzer.triggerParameterHints".into(),
+            command: "bsv-analyzer.triggerParameterHints".into(),
             arguments: None,
         }
     }
@@ -1799,7 +1799,7 @@ pub(crate) mod command {
     pub(crate) fn rename() -> lsp_types::Command {
         lsp_types::Command {
             title: "rename".into(),
-            command: "rust-analyzer.rename".into(),
+            command: "bsv-analyzer.rename".into(),
             arguments: None,
         }
     }

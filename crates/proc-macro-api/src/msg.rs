@@ -40,7 +40,7 @@ pub enum Request {
 pub enum SpanMode {
     #[default]
     Id,
-    RustAnalyzer,
+    BsvAnalyzer,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -1,4 +1,4 @@
-//! rust-analyzer extensions to the LSP.
+//! bsv-analyzer (using rust-analyzer) extensions to the LSP.
 
 #![allow(clippy::disallowed_types)]
 
@@ -32,7 +32,7 @@ impl Request for InternalTestingFetchConfig {
     type Params = InternalTestingFetchConfigParams;
     // Option is solely to circumvent Default bound.
     type Result = Option<InternalTestingFetchConfigResponse>;
-    const METHOD: &'static str = "rust-analyzer-internal/internalTestingFetchConfig";
+    const METHOD: &'static str = "bsv-analyzer-internal/internalTestingFetchConfig";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -46,7 +46,7 @@ pub enum AnalyzerStatus {}
 impl Request for AnalyzerStatus {
     type Params = AnalyzerStatusParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/analyzerStatus";
+    const METHOD: &'static str = "bsv-analyzer/analyzerStatus";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -67,7 +67,7 @@ pub enum FetchDependencyList {}
 impl Request for FetchDependencyList {
     type Params = FetchDependencyListParams;
     type Result = FetchDependencyListResult;
-    const METHOD: &'static str = "rust-analyzer/fetchDependencyList";
+    const METHOD: &'static str = "bsv-analyzer/fetchDependencyList";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -85,7 +85,7 @@ pub enum MemoryUsage {}
 impl Request for MemoryUsage {
     type Params = ();
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/memoryUsage";
+    const METHOD: &'static str = "bsv-analyzer/memoryUsage";
 }
 
 pub enum ReloadWorkspace {}
@@ -93,7 +93,7 @@ pub enum ReloadWorkspace {}
 impl Request for ReloadWorkspace {
     type Params = ();
     type Result = ();
-    const METHOD: &'static str = "rust-analyzer/reloadWorkspace";
+    const METHOD: &'static str = "bsv-analyzer/reloadWorkspace";
 }
 
 pub enum RebuildProcMacros {}
@@ -101,7 +101,7 @@ pub enum RebuildProcMacros {}
 impl Request for RebuildProcMacros {
     type Params = ();
     type Result = ();
-    const METHOD: &'static str = "rust-analyzer/rebuildProcMacros";
+    const METHOD: &'static str = "bsv-analyzer/rebuildProcMacros";
 }
 
 pub enum SyntaxTree {}
@@ -109,7 +109,7 @@ pub enum SyntaxTree {}
 impl Request for SyntaxTree {
     type Params = SyntaxTreeParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/syntaxTree";
+    const METHOD: &'static str = "bsv-analyzer/syntaxTree";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -124,7 +124,7 @@ pub enum ViewHir {}
 impl Request for ViewHir {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewHir";
+    const METHOD: &'static str = "bsv-analyzer/viewHir";
 }
 
 pub enum ViewMir {}
@@ -132,7 +132,7 @@ pub enum ViewMir {}
 impl Request for ViewMir {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewMir";
+    const METHOD: &'static str = "bsv-analyzer/viewMir";
 }
 
 pub enum InterpretFunction {}
@@ -140,7 +140,7 @@ pub enum InterpretFunction {}
 impl Request for InterpretFunction {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/interpretFunction";
+    const METHOD: &'static str = "bsv-analyzer/interpretFunction";
 }
 
 pub enum ViewFileText {}
@@ -148,7 +148,7 @@ pub enum ViewFileText {}
 impl Request for ViewFileText {
     type Params = lsp_types::TextDocumentIdentifier;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewFileText";
+    const METHOD: &'static str = "bsv-analyzer/viewFileText";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -163,7 +163,7 @@ pub enum ViewCrateGraph {}
 impl Request for ViewCrateGraph {
     type Params = ViewCrateGraphParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewCrateGraph";
+    const METHOD: &'static str = "bsv-analyzer/viewCrateGraph";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -177,7 +177,7 @@ pub enum ViewItemTree {}
 impl Request for ViewItemTree {
     type Params = ViewItemTreeParams;
     type Result = String;
-    const METHOD: &'static str = "rust-analyzer/viewItemTree";
+    const METHOD: &'static str = "bsv-analyzer/viewItemTree";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -295,7 +295,7 @@ pub enum ExpandMacro {}
 impl Request for ExpandMacro {
     type Params = ExpandMacroParams;
     type Result = Option<ExpandedMacro>;
-    const METHOD: &'static str = "rust-analyzer/expandMacro";
+    const METHOD: &'static str = "bsv-analyzer/expandMacro";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -317,7 +317,7 @@ pub enum ViewRecursiveMemoryLayout {}
 impl Request for ViewRecursiveMemoryLayout {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = Option<RecursiveMemoryLayout>;
-    const METHOD: &'static str = "rust-analyzer/viewRecursiveMemoryLayout";
+    const METHOD: &'static str = "bsv-analyzer/viewRecursiveMemoryLayout";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -343,28 +343,28 @@ pub enum CancelFlycheck {}
 
 impl Notification for CancelFlycheck {
     type Params = ();
-    const METHOD: &'static str = "rust-analyzer/cancelFlycheck";
+    const METHOD: &'static str = "bsv-analyzer/cancelFlycheck";
 }
 
 pub enum RunFlycheck {}
 
 impl Notification for RunFlycheck {
     type Params = RunFlycheckParams;
-    const METHOD: &'static str = "rust-analyzer/runFlycheck";
+    const METHOD: &'static str = "bsv-analyzer/runFlycheck";
 }
 
 pub enum ClearFlycheck {}
 
 impl Notification for ClearFlycheck {
     type Params = ();
-    const METHOD: &'static str = "rust-analyzer/clearFlycheck";
+    const METHOD: &'static str = "bsv-analyzer/clearFlycheck";
 }
 
 pub enum OpenServerLogs {}
 
 impl Notification for OpenServerLogs {
     type Params = ();
-    const METHOD: &'static str = "rust-analyzer/openServerLogs";
+    const METHOD: &'static str = "bsv-analyzer/openServerLogs";
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -490,7 +490,7 @@ pub enum RelatedTests {}
 impl Request for RelatedTests {
     type Params = lsp_types::TextDocumentPositionParams;
     type Result = Vec<TestInfo>;
-    const METHOD: &'static str = "rust-analyzer/relatedTests";
+    const METHOD: &'static str = "bsv-analyzer/relatedTests";
 }
 
 #[derive(Debug, Deserialize, Serialize)]

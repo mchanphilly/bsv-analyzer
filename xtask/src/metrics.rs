@@ -77,7 +77,7 @@ impl Metrics {
         cmd!(sh, "cargo fetch").run()?;
 
         let time = Instant::now();
-        cmd!(sh, "cargo build --release --package rust-analyzer --bin rust-analyzer").run()?;
+        cmd!(sh, "cargo build --release --package bsv-analyzer --bin bsv-analyzer").run()?;
         let time = time.elapsed();
         self.report("build", time.as_millis() as u64, "ms".into());
         Ok(())
@@ -92,7 +92,7 @@ impl Metrics {
         )
         .run()?;
 
-        let output = cmd!(sh, "./target/release/rust-analyzer rustc-tests ./rust").read()?;
+        let output = cmd!(sh, "./target/release/bsv-analyzer rustc-tests ./rust").read()?;
         for (metric, value, unit) in parse_metrics(&output) {
             self.report(metric, value, unit.into());
         }
@@ -117,7 +117,7 @@ impl Metrics {
     ) -> anyhow::Result<()> {
         assert!(Path::new(path).exists(), "unable to find bench in {path}");
         eprintln!("\nMeasuring analysis-stats/{name}");
-        let output = cmd!(sh, "./target/release/rust-analyzer -q analysis-stats {path}").read()?;
+        let output = cmd!(sh, "./target/release/bsv-analyzer -q analysis-stats {path}").read()?;
         for (metric, value, unit) in parse_metrics(&output) {
             self.report(&format!("analysis-stats/{name}/{metric}"), value, unit.into());
         }

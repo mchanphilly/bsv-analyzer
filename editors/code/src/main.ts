@@ -8,20 +8,20 @@ import { activateTaskProvider } from "./tasks";
 import { setContextValue } from "./util";
 import { initializeDebugSessionTrackingAndRebuild } from "./debug";
 
-const RUST_PROJECT_CONTEXT_NAME = "inRustProject";
+const BSV_PROJECT_CONTEXT_NAME = "inBsvProject";
 
-export interface RustAnalyzerExtensionApi {
+export interface BsvAnalyzerExtensionApi {
     // FIXME: this should be non-optional
     readonly client?: lc.LanguageClient;
 }
 
 export async function deactivate() {
-    await setContextValue(RUST_PROJECT_CONTEXT_NAME, undefined);
+    await setContextValue(BSV_PROJECT_CONTEXT_NAME, undefined);
 }
 
 export async function activate(
     context: vscode.ExtensionContext,
-): Promise<RustAnalyzerExtensionApi> {
+): Promise<BsvAnalyzerExtensionApi> {
     checkConflictingExtensions();
 
     const ctx = new Ctx(context, createCommands(), fetchWorkspace());
@@ -29,15 +29,15 @@ export async function activate(
     // so we do it ourselves.
     const api = await activateServer(ctx).catch((err) => {
         void vscode.window.showErrorMessage(
-            `Cannot activate rust-analyzer extension: ${err.message}`,
+            `Cannot activate bsv-analyzer extension: ${err.message}`,
         );
         throw err;
     });
-    await setContextValue(RUST_PROJECT_CONTEXT_NAME, true);
+    await setContextValue(BSV_PROJECT_CONTEXT_NAME, true);
     return api;
 }
 
-async function activateServer(ctx: Ctx): Promise<RustAnalyzerExtensionApi> {
+async function activateServer(ctx: Ctx): Promise<BsvAnalyzerExtensionApi> {
     if (ctx.workspace.kind === "Workspace Folder") {
         ctx.pushExtCleanup(activateTaskProvider(ctx.config));
     }
@@ -199,7 +199,7 @@ function checkConflictingExtensions() {
     if (vscode.extensions.getExtension("rust-lang.rust")) {
         vscode.window
             .showWarningMessage(
-                `You have both the rust-analyzer (rust-lang.rust-analyzer) and Rust (rust-lang.rust) ` +
+                `You have both the bsv-analyzer (rust-lang.bsv-analyzer) and Rust (rust-lang.rust) ` +
                     "plugins enabled. These are known to conflict and cause various functions of " +
                     "both plugins to not work correctly. You should disable one of them.",
                 "Got it",

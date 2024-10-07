@@ -27,7 +27,7 @@ use lsp_types::{
     InlayHint, InlayHintLabel, InlayHintParams, PartialResultParams, Position, Range,
     RenameFilesParams, TextDocumentItem, TextDocumentPositionParams, WorkDoneProgressParams,
 };
-use rust_analyzer::lsp::ext::{OnEnter, Runnables, RunnablesParams};
+use bsv_analyzer::lsp::ext::{OnEnter, Runnables, RunnablesParams};
 use serde_json::json;
 use stdx::format_to_acc;
 
@@ -1073,7 +1073,7 @@ fn root_contains_symlink_out_dirs_check() {
 }
 
 #[test]
-#[cfg(any(feature = "sysroot-abi", rust_analyzer))]
+#[cfg(any(feature = "sysroot-abi", bsv_analyzer))]
 fn resolve_proc_macro() {
     use expect_test::expect;
     use vfs::AbsPathBuf;

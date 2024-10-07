@@ -99,7 +99,7 @@ impl ProcMacroProcessSrv {
 
     fn enable_rust_analyzer_spans(&self) -> Result<SpanMode, ServerError> {
         let request = Request::SetConfig(crate::msg::ServerConfig {
-            span_mode: crate::msg::SpanMode::RustAnalyzer,
+            span_mode: crate::msg::SpanMode::BsvAnalyzer,
         });
         let response = self.send_task(request)?;
 

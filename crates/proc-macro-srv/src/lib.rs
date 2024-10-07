@@ -90,7 +90,7 @@ impl<'env> ProcMacroSrv<'env> {
 
         let result = match span_mode {
             SpanMode::Id => expand_id(data, expander).map(|it| (it, vec![])),
-            SpanMode::RustAnalyzer => expand_ra_span(data, expander),
+            SpanMode::BsvAnalyzer => expand_ra_span(data, expander),
         };
 
         prev_env.rollback();

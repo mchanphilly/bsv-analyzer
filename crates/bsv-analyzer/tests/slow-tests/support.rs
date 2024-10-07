@@ -10,7 +10,7 @@ use lsp_server::{Connection, Message, Notification, Request};
 use lsp_types::{notification::Exit, request::Shutdown, TextDocumentIdentifier, Url};
 use parking_lot::{Mutex, MutexGuard};
 use paths::{Utf8Path, Utf8PathBuf};
-use rust_analyzer::{
+use bsv_analyzer::{
     config::{Config, ConfigChange, ConfigErrors},
     lsp, main_loop,
 };
@@ -96,7 +96,7 @@ impl Project<'_> {
 
         static INIT: Once = Once::new();
         INIT.call_once(|| {
-            let _ = rust_analyzer::tracing::Config {
+            let _ = bsv_analyzer::tracing::Config {
                 writer: TestWriter::default(),
                 // Deliberately enable all `error` logs if the user has not set RA_LOG, as there is usually
                 // useful information in there for debugging.

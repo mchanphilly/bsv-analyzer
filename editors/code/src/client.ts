@@ -70,7 +70,7 @@ export async function createClient(
                         (diag.message === "file not included in crate hierarchy" ||
                             diag.message.startsWith("This file is not included in any crates"))
                     ) {
-                        const config = vscode.workspace.getConfiguration("rust-analyzer");
+                        const config = vscode.workspace.getConfiguration("bsv-analyzer");
                         if (config.get("showUnlinkedFileNotification")) {
                             unlinkedFiles.push(uri);
                             const folder = vscode.workspace.getWorkspaceFolder(uri)?.uri.fsPath;
@@ -241,7 +241,7 @@ export async function createClient(
                             const action = new vscode.CodeAction(item.title, kind);
                             const group = (item as any).group;
                             action.command = {
-                                command: "rust-analyzer.resolveCodeAction",
+                                command: "bsv-analyzer.resolveCodeAction",
                                 title: item.title,
                                 arguments: [item],
                             };
@@ -270,7 +270,7 @@ export async function createClient(
                                 const item = unwrapUndefinable(items[0]);
                                 action.kind = item.kind;
                                 action.command = {
-                                    command: "rust-analyzer.applyActionGroup",
+                                    command: "bsv-analyzer.applyActionGroup",
                                     title: "",
                                     arguments: [
                                         items.map((item) => {
@@ -300,8 +300,8 @@ export async function createClient(
     };
 
     const client = new RaLanguageClient(
-        "rust-analyzer",
-        "Rust Analyzer Language Server",
+        "bsv-analyzer",
+        "BSV Language Server (based on rust-analyzer)",
         serverOptions,
         clientOptions,
     );
@@ -334,12 +334,12 @@ class ExperimentalFeatures implements lc.StaticFeature {
             testExplorer: this.testExplorer,
             commands: {
                 commands: [
-                    "rust-analyzer.runSingle",
-                    "rust-analyzer.debugSingle",
-                    "rust-analyzer.showReferences",
-                    "rust-analyzer.gotoLocation",
-                    "rust-analyzer.triggerParameterHints",
-                    "rust-analyzer.rename",
+                    "bsv-analyzer.runSingle",
+                    "bsv-analyzer.debugSingle",
+                    "bsv-analyzer.showReferences",
+                    "bsv-analyzer.gotoLocation",
+                    "bsv-analyzer.triggerParameterHints",
+                    "bsv-analyzer.rename",
                 ],
             },
             ...capabilities.experimental,
@@ -396,7 +396,7 @@ export let HOVER_REFERENCE_COMMAND: ra.CommandLink[] = [];
 
 function renderCommand(cmd: ra.CommandLink): string {
     HOVER_REFERENCE_COMMAND.push(cmd);
-    return `[${cmd.title}](command:rust-analyzer.hoverRefCommandProxy?${
+    return `[${cmd.title}](command:bsv-analyzer.hoverRefCommandProxy?${
         HOVER_REFERENCE_COMMAND.length - 1
     } '${cmd.tooltip}')`;
 }

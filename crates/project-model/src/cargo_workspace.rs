@@ -149,11 +149,11 @@ pub struct PackageData {
     /// Rust version as given in the `Cargo.toml`
     pub rust_version: Option<semver::Version>,
     /// The contents of [package.metadata.rust-analyzer]
-    pub metadata: RustAnalyzerPackageMetaData,
+    pub metadata: BsvAnalyzerPackageMetaData,
 }
 
 #[derive(Deserialize, Default, Debug, Clone, Eq, PartialEq)]
-pub struct RustAnalyzerPackageMetaData {
+pub struct BsvAnalyzerPackageMetaData {
     pub rustc_private: bool,
 }
 
@@ -251,8 +251,8 @@ impl TargetKind {
 // Deserialize helper for the cargo metadata
 #[derive(Deserialize, Default)]
 struct PackageMetadata {
-    #[serde(rename = "rust-analyzer")]
-    rust_analyzer: Option<RustAnalyzerPackageMetaData>,
+    #[serde(rename = "bsv_analyzer")]
+    rust_analyzer: Option<BsvAnalyzerPackageMetaData>,
 }
 
 impl CargoWorkspace {

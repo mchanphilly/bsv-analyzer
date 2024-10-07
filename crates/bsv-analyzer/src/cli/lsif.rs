@@ -163,7 +163,7 @@ impl LsifManager<'_> {
         if let Some(moniker) = token.moniker {
             let package_id = self.get_package_id(moniker.package_information);
             let moniker_id = self.add_vertex(lsif::Vertex::Moniker(lsp_types::Moniker {
-                scheme: "rust-analyzer".to_owned(),
+                scheme: "bsv_analyzer".to_owned(),
                 identifier: moniker.identifier.to_string(),
                 unique: lsp_types::UniquenessLevel::Scheme,
                 kind: Some(match moniker.kind {
@@ -314,7 +314,7 @@ impl flags::Lsif {
             project_root: lsp_types::Url::from_file_path(path).unwrap(),
             position_encoding: lsif::Encoding::Utf16,
             tool_info: Some(lsp_types::lsif::ToolInfo {
-                name: "rust-analyzer".to_owned(),
+                name: "bsv_analyzer".to_owned(),
                 args: vec![],
                 version: Some(version().to_string()),
             }),

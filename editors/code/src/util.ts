@@ -18,7 +18,7 @@ export type Env = {
 };
 
 class Log {
-    private readonly output = vscode.window.createOutputChannel("Rust Analyzer Client", {
+    private readonly output = vscode.window.createOutputChannel("BSV Analyzer Client", {
         log: true,
     });
 
@@ -65,14 +65,14 @@ export function sleep(ms: number) {
 }
 
 export type RustDocument = vscode.TextDocument & { languageId: "rust" };
-export type RustEditor = vscode.TextEditor & { document: RustDocument };
+export type BsvEditor = vscode.TextEditor & { document: RustDocument };
 
-export function isRustDocument(document: vscode.TextDocument): document is RustDocument {
+export function isBsvDocument(document: vscode.TextDocument): document is RustDocument {
     // Prevent corrupted text (particularly via inlay hints) in diff views
     // by allowing only `file` schemes
     // unfortunately extensions that use diff views not always set this
     // to something different than 'file' (see ongoing bug: #4608)
-    return document.languageId === "rust" && document.uri.scheme === "file";
+    return document.languageId === "bluespec" && document.uri.scheme === "file";
 }
 
 export function isCargoTomlDocument(document: vscode.TextDocument): document is RustDocument {
@@ -86,8 +86,8 @@ export function isCargoRunnableArgs(
     return (args as CargoRunnableArgs).executableArgs !== undefined;
 }
 
-export function isRustEditor(editor: vscode.TextEditor): editor is RustEditor {
-    return isRustDocument(editor.document);
+export function isBsvEditor(editor: vscode.TextEditor): editor is BsvEditor {
+    return isBsvDocument(editor.document);
 }
 
 export function isDocumentInWorkspace(document: RustDocument): boolean {

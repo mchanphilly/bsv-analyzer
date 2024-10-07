@@ -787,9 +787,9 @@ impl Config {
             let user_config_path = if let Some(path) = env::var_os("__TEST_RA_USER_CONFIG_DIR") {
                 std::path::PathBuf::from(path)
             } else {
-                dirs::config_dir()?.join("rust-analyzer")
+                dirs::config_dir()?.join("bsv_analyzer")
             }
-            .join("rust-analyzer.toml");
+            .join("bsv_analyzer.toml");
             Some(AbsPathBuf::assert_utf8(user_config_path))
         });
         USER_CONFIG_PATH.as_deref()
@@ -1551,7 +1551,7 @@ impl Config {
                 .to_owned(),
             closure_style: match self.inlayHints_closureStyle() {
                 ClosureStyle::ImplFn => hir::ClosureStyle::ImplFn,
-                ClosureStyle::RustAnalyzer => hir::ClosureStyle::RANotation,
+                ClosureStyle::BsvAnalyzer => hir::ClosureStyle::RANotation,
                 ClosureStyle::WithId => hir::ClosureStyle::ClosureWithId,
                 ClosureStyle::Hide => hir::ClosureStyle::Hide,
             },
@@ -2024,7 +2024,7 @@ impl Config {
     fn target_dir_from_config(&self, source_root: Option<SourceRootId>) -> Option<Utf8PathBuf> {
         self.cargo_targetDir(source_root).as_ref().and_then(|target_dir| match target_dir {
             TargetDirectory::UseSubdirectory(true) => {
-                Some(Utf8PathBuf::from("target/rust-analyzer"))
+                Some(Utf8PathBuf::from("target/bsv_analyzer"))
             }
             TargetDirectory::UseSubdirectory(false) => None,
             TargetDirectory::Directory(dir) if dir.is_relative() => Some(dir.clone()),
@@ -2105,12 +2105,12 @@ impl Config {
         let get = |name: &str| commands.iter().any(|it| it == name);
 
         ClientCommandsConfig {
-            run_single: get("rust-analyzer.runSingle"),
-            debug_single: get("rust-analyzer.debugSingle"),
-            show_reference: get("rust-analyzer.showReferences"),
-            goto_location: get("rust-analyzer.gotoLocation"),
-            trigger_parameter_hints: get("rust-analyzer.triggerParameterHints"),
-            rename: get("rust-analyzer.rename"),
+            run_single: get("bsv_analyzer.runSingle"),
+            debug_single: get("bsv_analyzer.debugSingle"),
+            show_reference: get("bsv_analyzer.showReferences"),
+            goto_location: get("bsv_analyzer.gotoLocation"),
+            trigger_parameter_hints: get("bsv_analyzer.triggerParameterHints"),
+            rename: get("bsv_analyzer.rename"),
         }
     }
 
@@ -2407,7 +2407,7 @@ enum ClosureReturnTypeHintsDef {
 #[serde(rename_all = "snake_case")]
 enum ClosureStyle {
     ImplFn,
-    RustAnalyzer,
+    BsvAnalyzer,
     WithId,
     Hide,
 }
@@ -2975,7 +2975,7 @@ fn schema(fields: &[SchemaField]) -> serde_json::Value {
             let name = field.replace('_', ".");
             let category =
                 name.find('.').map(|end| String::from(&name[..end])).unwrap_or("general".into());
-            let name = format!("rust-analyzer.{name}");
+            let name = format!("bsv_analyzer.{name}");
             let props = field_props(field, ty, doc, default);
             serde_json::json!({
                 "title": category,
@@ -3422,7 +3422,7 @@ fn validate_toml_table(
 #[cfg(test)]
 fn manual(fields: &[SchemaField]) -> String {
     fields.iter().fold(String::new(), |mut acc, (field, _ty, doc, default)| {
-        let name = format!("rust-analyzer.{}", field.replace('_', "."));
+        let name = format!("bsv_analyzer.{}", field.replace('_', "."));
         let doc = doc_comment_to_string(doc);
         if default.contains('\n') {
             format_to_acc!(
@@ -3607,7 +3607,7 @@ mod tests {
 
         assert_eq!(config.cargo_targetDir(None), &Some(TargetDirectory::UseSubdirectory(true)));
         assert!(
-            matches!(config.flycheck(None), FlycheckConfig::CargoCommand { options, .. } if options.target_dir == Some(Utf8PathBuf::from("target/rust-analyzer")))
+            matches!(config.flycheck(None), FlycheckConfig::CargoCommand { options, .. } if options.target_dir == Some(Utf8PathBuf::from("target/bsv_analyzer")))
         );
     }
 

@@ -1,4 +1,4 @@
-//! Installs rust-analyzer language server and/or editor plugin.
+//! Installs bsv-analyzer language server and/or editor plugin.
 
 use std::{env, path::PathBuf, str};
 
@@ -113,14 +113,14 @@ fn install_client(sh: &Shell, client_opt: ClientOpt) -> anyhow::Result<()> {
 
     // Install & verify.
     let installed_extensions = if cfg!(unix) {
-        cmd!(sh, "{code} --install-extension rust-analyzer.vsix --force").run()?;
+        cmd!(sh, "{code} --install-extension bsv-analyzer.vsix --force").run()?;
         cmd!(sh, "{code} --list-extensions").read()?
     } else {
-        cmd!(sh, "cmd.exe /c {code}.cmd --install-extension rust-analyzer.vsix --force").run()?;
+        cmd!(sh, "cmd.exe /c {code}.cmd --install-extension bsv-analyzer.vsix --force").run()?;
         cmd!(sh, "cmd.exe /c {code}.cmd --list-extensions").read()?
     };
 
-    if !installed_extensions.contains("rust-analyzer") {
+    if !installed_extensions.contains("bsv-analyzer") {
         bail!(
             "Could not install the Visual Studio Code extension. \
             Please make sure you have at least NodeJS 16.x together with the latest version of VS Code installed and try again. \
@@ -135,7 +135,7 @@ fn install_server(sh: &Shell, opts: ServerOpt) -> anyhow::Result<()> {
     let features = opts.malloc.to_features();
     let profile = if opts.dev_rel { "dev-rel" } else { "release" };
 
-    let cmd = cmd!(sh, "cargo install --path crates/rust-analyzer --profile={profile} --locked --force --features force-always-assert {features...}");
+    let cmd = cmd!(sh, "cargo install --path crates/bsv-analyzer --profile={profile} --locked --force --features force-always-assert {features...}");
     cmd.run()?;
     Ok(())
 }

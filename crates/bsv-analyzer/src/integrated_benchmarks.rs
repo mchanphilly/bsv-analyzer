@@ -33,7 +33,7 @@ fn integrated_highlighting_benchmark() {
 
     // Load rust-analyzer itself.
     let workspace_to_load = project_root();
-    let file = "./crates/rust-analyzer/src/config.rs";
+    let file = "./crates/bsv-analyzer/src/config.rs";
 
     let cargo_config = CargoConfig {
         sysroot: Some(project_model::RustLibSource::Discover),

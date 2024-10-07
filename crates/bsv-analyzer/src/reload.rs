@@ -165,7 +165,7 @@ impl GlobalState {
 
             if self.config.has_linked_projects() {
                 message.push_str(
-                    "`rust-analyzer.linkedProjects` have been specified, which may be incorrect. Specified project paths:\n",
+                    "`bsv-analyzer.linkedProjects` have been specified, which may be incorrect. Specified project paths:\n",
                 );
                 message
                     .push_str(&format!("    {}", self.config.linked_manifests().format("\n    ")));
@@ -535,7 +535,7 @@ impl GlobalState {
                                 [
                                     (base.clone(), "**/*.rs"),
                                     (base.clone(), "**/Cargo.{lock,toml}"),
-                                    (base, "**/rust-analyzer.toml"),
+                                    (base, "**/bsv-analyzer.toml"),
                                 ]
                             })
                         })
@@ -559,7 +559,7 @@ impl GlobalState {
                                 [
                                     format!("{base}/**/*.rs"),
                                     format!("{base}/**/Cargo.{{toml,lock}}"),
-                                    format!("{base}/**/rust-analyzer.toml"),
+                                    format!("{base}/**/bsv-analyzer.toml"),
                                 ]
                             })
                         })
@@ -750,11 +750,11 @@ impl GlobalState {
         };
 
         if workspaces.is_empty() && self.config.discover_workspace_config().is_none() {
-            stdx::format_to!(buf, "rust-analyzer failed to fetch workspace");
+            stdx::format_to!(buf, "bsv-analyzer failed to fetch workspace");
         } else {
             for ws in workspaces {
                 if let Err(err) = ws {
-                    stdx::format_to!(buf, "rust-analyzer failed to load workspace: {:#}\n", err);
+                    stdx::format_to!(buf, "bsv-analyzer failed to load workspace: {:#}\n", err);
                 }
             }
         }

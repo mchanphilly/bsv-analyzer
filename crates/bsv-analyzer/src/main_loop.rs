@@ -1003,7 +1003,7 @@ impl GlobalState {
                     state,
                     message,
                     None,
-                    Some(format!("rust-analyzer/flycheck/{id}")),
+                    Some(format!("bsv-analyzer/flycheck/{id}")),
                 );
             }
         }

@@ -2540,14 +2540,14 @@ macro_rules! declare_server_traits {
 with_api!(Self, self_, declare_server_traits);
 struct G {}
 struct T {}
-struct RustAnalyzer;
-impl Types for RustAnalyzer {
+struct BsvAnalyzer;
+impl Types for BsvAnalyzer {
     type TokenStream = T;
     type Group = G;
 }
 
 fn make<T>() -> T { loop {} }
-impl TokenStream for RustAnalyzer {
+impl TokenStream for BsvAnalyzer {
     fn new() -> Self::TokenStream {
         let group: Self::Group = make();
         make()

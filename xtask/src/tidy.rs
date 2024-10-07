@@ -22,7 +22,7 @@ impl Tidy {
 fn check_lsp_extensions_docs(sh: &Shell) {
     let expected_hash = {
         let lsp_ext_rs =
-            sh.read_file(project_root().join("crates/rust-analyzer/src/lsp/ext.rs")).unwrap();
+            sh.read_file(project_root().join("crates/bsv-analyzer/src/lsp/ext.rs")).unwrap();
         stable_hash(lsp_ext_rs.as_str())
     };
 

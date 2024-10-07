@@ -14,7 +14,7 @@ export async function bootstrap(
     const path = await getServer(context, config, state);
     if (!path) {
         throw new Error(
-            "rust-analyzer Language Server is not available. " +
+            "bsv-analyzer Language Server is not available. " +
                 "Please, ensure its [proper installation](https://rust-analyzer.github.io/manual.html#installation).",
         );
     }
@@ -61,7 +61,7 @@ async function getServer(
             // if so, use the rust-analyzer component
             const toolchainUri = vscode.Uri.joinPath(workspaceFolder.uri, "rust-toolchain.toml");
             if (await hasToolchainFileWithRaDeclared(toolchainUri)) {
-                const res = spawnSync("rustup", ["which", "rust-analyzer"], {
+                const res = spawnSync("rustup", ["which", "bsv-analyzer"], {
                     encoding: "utf8",
                     env: { ...process.env },
                     cwd: workspaceFolder.uri.fsPath,
@@ -80,11 +80,11 @@ async function getServer(
         return toolchainServerPath;
     }
 
-    if (packageJson.releaseTag === null) return "rust-analyzer";
+    if (packageJson.releaseTag === null) return "bsv-analyzer";
 
     // finally, use the bundled one
     const ext = process.platform === "win32" ? ".exe" : "";
-    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `rust-analyzer${ext}`);
+    const bundled = vscode.Uri.joinPath(context.extensionUri, "server", `bsv-analyzer${ext}`);
     const bundledExists = await fileExists(bundled);
     if (bundledExists) {
         let server = bundled;
@@ -155,7 +155,7 @@ function orderFromPath(
     raVersionResolver: (path: string) => string | undefined,
 ): string {
     const raVersion = raVersionResolver(path);
-    const raDate = raVersion?.match(/^rust-analyzer .*\(.* (\d{4}-\d{2}-\d{2})\)$/);
+    const raDate = raVersion?.match(/^bsv-analyzer .*\(.* (\d{4}-\d{2}-\d{2})\)$/);
     if (raDate?.length === 2) {
         const precedence = path.includes("nightly-") ? "0" : "1";
         return "0-" + raDate[1] + "/" + precedence;
@@ -177,7 +177,7 @@ async function hasToolchainFileWithRaDeclared(uri: vscode.Uri): Promise<boolean>
             await vscode.workspace.fs.readFile(uri),
         );
         return (
-            toolchainFileContents.match(/components\s*=\s*\[.*\"rust-analyzer\".*\]/g)?.length === 1
+            toolchainFileContents.match(/components\s*=\s*\[.*\"bsv-analyzer\".*\]/g)?.length === 1
         );
     } catch (e) {
         return false;
@@ -209,7 +209,7 @@ async function getNixOsServer(
     server: vscode.Uri,
 ) {
     await vscode.workspace.fs.createDirectory(globalStorageUri).then();
-    const dest = vscode.Uri.joinPath(globalStorageUri, `rust-analyzer${ext}`);
+    const dest = vscode.Uri.joinPath(globalStorageUri, `bsv-analyzer${ext}`);
     let exists = await vscode.workspace.fs.stat(dest).then(
         () => true,
         () => false,
@@ -242,13 +242,13 @@ async function patchelf(dest: vscode.Uri): Promise<void> {
     await vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Notification,
-            title: "Patching rust-analyzer for NixOS",
+            title: "Patching bsv-analyzer for NixOS",
         },
         async (progress, _) => {
             const expression = `
             {srcStr, pkgs ? import <nixpkgs> {}}:
                 pkgs.stdenv.mkDerivation {
-                    name = "rust-analyzer";
+                    name = "bsv-analyzer";
                     src = /. + srcStr;
                     phases = [ "installPhase" "fixupPhase" ];
                     installPhase = "cp $src $out";

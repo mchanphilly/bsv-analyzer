@@ -310,7 +310,7 @@ impl GlobalState {
             let mut modified_rust_files = vec![];
             for file in changed_files.into_values() {
                 let vfs_path = vfs.file_path(file.file_id);
-                if let Some(("rust-analyzer", Some("toml"))) = vfs_path.name_and_extension() {
+                if let Some(("bsv_analyzer", Some("toml"))) = vfs_path.name_and_extension() {
                     // Remember ids to use them after `apply_changes`
                     modified_ratoml_files.insert(file.file_id, (file.kind(), vfs_path.clone()));
                 }
@@ -400,7 +400,7 @@ impl GlobalState {
                     .map(|ws| {
                         VfsPath::from({
                             let mut p = ws.workspace_root().to_owned();
-                            p.push("rust-analyzer.toml");
+                            p.push("bsv_analyzer.toml");
                             p
                         })
                     })
@@ -435,7 +435,7 @@ impl GlobalState {
                         if let Some((kind, old_path, old_text)) = entry {
                             // SourceRoot has more than 1 RATOML files. In this case lexicographically smaller wins.
                             if old_path < vfs_path {
-                                span!(Level::ERROR, "Two `rust-analyzer.toml` files were found inside the same crate. {vfs_path} has no effect.");
+                                span!(Level::ERROR, "Two `bsv_analyzer.toml` files were found inside the same crate. {vfs_path} has no effect.");
                                 // Put the old one back in.
                                 match kind {
                                     RatomlFileKind::Crate => {

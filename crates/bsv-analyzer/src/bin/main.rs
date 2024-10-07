@@ -15,7 +15,7 @@ use std::{env, fs, path::PathBuf, process::ExitCode, sync::Arc};
 use anyhow::Context;
 use lsp_server::Connection;
 use paths::Utf8PathBuf;
-use rust_analyzer::{
+use bsv_analyzer::{
     cli::flags,
     config::{Config, ConfigChange, ConfigErrors},
     from_json,
@@ -41,7 +41,7 @@ fn main() -> anyhow::Result<ExitCode> {
 }
 
 fn actual_main() -> anyhow::Result<ExitCode> {
-    let flags = flags::RustAnalyzer::from_env_or_exit();
+    let flags = flags::BsvAnalyzer::from_env_or_exit();
 
     #[cfg(debug_assertions)]
     if flags.wait_dbg || env::var("RA_WAIT_DBG").is_ok() {
@@ -57,13 +57,13 @@ fn actual_main() -> anyhow::Result<ExitCode> {
     let verbosity = flags.verbosity();
 
     match flags.subcommand {
-        flags::RustAnalyzerCmd::LspServer(cmd) => 'lsp_server: {
+        flags::BsvAnalyzerCmd::LspServer(cmd) => 'lsp_server: {
             if cmd.print_config_schema {
                 println!("{:#}", Config::json_schema());
                 break 'lsp_server;
             }
             if cmd.version {
-                println!("rust-analyzer {}", rust_analyzer::version());
+                println!("bsv_analyzer {}", bsv_analyzer::version());
                 break 'lsp_server;
             }
 
@@ -77,18 +77,18 @@ fn actual_main() -> anyhow::Result<ExitCode> {
                 run_server,
             )?;
         }
-        flags::RustAnalyzerCmd::Parse(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::Symbols(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::Highlight(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::AnalysisStats(cmd) => cmd.run(verbosity)?,
-        flags::RustAnalyzerCmd::Diagnostics(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::UnresolvedReferences(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::Ssr(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::Search(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::Lsif(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::Scip(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::RunTests(cmd) => cmd.run()?,
-        flags::RustAnalyzerCmd::RustcTests(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::Parse(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::Symbols(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::Highlight(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::AnalysisStats(cmd) => cmd.run(verbosity)?,
+        flags::BsvAnalyzerCmd::Diagnostics(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::UnresolvedReferences(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::Ssr(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::Search(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::Lsif(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::Scip(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::RunTests(cmd) => cmd.run()?,
+        flags::BsvAnalyzerCmd::RustcTests(cmd) => cmd.run()?,
     }
     Ok(ExitCode::SUCCESS)
 }
@@ -130,7 +130,7 @@ fn setup_logging(log_file_flag: Option<PathBuf>) -> anyhow::Result<()> {
         None => BoxMakeWriter::new(std::io::stderr),
     };
 
-    rust_analyzer::tracing::Config {
+    bsv_analyzer::tracing::Config {
         writer,
         // Deliberately enable all `error` logs if the user has not set RA_LOG, as there is usually
         // useful information in there for debugging.
@@ -165,7 +165,7 @@ fn with_extra_thread(
 }
 
 fn run_server() -> anyhow::Result<()> {
-    tracing::info!("server version {} will start", rust_analyzer::version());
+    tracing::info!("server version {} will start", bsv_analyzer::version());
 
     let (connection, io_threads) = Connection::stdio();
 
@@ -250,13 +250,13 @@ fn run_server() -> anyhow::Result<()> {
         }
     }
 
-    let server_capabilities = rust_analyzer::server_capabilities(&config);
+    let server_capabilities = bsv_analyzer::server_capabilities(&config);
 
     let initialize_result = lsp_types::InitializeResult {
         capabilities: server_capabilities,
         server_info: Some(lsp_types::ServerInfo {
-            name: String::from("rust-analyzer"),
-            version: Some(rust_analyzer::version().to_string()),
+            name: String::from("bsv_analyzer"),
+            version: Some(bsv_analyzer::version().to_string()),
         }),
         offset_encoding: None,
     };
@@ -279,7 +279,7 @@ fn run_server() -> anyhow::Result<()> {
 
     // If the io_threads have an error, there's usually an error on the main
     // loop too because the channels are closed. Ensure we report both errors.
-    match (rust_analyzer::main_loop(config, connection), io_threads.join()) {
+    match (bsv_analyzer::main_loop(config, connection), io_threads.join()) {
         (Err(loop_e), Err(join_e)) => anyhow::bail!("{loop_e}\n{join_e}"),
         (Ok(_), Err(join_e)) => anyhow::bail!("{join_e}"),
         (Err(loop_e), Ok(_)) => anyhow::bail!("{loop_e}"),

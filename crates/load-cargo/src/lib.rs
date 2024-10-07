@@ -270,12 +270,12 @@ impl ProjectFolders {
                 entries.push(buildfile.to_owned());
             }
 
-            // In case of detached files we do **not** look for a rust-analyzer.toml.
+            // In case of detached files we do **not** look for a bsv-analyzer.toml.
             if !matches!(ws.kind, ProjectWorkspaceKind::DetachedFile { .. }) {
                 let ws_root = ws.workspace_root();
                 let ratoml_path = {
                     let mut p = ws_root.to_path_buf();
-                    p.push("rust-analyzer.toml");
+                    p.push("bsv-analyzer.toml");
                     p
                 };
                 file_set_roots.push(VfsPath::from(ratoml_path.to_owned()));

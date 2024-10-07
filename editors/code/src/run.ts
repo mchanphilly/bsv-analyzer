@@ -7,7 +7,7 @@ import type { CtxInit } from "./ctx";
 import { makeDebugConfig } from "./debug";
 import type { Config, RunnableEnvCfg, RunnableEnvCfgItem } from "./config";
 import type { LanguageClient } from "vscode-languageclient/node";
-import { unwrapUndefinable, type RustEditor } from "./util";
+import { unwrapUndefinable, type BsvEditor } from "./util";
 
 const quickPickButtons = [
     { iconPath: new vscode.ThemeIcon("save"), tooltip: "Save as a launch.json configuration." },
@@ -19,7 +19,7 @@ export async function selectRunnable(
     debuggeeOnly = false,
     showButtons: boolean = true,
 ): Promise<RunnableQuickPick | undefined> {
-    const editor = ctx.activeRustEditor;
+    const editor = ctx.activeBsvEditor;
     if (!editor) return;
 
     // show a placeholder while we get the runnables from the server
@@ -182,7 +182,7 @@ export function createCargoArgs(runnableArgs: ra.CargoRunnableArgs): string[] {
 
 async function getRunnables(
     client: LanguageClient,
-    editor: RustEditor,
+    editor: BsvEditor,
     prevRunnable?: RunnableQuickPick,
     debuggeeOnly = false,
 ): Promise<RunnableQuickPick[]> {

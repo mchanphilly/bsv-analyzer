@@ -1,7 +1,7 @@
-//! Implementation of the LSP for rust-analyzer.
+//! Implementation of the LSP for Bluespec SystemVerilog built upon [rust-analyzer](https://github.com/rust-lang/rust-analyzer).
 //!
-//! This crate takes Rust-specific analysis results from ide and translates
-//! into LSP types.
+//! This crate used to take Rust-specific analysis results from ide and translate
+//! into LSP types. I am currently in the process of adapting this for use with the Bluespec language.
 //!
 //! It also is the root of all state. `world` module defines the bulk of the
 //! state, and `main_loop` module defines the rules for modifying it.

@@ -1,10 +1,10 @@
 /**
- * This file mirrors `crates/rust-analyzer/src/lsp_ext.rs` declarations.
+ * This file mirrors `crates/bsv-analyzer/src/lsp_ext.rs` declarations.
  */
 
 import * as lc from "vscode-languageclient";
 
-// rust-analyzer overrides
+// bsv-analyzer overrides
 
 export const hover = new lc.RequestType<
     HoverParams,
@@ -24,47 +24,47 @@ export type CommandLinkGroup = {
     commands: CommandLink[];
 };
 
-// rust-analyzer extensions
+// bsv-analyzer extensions
 
 export const analyzerStatus = new lc.RequestType<AnalyzerStatusParams, string, void>(
-    "rust-analyzer/analyzerStatus",
+    "bsv-analyzer/analyzerStatus",
 );
-export const cancelFlycheck = new lc.NotificationType0("rust-analyzer/cancelFlycheck");
-export const clearFlycheck = new lc.NotificationType0("rust-analyzer/clearFlycheck");
+export const cancelFlycheck = new lc.NotificationType0("bsv-analyzer/cancelFlycheck");
+export const clearFlycheck = new lc.NotificationType0("bsv-analyzer/clearFlycheck");
 export const expandMacro = new lc.RequestType<ExpandMacroParams, ExpandedMacro | null, void>(
-    "rust-analyzer/expandMacro",
+    "bsv-analyzer/expandMacro",
 );
-export const memoryUsage = new lc.RequestType0<string, void>("rust-analyzer/memoryUsage");
-export const openServerLogs = new lc.NotificationType0("rust-analyzer/openServerLogs");
+export const memoryUsage = new lc.RequestType0<string, void>("bsv-analyzer/memoryUsage");
+export const openServerLogs = new lc.NotificationType0("bsv-analyzer/openServerLogs");
 export const relatedTests = new lc.RequestType<lc.TextDocumentPositionParams, TestInfo[], void>(
-    "rust-analyzer/relatedTests",
+    "bsv-analyzer/relatedTests",
 );
-export const reloadWorkspace = new lc.RequestType0<null, void>("rust-analyzer/reloadWorkspace");
-export const rebuildProcMacros = new lc.RequestType0<null, void>("rust-analyzer/rebuildProcMacros");
+export const reloadWorkspace = new lc.RequestType0<null, void>("bsv-analyzer/reloadWorkspace");
+export const rebuildProcMacros = new lc.RequestType0<null, void>("bsv-analyzer/rebuildProcMacros");
 
 export const runFlycheck = new lc.NotificationType<{
     textDocument: lc.TextDocumentIdentifier | null;
-}>("rust-analyzer/runFlycheck");
+}>("bsv-analyzer/runFlycheck");
 export const syntaxTree = new lc.RequestType<SyntaxTreeParams, string, void>(
-    "rust-analyzer/syntaxTree",
+    "bsv-analyzer/syntaxTree",
 );
 export const viewCrateGraph = new lc.RequestType<ViewCrateGraphParams, string, void>(
-    "rust-analyzer/viewCrateGraph",
+    "bsv-analyzer/viewCrateGraph",
 );
 export const viewFileText = new lc.RequestType<lc.TextDocumentIdentifier, string, void>(
-    "rust-analyzer/viewFileText",
+    "bsv-analyzer/viewFileText",
 );
 export const viewHir = new lc.RequestType<lc.TextDocumentPositionParams, string, void>(
-    "rust-analyzer/viewHir",
+    "bsv-analyzer/viewHir",
 );
 export const viewMir = new lc.RequestType<lc.TextDocumentPositionParams, string, void>(
-    "rust-analyzer/viewMir",
+    "bsv-analyzer/viewMir",
 );
 export const interpretFunction = new lc.RequestType<lc.TextDocumentPositionParams, string, void>(
-    "rust-analyzer/interpretFunction",
+    "bsv-analyzer/interpretFunction",
 );
 export const viewItemTree = new lc.RequestType<ViewItemTreeParams, string, void>(
-    "rust-analyzer/viewItemTree",
+    "bsv-analyzer/viewItemTree",
 );
 
 export type DiscoverTestParams = { testId?: string | undefined };
@@ -126,7 +126,7 @@ export const fetchDependencyList = new lc.RequestType<
     FetchDependencyListParams,
     FetchDependencyListResult,
     void
->("rust-analyzer/fetchDependencyList");
+>("bsv-analyzer/fetchDependencyList");
 
 export interface FetchDependencyGraphParams {}
 
@@ -142,7 +142,7 @@ export const fetchDependencyGraph = new lc.RequestType<
     FetchDependencyGraphParams,
     FetchDependencyGraphResult,
     void
->("rust-analyzer/fetchDependencyGraph");
+>("bsv-analyzer/fetchDependencyGraph");
 
 export type ExpandMacroParams = {
     textDocument: lc.TextDocumentIdentifier;
@@ -200,7 +200,7 @@ export const viewRecursiveMemoryLayout = new lc.RequestType<
     lc.TextDocumentPositionParams,
     RecursiveMemoryLayout | null,
     void
->("rust-analyzer/viewRecursiveMemoryLayout");
+>("bsv-analyzer/viewRecursiveMemoryLayout");
 
 export type JoinLinesParams = {
     textDocument: lc.TextDocumentIdentifier;
@@ -268,7 +268,7 @@ export type CargoRunnableArgs = {
      * Command to execute instead of `cargo`.
      */
     // This is supplied by the user via config. We could pull this through the client config in the
-    // extension directly, but that would prevent us from honoring the rust-analyzer.toml for it.
+    // extension directly, but that would prevent us from honoring the bsv-analyzer.toml for it.
     overrideCargo?: string;
 } & CommonRunnableArgs;
 

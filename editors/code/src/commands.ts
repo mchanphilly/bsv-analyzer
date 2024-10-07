@@ -17,12 +17,12 @@ import {
 } from "./run";
 import { AstInspector } from "./ast_inspector";
 import {
-    isRustDocument,
+    isBsvDocument,
     isCargoRunnableArgs,
     isCargoTomlDocument,
     sleep,
-    isRustEditor,
-    type RustEditor,
+    isBsvEditor,
+    type BsvEditor,
     type RustDocument,
     unwrapUndefinable,
 } from "./util";
@@ -37,7 +37,7 @@ export * from "./run";
 
 export function analyzerStatus(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-status://status");
+        readonly uri = vscode.Uri.parse("bsv-analyzer-status://status");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
 
         async provideTextDocumentContent(_uri: vscode.Uri): Promise<string> {
@@ -45,7 +45,7 @@ export function analyzerStatus(ctx: CtxInit): Cmd {
             const client = ctx.client;
 
             const params: ra.AnalyzerStatusParams = {};
-            const doc = ctx.activeRustEditor?.document;
+            const doc = ctx.activeBsvEditor?.document;
             if (doc != null) {
                 params.textDocument = client.code2ProtocolConverter.asTextDocumentIdentifier(doc);
             }
@@ -58,7 +58,7 @@ export function analyzerStatus(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-status", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("bsv-analyzer-status", tdcp),
     );
 
     return async () => {
@@ -73,7 +73,7 @@ export function analyzerStatus(ctx: CtxInit): Cmd {
 
 export function memoryUsage(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-memory://memory");
+        readonly uri = vscode.Uri.parse("bsv-analyzer-memory://memory");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
 
         provideTextDocumentContent(_uri: vscode.Uri): vscode.ProviderResult<string> {
@@ -90,7 +90,7 @@ export function memoryUsage(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-memory", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("bsv-analyzer-memory", tdcp),
     );
 
     return async () => {
@@ -128,7 +128,7 @@ export function openLogs(ctx: CtxInit): Cmd {
 
 export function matchingBrace(ctx: CtxInit): Cmd {
     return async () => {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
         if (!editor) return;
 
         const client = ctx.client;
@@ -151,7 +151,7 @@ export function matchingBrace(ctx: CtxInit): Cmd {
 
 export function joinLines(ctx: CtxInit): Cmd {
     return async () => {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
         if (!editor) return;
 
         const client = ctx.client;
@@ -179,7 +179,7 @@ export function moveItemDown(ctx: CtxInit): Cmd {
 
 export function moveItem(ctx: CtxInit, direction: ra.Direction): Cmd {
     return async () => {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
         if (!editor) return;
         const client = ctx.client;
 
@@ -198,7 +198,7 @@ export function moveItem(ctx: CtxInit, direction: ra.Direction): Cmd {
 
 export function onEnter(ctx: CtxInit): Cmd {
     async function handleKeypress() {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
 
         if (!editor) return false;
 
@@ -232,7 +232,7 @@ export function parentModule(ctx: CtxInit): Cmd {
     return async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
-        if (!(isRustDocument(editor.document) || isCargoTomlDocument(editor.document))) return;
+        if (!(isBsvDocument(editor.document) || isCargoTomlDocument(editor.document))) return;
 
         const client = ctx.client;
 
@@ -267,7 +267,7 @@ export function parentModule(ctx: CtxInit): Cmd {
 
 export function openCargoToml(ctx: CtxInit): Cmd {
     return async () => {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
         if (!editor) return;
 
         const client = ctx.client;
@@ -287,7 +287,7 @@ export function openCargoToml(ctx: CtxInit): Cmd {
 }
 
 export function revealDependency(ctx: CtxInit): Cmd {
-    return async (editor: RustEditor) => {
+    return async (editor: BsvEditor) => {
         if (!ctx.dependencies?.isInitialized()) {
             return;
         }
@@ -353,8 +353,8 @@ async function revealParentChain(document: RustDocument, ctx: CtxInit) {
     }
 }
 
-export async function execRevealDependency(e: RustEditor): Promise<void> {
-    await vscode.commands.executeCommand("rust-analyzer.revealDependency", e);
+export async function execRevealDependency(e: BsvEditor): Promise<void> {
+    await vscode.commands.executeCommand("bsv-analyzer.revealDependency", e);
 }
 
 export function ssr(ctx: CtxInit): Cmd {
@@ -417,11 +417,11 @@ export function ssr(ctx: CtxInit): Cmd {
 export function serverVersion(ctx: CtxInit): Cmd {
     return async () => {
         if (!ctx.serverPath) {
-            void vscode.window.showWarningMessage(`rust-analyzer server is not running`);
+            void vscode.window.showWarningMessage(`bsv-analyzer server is not running`);
             return;
         }
         void vscode.window.showInformationMessage(
-            `rust-analyzer version: ${ctx.serverVersion} [${ctx.serverPath}]`,
+            `bsv-analyzer version: ${ctx.serverVersion} [${ctx.serverPath}]`,
         );
     };
 }
@@ -431,7 +431,7 @@ export function serverVersion(ctx: CtxInit): Cmd {
 // The contents of the file come from the `TextDocumentContentProvider`
 export function syntaxTree(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-syntax-tree://syntaxtree/tree.rast");
+        readonly uri = vscode.Uri.parse("bsv-analyzer-syntax-tree://syntaxtree/tree.rast");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -447,14 +447,14 @@ export function syntaxTree(ctx: CtxInit): Cmd {
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isRustDocument(event.document)) {
+            if (isBsvDocument(event.document)) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isRustEditor(editor)) {
+            if (editor && isBsvEditor(editor)) {
                 this.eventEmitter.fire(this.uri);
             }
         }
@@ -463,17 +463,17 @@ export function syntaxTree(ctx: CtxInit): Cmd {
             uri: vscode.Uri,
             ct: vscode.CancellationToken,
         ): Promise<string> {
-            const rustEditor = ctx.activeRustEditor;
-            if (!rustEditor) return "";
+            const BsvEditor = ctx.activeBsvEditor;
+            if (!BsvEditor) return "";
             const client = ctx.client;
 
             // When the range based query is enabled we take the range of the selection
             const range =
-                uri.query === "range=true" && !rustEditor.selection.isEmpty
-                    ? client.code2ProtocolConverter.asRange(rustEditor.selection)
+                uri.query === "range=true" && !BsvEditor.selection.isEmpty
+                    ? client.code2ProtocolConverter.asRange(BsvEditor.selection)
                     : null;
 
-            const params = { textDocument: { uri: rustEditor.document.uri.toString() }, range };
+            const params = { textDocument: { uri: BsvEditor.document.uri.toString() }, range };
             return client.sendRequest(ra.syntaxTree, params, ct);
         }
 
@@ -484,7 +484,7 @@ export function syntaxTree(ctx: CtxInit): Cmd {
 
     ctx.pushExtCleanup(new AstInspector(ctx));
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-syntax-tree", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("bsv-analyzer-syntax-tree", tdcp),
     );
     ctx.pushExtCleanup(
         vscode.languages.setLanguageConfiguration("ra_syntax_tree", {
@@ -512,8 +512,8 @@ export function syntaxTree(ctx: CtxInit): Cmd {
 function viewHirOrMir(ctx: CtxInit, xir: "hir" | "mir"): Cmd {
     const viewXir = xir === "hir" ? "viewHir" : "viewMir";
     const requestType = xir === "hir" ? ra.viewHir : ra.viewMir;
-    const uri = `rust-analyzer-${xir}://${viewXir}/${xir}.rs`;
-    const scheme = `rust-analyzer-${xir}`;
+    const uri = `bsv-analyzer-${xir}://${viewXir}/${xir}.rs`;
+    const scheme = `bsv-analyzer-${xir}`;
     return viewFileUsingTextDocumentContentProvider(ctx, requestType, uri, scheme, true);
 }
 
@@ -541,14 +541,14 @@ function viewFileUsingTextDocumentContentProvider(
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isRustDocument(event.document) && shouldUpdate) {
+            if (isBsvDocument(event.document) && shouldUpdate) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isRustEditor(editor) && shouldUpdate) {
+            if (editor && isBsvEditor(editor) && shouldUpdate) {
                 this.eventEmitter.fire(this.uri);
             }
         }
@@ -557,15 +557,15 @@ function viewFileUsingTextDocumentContentProvider(
             _uri: vscode.Uri,
             ct: vscode.CancellationToken,
         ): Promise<string> {
-            const rustEditor = ctx.activeRustEditor;
-            if (!rustEditor) return "";
+            const BsvEditor = ctx.activeBsvEditor;
+            if (!BsvEditor) return "";
 
             const client = ctx.client;
             const params = {
                 textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(
-                    rustEditor.document,
+                    BsvEditor.document,
                 ),
-                position: client.code2ProtocolConverter.asPosition(rustEditor.selection.active),
+                position: client.code2ProtocolConverter.asPosition(BsvEditor.selection.active),
             };
             return client.sendRequest(requestType, params, ct);
         }
@@ -605,19 +605,19 @@ export function viewMir(ctx: CtxInit): Cmd {
 //
 // The contents of the file come from the `TextDocumentContentProvider`
 export function interpretFunction(ctx: CtxInit): Cmd {
-    const uri = `rust-analyzer-interpret-function://interpretFunction/result.log`;
+    const uri = `bsv-analyzer-interpret-function://interpretFunction/result.log`;
     return viewFileUsingTextDocumentContentProvider(
         ctx,
         ra.interpretFunction,
         uri,
-        `rust-analyzer-interpret-function`,
+        `bsv-analyzer-interpret-function`,
         false,
     );
 }
 
 export function viewFileText(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-file-text://viewFileText/file.rs");
+        readonly uri = vscode.Uri.parse("bsv-analyzer-file-text://viewFileText/file.rs");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -633,14 +633,14 @@ export function viewFileText(ctx: CtxInit): Cmd {
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isRustDocument(event.document)) {
+            if (isBsvDocument(event.document)) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isRustEditor(editor)) {
+            if (editor && isBsvEditor(editor)) {
                 this.eventEmitter.fire(this.uri);
             }
         }
@@ -649,12 +649,12 @@ export function viewFileText(ctx: CtxInit): Cmd {
             _uri: vscode.Uri,
             ct: vscode.CancellationToken,
         ): Promise<string> {
-            const rustEditor = ctx.activeRustEditor;
-            if (!rustEditor) return "";
+            const BsvEditor = ctx.activeBsvEditor;
+            if (!BsvEditor) return "";
             const client = ctx.client;
 
             const params = client.code2ProtocolConverter.asTextDocumentIdentifier(
-                rustEditor.document,
+                BsvEditor.document,
             );
             return client.sendRequest(ra.viewFileText, params, ct);
         }
@@ -665,7 +665,7 @@ export function viewFileText(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-file-text", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("bsv-analyzer-file-text", tdcp),
     );
 
     return async () => {
@@ -680,7 +680,7 @@ export function viewFileText(ctx: CtxInit): Cmd {
 
 export function viewItemTree(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-item-tree://viewItemTree/itemtree.rs");
+        readonly uri = vscode.Uri.parse("bsv-analyzer-item-tree://viewItemTree/itemtree.rs");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -696,14 +696,14 @@ export function viewItemTree(ctx: CtxInit): Cmd {
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isRustDocument(event.document)) {
+            if (isBsvDocument(event.document)) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isRustEditor(editor)) {
+            if (editor && isBsvEditor(editor)) {
                 this.eventEmitter.fire(this.uri);
             }
         }
@@ -712,13 +712,13 @@ export function viewItemTree(ctx: CtxInit): Cmd {
             _uri: vscode.Uri,
             ct: vscode.CancellationToken,
         ): Promise<string> {
-            const rustEditor = ctx.activeRustEditor;
-            if (!rustEditor) return "";
+            const BsvEditor = ctx.activeBsvEditor;
+            if (!BsvEditor) return "";
             const client = ctx.client;
 
             const params = {
                 textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(
-                    rustEditor.document,
+                    BsvEditor.document,
                 ),
             };
             return client.sendRequest(ra.viewItemTree, params, ct);
@@ -730,7 +730,7 @@ export function viewItemTree(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-item-tree", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("bsv-analyzer-item-tree", tdcp),
     );
 
     return async () => {
@@ -748,8 +748,8 @@ function crateGraph(ctx: CtxInit, full: boolean): Cmd {
         const nodeModulesPath = vscode.Uri.file(path.join(ctx.extensionPath, "node_modules"));
 
         const panel = vscode.window.createWebviewPanel(
-            "rust-analyzer.crate-graph",
-            "rust-analyzer crate graph",
+            "bsv-analyzer.crate-graph",
+            "bsv-analyzer crate graph",
             vscode.ViewColumn.Two,
             {
                 enableScripts: true,
@@ -833,7 +833,7 @@ export function expandMacro(ctx: CtxInit): Cmd {
     }
 
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        uri = vscode.Uri.parse("rust-analyzer-expand-macro://expandMacro/[EXPANSION].rs");
+        uri = vscode.Uri.parse("bsv-analyzer-expand-macro://expandMacro/[EXPANSION].rs");
         eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         async provideTextDocumentContent(_uri: vscode.Uri): Promise<string> {
             const editor = vscode.window.activeTextEditor;
@@ -860,7 +860,7 @@ export function expandMacro(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-expand-macro", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("bsv-analyzer-expand-macro", tdcp),
     );
 
     return async () => {
@@ -905,7 +905,7 @@ export function applyActionGroup(_ctx: CtxInit): Cmd {
         const selectedAction = await vscode.window.showQuickPick(actions);
         if (!selectedAction) return;
         await vscode.commands.executeCommand(
-            "rust-analyzer.resolveCodeAction",
+            "bsv-analyzer.resolveCodeAction",
             selectedAction.arguments,
         );
     };
@@ -997,7 +997,7 @@ export function clearFlycheck(ctx: CtxInit): Cmd {
 
 export function runFlycheck(ctx: CtxInit): Cmd {
     return async () => {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
         const client = ctx.client;
         const params = editor ? { uri: editor.document.uri.toString() } : null;
 
@@ -1108,7 +1108,7 @@ export function run(ctx: CtxInit): Cmd {
 
 export function peekTests(ctx: CtxInit): Cmd {
     return async () => {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
         if (!editor) return;
         const client = ctx.client;
 
@@ -1141,7 +1141,7 @@ export function peekTests(ctx: CtxInit): Cmd {
 
 export function runSingle(ctx: CtxInit): Cmd {
     return async (runnable: ra.Runnable) => {
-        const editor = ctx.activeRustEditor;
+        const editor = ctx.activeBsvEditor;
         if (!editor) return;
 
         const task = await createTaskFromRunnable(runnable, ctx.config);
@@ -1493,7 +1493,7 @@ export function toggleCheckOnSave(ctx: Ctx): Cmd {
 
 export function toggleLSPLogs(ctx: Ctx): Cmd {
     return async () => {
-        const config = vscode.workspace.getConfiguration("rust-analyzer");
+        const config = vscode.workspace.getConfiguration("bsv-analyzer");
         const targetValue =
             config.get<string | undefined>("trace.server") === "verbose" ? undefined : "verbose";
 
@@ -1508,7 +1508,7 @@ export function openWalkthrough(_: Ctx): Cmd {
     return async () => {
         await vscode.commands.executeCommand(
             "workbench.action.openWalkthrough",
-            "rust-lang.rust-analyzer#landing",
+            "MartinChan.bsv-analyzer#landing",
             false,
         );
     };

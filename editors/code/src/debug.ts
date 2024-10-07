@@ -15,7 +15,7 @@ const debugOutput = vscode.window.createOutputChannel("Debug");
 const activeDebugSessionIds: string[] = [];
 
 export async function makeDebugConfig(ctx: Ctx, runnable: ra.Runnable): Promise<void> {
-    const scope = ctx.activeRustEditor?.document.uri;
+    const scope = ctx.activeBsvEditor?.document.uri;
     if (!scope) return;
 
     const debugConfig = await getDebugConfiguration(ctx.config, runnable, false);
@@ -171,7 +171,7 @@ async function getDebugConfiguration(
     }
 
     if (debugConfig.name === "run binary") {
-        // The LSP side: crates\rust-analyzer\src\main_loop\handlers.rs,
+        // The LSP side: crates\bsv-analyzer\src\main_loop\handlers.rs,
         // fn to_lsp_runnable(...) with RunnableKind::Bin
         // FIXME: Neither crates\rust-analyzer\src\main_loop\handlers.rs
         // nor to_lsp_runnable exist anymore
