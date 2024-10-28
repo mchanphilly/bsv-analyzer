@@ -64,10 +64,10 @@ export function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export type RustDocument = vscode.TextDocument & { languageId: "rust" };
-export type BsvEditor = vscode.TextEditor & { document: RustDocument };
+export type BsvDocument = vscode.TextDocument & { languageId: "bluespec" };
+export type BsvEditor = vscode.TextEditor & { document: BsvDocument };
 
-export function isBsvDocument(document: vscode.TextDocument): document is RustDocument {
+export function isBsvDocument(document: vscode.TextDocument): document is BsvDocument {
     // Prevent corrupted text (particularly via inlay hints) in diff views
     // by allowing only `file` schemes
     // unfortunately extensions that use diff views not always set this
@@ -75,7 +75,7 @@ export function isBsvDocument(document: vscode.TextDocument): document is RustDo
     return document.languageId === "bluespec" && document.uri.scheme === "file";
 }
 
-export function isCargoTomlDocument(document: vscode.TextDocument): document is RustDocument {
+export function isCargoTomlDocument(document: vscode.TextDocument): document is BsvDocument {
     // ideally `document.languageId` should be 'toml' but user maybe not have toml extension installed
     return document.uri.scheme === "file" && document.fileName.endsWith("Cargo.toml");
 }
@@ -90,7 +90,7 @@ export function isBsvEditor(editor: vscode.TextEditor): editor is BsvEditor {
     return isBsvDocument(editor.document);
 }
 
-export function isDocumentInWorkspace(document: RustDocument): boolean {
+export function isDocumentInWorkspace(document: BsvDocument): boolean {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders) {
         return false;

@@ -494,12 +494,12 @@ config_data! {
 config_data! {
     workspace: struct WorkspaceDefaultConfigData <- WorkspaceConfigInput -> {
         /// Pass `--all-targets` to cargo invocation.
-        cargo_allTargets: bool           = true,
+        cargo_allTargets: bool           = false,
         /// Automatically refresh project info via `cargo metadata` on
         /// `Cargo.toml` or `.cargo/config.toml` changes.
-        cargo_autoreload: bool           = true,
+        cargo_autoreload: bool           = false,
         /// Run build scripts (`build.rs`) for more precise code analysis.
-        cargo_buildScripts_enable: bool  = true,
+        cargo_buildScripts_enable: bool  = false,
         /// Specifies the invocation strategy to use when running the build scripts command.
         /// If `per_workspace` is set, the command will be executed for each Rust workspace with the
         /// workspace as the working directory.
@@ -528,10 +528,10 @@ config_data! {
         cargo_buildScripts_overrideCommand: Option<Vec<String>> = None,
         /// Rerun proc-macros building/build-scripts running when proc-macro
         /// or build-script sources change and are saved.
-        cargo_buildScripts_rebuildOnSave: bool = true,
+        cargo_buildScripts_rebuildOnSave: bool = false,
         /// Use `RUSTC_WRAPPER=rust-analyzer` when running build scripts to
         /// avoid checking unnecessary things.
-        cargo_buildScripts_useRustcWrapper: bool = true,
+        cargo_buildScripts_useRustcWrapper: bool = false,
         /// List of cfg options to enable with the given values.
         cargo_cfgs: FxHashMap<String, Option<String>> = {
             let mut m = FxHashMap::default();
@@ -556,7 +556,7 @@ config_data! {
         /// Unsetting this disables sysroot loading.
         ///
         /// This option does not take effect until rust-analyzer is restarted.
-        cargo_sysroot: Option<String>    = Some("discover".to_owned()),
+        cargo_sysroot: Option<String>    = None,
         /// Relative path to the sysroot library sources. If left unset, this will default to
         /// `{cargo.sysroot}/lib/rustlib/src/rust/library`.
         ///
@@ -578,7 +578,7 @@ config_data! {
         cfg_setTest: bool = true,
 
         /// Run the check command for diagnostics on save.
-        checkOnSave | checkOnSave_enable: bool                         = true,
+        checkOnSave | checkOnSave_enable: bool                         = false,
 
 
         /// Check all targets and tests (`--all-targets`). Defaults to

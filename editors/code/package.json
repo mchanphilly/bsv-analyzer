@@ -154,11 +154,6 @@
                 "category": "bsv-analyzer"
             },
             {
-                "command": "bsv-analyzer.expandMacro",
-                "title": "Expand macro recursively at caret",
-                "category": "bsv-analyzer"
-            },
-            {
                 "command": "bsv-analyzer.matchingBrace",
                 "title": "Find matching brace",
                 "category": "bsv-analyzer"
@@ -201,11 +196,6 @@
             {
                 "command": "bsv-analyzer.reloadWorkspace",
                 "title": "Reload workspace",
-                "category": "bsv-analyzer"
-            },
-            {
-                "command": "bsv-analyzer.rebuildProcMacros",
-                "title": "Rebuild proc macros and build scripts",
                 "category": "bsv-analyzer"
             },
             {
@@ -643,7 +633,7 @@
                 "properties": {
                     "bsv-analyzer.cargo.allTargets": {
                         "markdownDescription": "Pass `--all-targets` to cargo invocation.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -653,7 +643,7 @@
                 "properties": {
                     "bsv-analyzer.cargo.autoreload": {
                         "markdownDescription": "Automatically refresh project info via `cargo metadata` on\n`Cargo.toml` or `.cargo/config.toml` changes.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -663,7 +653,7 @@
                 "properties": {
                     "bsv-analyzer.cargo.buildScripts.enable": {
                         "markdownDescription": "Run build scripts (`build.rs`) for more precise code analysis.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -707,7 +697,7 @@
                 "properties": {
                     "bsv-analyzer.cargo.buildScripts.rebuildOnSave": {
                         "markdownDescription": "Rerun proc-macros building/build-scripts running when proc-macro\nor build-script sources change and are saved.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -838,7 +828,7 @@
                 "properties": {
                     "bsv-analyzer.cargo.targetDir": {
                         "markdownDescription": "Optional path to a bsv-analyzer specific target directory.\nThis prevents bsv-analyzer's `cargo check` and initial build-script and proc-macro\nbuilding from locking the `Cargo.lock` at the expense of duplicating build artifacts.\n\nSet to `true` to use a subdirectory of the existing target directory or\nset to a path relative to the workspace to use that path.",
-                        "default": null,
+                        "default": "/dev/null",
                         "anyOf": [
                             {
                                 "type": "null"
@@ -868,7 +858,7 @@
                 "properties": {
                     "bsv-analyzer.checkOnSave": {
                         "markdownDescription": "Run the check command for diagnostics on save.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
