@@ -172,7 +172,7 @@ export class Config {
             ];
         }
 
-        this.configureLang = vscode.languages.setLanguageConfiguration("rust", {
+        this.configureLang = vscode.languages.setLanguageConfiguration("bluespec", {
             onEnterRules,
         });
     }

@@ -234,7 +234,7 @@ const knownEngines: {
         ],
         sourceFileMapProperty: "sourceMap",
         additional: {
-            sourceLanguages: ["rust"],
+            sourceLanguages: ["bluespec"],
         },
     },
     "ms-vscode.cpptools": {
@@ -340,7 +340,7 @@ type CodeLldbDebugConfig = {
     program: string;
     args: string[];
     sourceMap: Record<string, string> | undefined;
-    sourceLanguages: ["rust"];
+    sourceLanguages: ["bluespec"];
     env: Record<string, string>;
 } & BaseDebugConfig<"lldb">;
 
