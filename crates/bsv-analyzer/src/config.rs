@@ -497,7 +497,7 @@ config_data! {
         cargo_allTargets: bool           = false,
         /// Automatically refresh project info via `cargo metadata` on
         /// `Cargo.toml` or `.cargo/config.toml` changes.
-        cargo_autoreload: bool           = false,
+        cargo_autoreload: bool           = true,
         /// Run build scripts (`build.rs`) for more precise code analysis.
         cargo_buildScripts_enable: bool  = false,
         /// Specifies the invocation strategy to use when running the build scripts command.
@@ -1698,12 +1698,13 @@ impl Config {
     }
 
     pub fn linked_or_discovered_projects(&self) -> Vec<LinkedProject> {
-        let linked_projects = self.linkedProjects();
-        let projects = if linked_projects.is_empty() {
-            self.discovered_projects()
-        } else {
-            linked_projects.clone()
-        };
+        // let linked_projects = self.linkedProjects();
+        // let projects = if linked_projects.is_empty() {
+        //     self.discovered_projects()
+        // } else {
+        //     linked_projects.clone()
+        // };
+        let projects = vec![];
 
         projects
             .iter()

@@ -749,6 +749,7 @@ impl GlobalState {
             return Ok(());
         };
 
+        return Ok(());
         if workspaces.is_empty() && self.config.discover_workspace_config().is_none() {
             stdx::format_to!(buf, "bsv-analyzer failed to fetch workspace");
         } else {
