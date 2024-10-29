@@ -27,7 +27,7 @@ mod ast_src;
 use self::ast_src::{AstEnumSrc, AstNodeSrc, AstSrc, Cardinality, Field, KindsSrc};
 
 pub(crate) fn generate(check: bool) {
-    let grammar = fs::read_to_string(project_root().join("crates/syntax/rust.ungram"))
+    let grammar = fs::read_to_string(project_root().join("crates/syntax/bsv.ungram"))
         .unwrap()
         .parse()
         .unwrap();
