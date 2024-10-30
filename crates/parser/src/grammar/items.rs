@@ -36,7 +36,7 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![package],
     T![pub],
     T![crate],
-    T![use],
+    T![import],
     T![macro],
     T![;],
 ]);
@@ -221,7 +221,7 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
     let la = p.nth(1);
     match p.current() {
         T![extern] if la == T![crate] => extern_crate(p, m),
-        T![use] => use_item::use_(p, m),
+        T![import] => use_item::use_(p, m),
         T![package] => package_item(p, m),
 
         T![type] => type_alias(p, m),

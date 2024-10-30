@@ -69,6 +69,7 @@ impl<'t> Parser<'t> {
         match kind {
             T![-=] => self.at_composite2(n, T![-], T![=]),
             T![->] => self.at_composite2(n, T![-], T![>]),
+            T![<-] => self.at_composite2(n, T![<], T![-]),
             T![::] => self.at_composite2(n, T![:], T![:]),
             T![!=] => self.at_composite2(n, T![!], T![=]),
             T![..] => self.at_composite2(n, T![.], T![.]),
@@ -105,6 +106,7 @@ impl<'t> Parser<'t> {
         let n_raw_tokens = match kind {
             T![-=]
             | T![->]
+            | T![<-]
             | T![::]
             | T![!=]
             | T![..]

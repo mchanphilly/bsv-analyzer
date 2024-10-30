@@ -3,7 +3,7 @@ use super::*;
 // test use_item
 // use std::collections;
 pub(super) fn use_(p: &mut Parser<'_>, m: Marker) {
-    p.bump(T![use]);
+    p.bump(T![import]);
     use_tree(p, true);
     p.expect(T![;]);
     m.complete(p, USE);
