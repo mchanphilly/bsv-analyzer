@@ -61,9 +61,9 @@ impl server::FreeFunctions for TokenIdServer {
         s: &str,
     ) -> Result<bridge::Literal<Self::Span, Self::Symbol>, ()> {
         use proc_macro::bridge::LitKind;
-        use rustc_lexer::{LiteralKind, Token, TokenKind};
+        use bsv_lexer::{LiteralKind, Token, TokenKind};
 
-        let mut tokens = rustc_lexer::tokenize(s);
+        let mut tokens = bsv_lexer::tokenize(s);
         let minus_or_lit = tokens.next().unwrap_or(Token { kind: TokenKind::Eof, len: 0 });
 
         let lit = if minus_or_lit.kind == TokenKind::Minus {

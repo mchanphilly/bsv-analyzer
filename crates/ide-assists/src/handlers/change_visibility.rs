@@ -35,7 +35,6 @@ fn add_vis(acc: &mut Assists, ctx: &AssistContext<'_>) -> Option<()> {
             T![const]
                 | T![static]
                 | T![fn]
-                | T![mod]
                 | T![struct]
                 | T![enum]
                 | T![trait]

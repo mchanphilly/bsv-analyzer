@@ -167,6 +167,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bsv-lexer"
+version = "0.0.0"
+dependencies = [
+ "expect-test",
+ "unicode-properties",
+ "unicode-xid",
+]
+
+[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1107,11 +1116,11 @@ name = "mbe"
 version = "0.0.0"
 dependencies = [
  "arrayvec",
+ "bsv-lexer",
  "cov-mark",
  "expect-test",
  "intern",
  "parser",
- "ra-ap-rustc_lexer",
  "rustc-hash",
  "smallvec",
  "span",
@@ -1311,10 +1320,10 @@ dependencies = [
 name = "parser"
 version = "0.0.0"
 dependencies = [
+ "bsv-lexer",
  "drop_bomb",
  "expect-test",
  "limit",
- "ra-ap-rustc_lexer",
  "stdx",
  "tracing",
 ]
@@ -1411,6 +1420,7 @@ name = "proc-macro-srv"
 version = "0.0.0"
 dependencies = [
  "base-db",
+ "bsv-lexer",
  "expect-test",
  "intern",
  "libloading",
@@ -1419,7 +1429,6 @@ dependencies = [
  "paths",
  "proc-macro-api",
  "proc-macro-test",
- "ra-ap-rustc_lexer",
  "snap",
  "span",
  "stdx",
@@ -1949,13 +1958,13 @@ dependencies = [
 name = "syntax"
 version = "0.0.0"
 dependencies = [
+ "bsv-lexer",
  "cov-mark",
  "either",
  "expect-test",
  "indexmap",
  "itertools",
  "parser",
- "ra-ap-rustc_lexer",
  "rayon",
  "rowan",
  "rustc-hash",
@@ -2244,8 +2253,8 @@ name = "tt"
 version = "0.0.0"
 dependencies = [
  "arrayvec",
+ "bsv-lexer",
  "intern",
- "ra-ap-rustc_lexer",
  "stdx",
  "text-size",
 ]

@@ -27,7 +27,7 @@ span.workspace = true
 proc-macro-api.workspace = true
 intern.workspace = true
 
-ra-ap-rustc_lexer.workspace = true
+bsv-lexer.workspace = true
 
 [dev-dependencies]
 expect-test.workspace = true

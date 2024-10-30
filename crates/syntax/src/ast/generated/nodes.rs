@@ -1204,7 +1204,7 @@ impl Module {
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     #[inline]
-    pub fn mod_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![mod]) }
+    pub fn package_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![package]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2067,7 +2067,7 @@ impl Use {
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     #[inline]
-    pub fn use_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![use]) }
+    pub fn import_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![import]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

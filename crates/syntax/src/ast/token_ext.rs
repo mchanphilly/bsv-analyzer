@@ -2,7 +2,7 @@
 
 use std::{borrow::Cow, num::ParseIntError};
 
-use rustc_lexer::unescape::{
+use bsv_lexer::unescape::{
     unescape_byte, unescape_char, unescape_mixed, unescape_unicode, EscapeError, MixedUnit, Mode,
 };
 use stdx::always;

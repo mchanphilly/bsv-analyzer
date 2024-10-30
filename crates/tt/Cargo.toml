@@ -18,7 +18,7 @@ text-size.workspace = true
 
 stdx.workspace = true
 intern.workspace = true
-ra-ap-rustc_lexer.workspace = true
+bsv-lexer.workspace = true
 
 [features]
 in-rust-tree = []

@@ -367,7 +367,7 @@ fn expand_subtree(
                 marker(&mut result_span);
 
                 // FIXME: NFC normalize the result.
-                if !rustc_lexer::is_ident(&concatenated) {
+                if !bsv_lexer::is_ident(&concatenated) {
                     if err.is_none() {
                         err = Some(ExpandError::binding_error(
                             *concat_span,

@@ -21,10 +21,7 @@
 
 #![cfg_attr(feature = "in-rust-tree", feature(rustc_private))]
 
-#[cfg(not(feature = "in-rust-tree"))]
-extern crate ra_ap_rustc_lexer as rustc_lexer;
-#[cfg(feature = "in-rust-tree")]
-extern crate rustc_lexer;
+extern crate bsv_lexer;
 
 mod parsing;
 mod ptr;
@@ -65,7 +62,7 @@ pub use rowan::{
     api::Preorder, Direction, GreenNode, NodeOrToken, SyntaxText, TextRange, TextSize,
     TokenAtOffset, WalkEvent,
 };
-pub use rustc_lexer::unescape;
+pub use bsv_lexer::unescape;
 pub use smol_str::{format_smolstr, SmolStr, SmolStrBuilder, ToSmolStr};
 
 /// `Parse` is the result of the parsing: a syntax tree and a collection of

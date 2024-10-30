@@ -4,10 +4,7 @@
 
 #![cfg_attr(feature = "in-rust-tree", feature(rustc_private))]
 
-#[cfg(not(feature = "in-rust-tree"))]
-extern crate ra_ap_rustc_lexer as rustc_lexer;
-#[cfg(feature = "in-rust-tree")]
-extern crate rustc_lexer;
+extern crate bsv_lexer;
 
 pub mod buffer;
 pub mod iter;
@@ -210,11 +207,11 @@ pub fn token_to_literal<S>(text: &str, span: S) -> Literal<S>
 where
     S: Copy,
 {
-    use rustc_lexer::LiteralKind;
+    use bsv_lexer::LiteralKind;
 
-    let token = rustc_lexer::tokenize(text).next_tuple();
-    let Some((rustc_lexer::Token {
-        kind: rustc_lexer::TokenKind::Literal { kind, suffix_start },
+    let token = bsv_lexer::tokenize(text).next_tuple();
+    let Some((bsv_lexer::Token {
+        kind: bsv_lexer::TokenKind::Literal { kind, suffix_start },
         ..
     },)) = token
     else {

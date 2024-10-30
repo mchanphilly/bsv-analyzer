@@ -23,7 +23,7 @@ smol_str.workspace = true
 triomphe.workspace = true
 tracing.workspace = true
 
-ra-ap-rustc_lexer.workspace = true
+bsv-lexer.workspace = true
 
 parser.workspace = true
 stdx.workspace = true

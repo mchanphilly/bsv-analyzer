@@ -93,8 +93,8 @@ pub(crate) fn move_module_to_file(acc: &mut Assists, ctx: &AssistContext<'_>) ->
 
             let buf = format!("mod {module_name};");
 
-            let replacement_start = match module_ast.mod_token() {
-                Some(mod_token) => mod_token.text_range(),
+            let replacement_start = match module_ast.package_token() {
+                Some(package_token) => package_token.text_range(),
                 None => module_ast.syntax().text_range(),
             }
             .start();

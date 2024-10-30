@@ -33,7 +33,7 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![const],
     T![static],
     T![let],
-    T![mod],
+    T![package],
     T![pub],
     T![crate],
     T![use],
@@ -222,7 +222,7 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
     match p.current() {
         T![extern] if la == T![crate] => extern_crate(p, m),
         T![use] => use_item::use_(p, m),
-        T![mod] => mod_item(p, m),
+        T![package] => package_item(p, m),
 
         T![type] => type_alias(p, m),
         T![struct] => adt::strukt(p, m),
@@ -266,14 +266,16 @@ fn extern_crate(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, EXTERN_CRATE);
 }
 
-// test mod_item
-// mod a;
-pub(crate) fn mod_item(p: &mut Parser<'_>, m: Marker) {
-    p.bump(T![mod]);
+// BSV_TODO: Still uses Rust Module notation; also check whether curly
+// should be there.
+// test package_item
+// package a;
+pub(crate) fn package_item(p: &mut Parser<'_>, m: Marker) {
+    p.bump(T![package]);
     name(p);
     if p.at(T!['{']) {
-        // test mod_item_curly
-        // mod b { }
+        // test package_item_curly
+        // package b { }
         item_list(p);
     } else if !p.eat(T![;]) {
         p.error("expected `;` or `{`");

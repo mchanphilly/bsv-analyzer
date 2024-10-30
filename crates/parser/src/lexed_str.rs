@@ -10,7 +10,7 @@
 
 use std::ops;
 
-use rustc_lexer::unescape::{EscapeError, Mode};
+use bsv_lexer::unescape::{EscapeError, Mode};
 
 use crate::{
     Edition,
@@ -34,12 +34,12 @@ impl<'a> LexedStr<'a> {
     pub fn new(edition: Edition, text: &'a str) -> LexedStr<'a> {
         let _p = tracing::info_span!("LexedStr::new").entered();
         let mut conv = Converter::new(edition, text);
-        if let Some(shebang_len) = rustc_lexer::strip_shebang(text) {
+        if let Some(shebang_len) = bsv_lexer::strip_shebang(text) {
             conv.res.push(SHEBANG, conv.offset);
             conv.offset = shebang_len;
         };
 
-        for token in rustc_lexer::tokenize(&text[conv.offset..]) {
+        for token in bsv_lexer::tokenize(&text[conv.offset..]) {
             let token_text = &text[conv.offset..][..token.len as usize];
 
             conv.extend_token(&token.kind, token_text);
@@ -53,7 +53,7 @@ impl<'a> LexedStr<'a> {
             return None;
         }
 
-        let token = rustc_lexer::tokenize(text).next()?;
+        let token = bsv_lexer::tokenize(text).next()?;
         if token.len as usize != text.len() {
             return None;
         }
@@ -158,7 +158,7 @@ impl<'a> Converter<'a> {
         }
     }
 
-    fn extend_token(&mut self, kind: &rustc_lexer::TokenKind, token_text: &str) {
+    fn extend_token(&mut self, kind: &bsv_lexer::TokenKind, token_text: &str) {
         // A note on an intended tradeoff:
         // We drop some useful information here (see patterns with double dots `..`)
         // Storing that info in `SyntaxKind` is not possible due to its layout requirements of
@@ -167,77 +167,78 @@ impl<'a> Converter<'a> {
 
         let syntax_kind = {
             match kind {
-                rustc_lexer::TokenKind::LineComment { doc_style: _ } => COMMENT,
-                rustc_lexer::TokenKind::BlockComment { doc_style: _, terminated } => {
+                bsv_lexer::TokenKind::LineComment { doc_style: _ } => COMMENT,
+                bsv_lexer::TokenKind::BlockComment { doc_style: _, terminated } => {
                     if !terminated {
                         err = "Missing trailing `*/` symbols to terminate the block comment";
                     }
                     COMMENT
                 }
 
-                rustc_lexer::TokenKind::Whitespace => WHITESPACE,
+                bsv_lexer::TokenKind::Whitespace => WHITESPACE,
 
-                rustc_lexer::TokenKind::Ident if token_text == "_" => UNDERSCORE,
-                rustc_lexer::TokenKind::Ident => {
+                bsv_lexer::TokenKind::Ident if token_text == "_" => UNDERSCORE,
+                bsv_lexer::TokenKind::Ident => {
                     SyntaxKind::from_keyword(token_text, self.edition).unwrap_or(IDENT)
                 }
-                rustc_lexer::TokenKind::InvalidPrefix | rustc_lexer::TokenKind::InvalidIdent => {
+                bsv_lexer::TokenKind::InvalidPrefix | bsv_lexer::TokenKind::InvalidIdent => {
                     err = "Ident contains invalid characters";
                     IDENT
                 }
 
-                rustc_lexer::TokenKind::RawIdent => IDENT,
-                rustc_lexer::TokenKind::Literal { kind, .. } => {
+                bsv_lexer::TokenKind::RawIdent => IDENT,
+                bsv_lexer::TokenKind::Literal { kind, .. } => {
                     self.extend_literal(token_text.len(), kind);
                     return;
                 }
 
-                rustc_lexer::TokenKind::Lifetime { starts_with_number } => {
+                bsv_lexer::TokenKind::Lifetime { starts_with_number } => {
                     if *starts_with_number {
                         err = "Lifetime name cannot start with a number";
                     }
                     LIFETIME_IDENT
                 }
-                rustc_lexer::TokenKind::UnknownPrefixLifetime => {
+                bsv_lexer::TokenKind::UnknownPrefixLifetime => {
                     err = "Unknown lifetime prefix";
                     LIFETIME_IDENT
                 }
-                rustc_lexer::TokenKind::RawLifetime => LIFETIME_IDENT,
+                bsv_lexer::TokenKind::RawLifetime => LIFETIME_IDENT,
 
-                rustc_lexer::TokenKind::Semi => T![;],
-                rustc_lexer::TokenKind::Comma => T![,],
-                rustc_lexer::TokenKind::Dot => T![.],
-                rustc_lexer::TokenKind::OpenParen => T!['('],
-                rustc_lexer::TokenKind::CloseParen => T![')'],
-                rustc_lexer::TokenKind::OpenBrace => T!['{'],
-                rustc_lexer::TokenKind::CloseBrace => T!['}'],
-                rustc_lexer::TokenKind::OpenBracket => T!['['],
-                rustc_lexer::TokenKind::CloseBracket => T![']'],
-                rustc_lexer::TokenKind::At => T![@],
-                rustc_lexer::TokenKind::Pound => T![#],
-                rustc_lexer::TokenKind::Tilde => T![~],
-                rustc_lexer::TokenKind::Question => T![?],
-                rustc_lexer::TokenKind::Colon => T![:],
-                rustc_lexer::TokenKind::Dollar => T![$],
-                rustc_lexer::TokenKind::Eq => T![=],
-                rustc_lexer::TokenKind::Bang => T![!],
-                rustc_lexer::TokenKind::Lt => T![<],
-                rustc_lexer::TokenKind::Gt => T![>],
-                rustc_lexer::TokenKind::Minus => T![-],
-                rustc_lexer::TokenKind::And => T![&],
-                rustc_lexer::TokenKind::Or => T![|],
-                rustc_lexer::TokenKind::Plus => T![+],
-                rustc_lexer::TokenKind::Star => T![*],
-                rustc_lexer::TokenKind::Slash => T![/],
-                rustc_lexer::TokenKind::Caret => T![^],
-                rustc_lexer::TokenKind::Percent => T![%],
-                rustc_lexer::TokenKind::Unknown => ERROR,
-                rustc_lexer::TokenKind::UnknownPrefix if token_text == "builtin" => IDENT,
-                rustc_lexer::TokenKind::UnknownPrefix => {
+                bsv_lexer::TokenKind::Semi => T![;],
+                bsv_lexer::TokenKind::Comma => T![,],
+                bsv_lexer::TokenKind::Dot => T![.],
+                bsv_lexer::TokenKind::OpenParen => T!['('],
+                bsv_lexer::TokenKind::CloseParen => T![')'],
+                bsv_lexer::TokenKind::OpenBrace => T!['{'],
+                bsv_lexer::TokenKind::CloseBrace => T!['}'],
+                bsv_lexer::TokenKind::OpenBracket => T!['['],
+                bsv_lexer::TokenKind::CloseBracket => T![']'],
+                bsv_lexer::TokenKind::At => T![@],
+                bsv_lexer::TokenKind::Pound => T![#],
+                bsv_lexer::TokenKind::Tilde => T![~],
+                bsv_lexer::TokenKind::Question => T![?],
+                bsv_lexer::TokenKind::Colon => T![:],
+                bsv_lexer::TokenKind::Dollar => T![$],
+                bsv_lexer::TokenKind::Eq => T![=],
+                bsv_lexer::TokenKind::Bang => T![!],
+                bsv_lexer::TokenKind::Lt => T![<],
+                bsv_lexer::TokenKind::Gt => T![>],
+                bsv_lexer::TokenKind::Minus => T![-],
+                bsv_lexer::TokenKind::And => T![&],
+                bsv_lexer::TokenKind::Or => T![|],
+                bsv_lexer::TokenKind::Plus => T![+],
+                bsv_lexer::TokenKind::Star => T![*],
+                bsv_lexer::TokenKind::Slash => T![/],
+                bsv_lexer::TokenKind::Caret => T![^],
+                bsv_lexer::TokenKind::Percent => T![%],
+                bsv_lexer::TokenKind::Unknown => ERROR,
+                bsv_lexer::TokenKind::UnknownPrefix if token_text == "builtin" => IDENT,
+                bsv_lexer::TokenKind::UnknownPrefix => {
                     err = "unknown literal prefix";
                     IDENT
                 }
-                rustc_lexer::TokenKind::Eof => EOF,
+                bsv_lexer::TokenKind::Eof => EOF,
+                bsv_lexer::TokenKind::GuardedStrPrefix => ERROR,
             }
         };
 
@@ -245,50 +246,50 @@ impl<'a> Converter<'a> {
         self.push(syntax_kind, token_text.len(), err);
     }
 
-    fn extend_literal(&mut self, len: usize, kind: &rustc_lexer::LiteralKind) {
+    fn extend_literal(&mut self, len: usize, kind: &bsv_lexer::LiteralKind) {
         let mut err = "";
 
         let syntax_kind = match *kind {
-            rustc_lexer::LiteralKind::Int { empty_int, base: _ } => {
+            bsv_lexer::LiteralKind::Int { empty_int, base: _ } => {
                 if empty_int {
                     err = "Missing digits after the integer base prefix";
                 }
                 INT_NUMBER
             }
-            rustc_lexer::LiteralKind::Float { empty_exponent, base: _ } => {
+            bsv_lexer::LiteralKind::Float { empty_exponent, base: _ } => {
                 if empty_exponent {
                     err = "Missing digits after the exponent symbol";
                 }
                 FLOAT_NUMBER
             }
-            rustc_lexer::LiteralKind::Char { terminated } => {
+            bsv_lexer::LiteralKind::Char { terminated } => {
                 if !terminated {
                     err = "Missing trailing `'` symbol to terminate the character literal";
                 } else {
                     let text = &self.res.text[self.offset + 1..][..len - 1];
                     let i = text.rfind('\'').unwrap();
                     let text = &text[..i];
-                    if let Err(e) = rustc_lexer::unescape::unescape_char(text) {
+                    if let Err(e) = bsv_lexer::unescape::unescape_char(text) {
                         err = error_to_diagnostic_message(e, Mode::Char);
                     }
                 }
                 CHAR
             }
-            rustc_lexer::LiteralKind::Byte { terminated } => {
+            bsv_lexer::LiteralKind::Byte { terminated } => {
                 if !terminated {
                     err = "Missing trailing `'` symbol to terminate the byte literal";
                 } else {
                     let text = &self.res.text[self.offset + 2..][..len - 2];
                     let i = text.rfind('\'').unwrap();
                     let text = &text[..i];
-                    if let Err(e) = rustc_lexer::unescape::unescape_byte(text) {
+                    if let Err(e) = bsv_lexer::unescape::unescape_byte(text) {
                         err = error_to_diagnostic_message(e, Mode::Byte);
                     }
                 }
 
                 BYTE
             }
-            rustc_lexer::LiteralKind::Str { terminated } => {
+            bsv_lexer::LiteralKind::Str { terminated } => {
                 if !terminated {
                     err = "Missing trailing `\"` symbol to terminate the string literal";
                 } else {
@@ -299,7 +300,7 @@ impl<'a> Converter<'a> {
                 }
                 STRING
             }
-            rustc_lexer::LiteralKind::ByteStr { terminated } => {
+            bsv_lexer::LiteralKind::ByteStr { terminated } => {
                 if !terminated {
                     err = "Missing trailing `\"` symbol to terminate the byte string literal";
                 } else {
@@ -310,7 +311,7 @@ impl<'a> Converter<'a> {
                 }
                 BYTE_STRING
             }
-            rustc_lexer::LiteralKind::CStr { terminated } => {
+            bsv_lexer::LiteralKind::CStr { terminated } => {
                 if !terminated {
                     err = "Missing trailing `\"` symbol to terminate the string literal";
                 } else {
@@ -321,19 +322,19 @@ impl<'a> Converter<'a> {
                 }
                 C_STRING
             }
-            rustc_lexer::LiteralKind::RawStr { n_hashes } => {
+            bsv_lexer::LiteralKind::RawStr { n_hashes } => {
                 if n_hashes.is_none() {
                     err = "Invalid raw string literal";
                 }
                 STRING
             }
-            rustc_lexer::LiteralKind::RawByteStr { n_hashes } => {
+            bsv_lexer::LiteralKind::RawByteStr { n_hashes } => {
                 if n_hashes.is_none() {
                     err = "Invalid raw string literal";
                 }
                 BYTE_STRING
             }
-            rustc_lexer::LiteralKind::RawCStr { n_hashes } => {
+            bsv_lexer::LiteralKind::RawCStr { n_hashes } => {
                 if n_hashes.is_none() {
                     err = "Invalid raw string literal";
                 }
@@ -388,14 +389,14 @@ fn unescape_string_error_message(text: &str, mode: Mode) -> &'static str {
     let mut error_message = "";
     match mode {
         Mode::CStr => {
-            rustc_lexer::unescape::unescape_mixed(text, mode, &mut |_, res| {
+            bsv_lexer::unescape::unescape_mixed(text, mode, &mut |_, res| {
                 if let Err(e) = res {
                     error_message = error_to_diagnostic_message(e, mode);
                 }
             });
         }
         Mode::ByteStr | Mode::Str => {
-            rustc_lexer::unescape::unescape_unicode(text, mode, &mut |_, res| {
+            bsv_lexer::unescape::unescape_unicode(text, mode, &mut |_, res| {
                 if let Err(e) = res {
                     error_message = error_to_diagnostic_message(e, mode);
                 }

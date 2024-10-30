@@ -5,7 +5,7 @@
 mod block;
 
 use rowan::Direction;
-use rustc_lexer::unescape::{self, unescape_mixed, unescape_unicode, Mode};
+use bsv_lexer::unescape::{self, unescape_mixed, unescape_unicode, Mode};
 
 use crate::{
     algo,
