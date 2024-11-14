@@ -576,7 +576,7 @@
                 "properties": {
                     "bsv_analyzer.assist.termSearch.borrowcheck": {
                         "markdownDescription": "Enable borrow checking for term search code assists. If set to false, also there will be more suggestions, but some of them may not borrow-check.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -644,7 +644,7 @@
                 "properties": {
                     "bsv_analyzer.cargo.autoreload": {
                         "markdownDescription": "Automatically refresh project info via `cargo metadata` on\n`Cargo.toml` or `.cargo/config.toml` changes.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -849,7 +849,7 @@
                 "properties": {
                     "bsv_analyzer.cfg.setTest": {
                         "markdownDescription": "Set `cfg(test)` for local crates. Defaults to true.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1038,7 +1038,7 @@
                 "properties": {
                     "bsv_analyzer.completion.addSemicolonToUnit": {
                         "markdownDescription": "Whether to automatically add a semicolon when completing unit-returning functions.\n\nIn `match` arms it completes a comma instead.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1048,7 +1048,7 @@
                 "properties": {
                     "bsv_analyzer.completion.autoimport.enable": {
                         "markdownDescription": "Toggles the additional completions that automatically add imports when completed.\nNote that your client must specify the `additionalTextEdits` LSP client capability to truly have this feature enabled.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1058,7 +1058,7 @@
                 "properties": {
                     "bsv_analyzer.completion.autoself.enable": {
                         "markdownDescription": "Toggles the additional completions that automatically show method calls and field accesses\nwith `self` prefixed to them when inside a method.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1122,7 +1122,7 @@
                 "properties": {
                     "bsv_analyzer.completion.postfix.enable": {
                         "markdownDescription": "Whether to show postfix snippets like `dbg`, `if`, `not`, etc.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1324,7 +1324,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.breakPoints.enable": {
                         "markdownDescription": "Enables highlighting of related references while the cursor is on `break`, `loop`, `while`, or `for` keywords.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1334,7 +1334,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.closureCaptures.enable": {
                         "markdownDescription": "Enables highlighting of all captures of a closure while the cursor is on the `|` or move keyword of a closure.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1344,7 +1344,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.exitPoints.enable": {
                         "markdownDescription": "Enables highlighting of all exit points while the cursor is on any `return`, `?`, `fn`, or return type arrow (`->`).",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1354,7 +1354,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.references.enable": {
                         "markdownDescription": "Enables highlighting of related references while the cursor is on any identifier.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1364,7 +1364,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.yieldPoints.enable": {
                         "markdownDescription": "Enables highlighting of all break points for a loop or block context while the cursor is on any `async` or `await` keywords.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1374,7 +1374,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.debug.enable": {
                         "markdownDescription": "Whether to show `Debug` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1384,7 +1384,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.enable": {
                         "markdownDescription": "Whether to show HoverActions in Rust files.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1394,7 +1394,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.gotoTypeDef.enable": {
                         "markdownDescription": "Whether to show `Go to Type Definition` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1404,7 +1404,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.implementations.enable": {
                         "markdownDescription": "Whether to show `Implementations` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1424,7 +1424,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.run.enable": {
                         "markdownDescription": "Whether to show `Run` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1434,7 +1434,7 @@
                 "properties": {
                     "bsv_analyzer.hover.documentation.enable": {
                         "markdownDescription": "Whether to show documentation on hover.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1444,7 +1444,7 @@
                 "properties": {
                     "bsv_analyzer.hover.documentation.keywords.enable": {
                         "markdownDescription": "Whether to show keyword hover popups. Only applies when\n`#rust-analyzer.hover.documentation.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1454,7 +1454,7 @@
                 "properties": {
                     "bsv_analyzer.hover.links.enable": {
                         "markdownDescription": "Use markdown syntax for links on hover.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1491,7 +1491,7 @@
                 "properties": {
                     "bsv_analyzer.hover.memoryLayout.enable": {
                         "markdownDescription": "Whether to show memory layout data on hover.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1644,7 +1644,7 @@
                 "properties": {
                     "bsv_analyzer.imports.group.enable": {
                         "markdownDescription": "Group inserted imports by the [following order](https://rust-analyzer.github.io/manual.html#auto-import). Groups are separated by newlines.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1654,7 +1654,7 @@
                 "properties": {
                     "bsv_analyzer.imports.merge.glob": {
                         "markdownDescription": "Whether to allow import insertion to merge new imports into single path glob imports like `use std::fmt::*;`.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1724,7 +1724,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.chainingHints.enable": {
                         "markdownDescription": "Whether to show inlay type hints for method chains.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1734,7 +1734,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.closingBraceHints.enable": {
                         "markdownDescription": "Whether to show inlay hints after a closing `}` to indicate what item it belongs to.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1879,7 +1879,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.genericParameterHints.const.enable": {
                         "markdownDescription": "Whether to show const generic parameter name inlay hints.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -1963,7 +1963,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.parameterHints.enable": {
                         "markdownDescription": "Whether to show function parameter name inlay hints at the call\nsite.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2003,7 +2003,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.renderColons": {
                         "markdownDescription": "Whether to render leading colons for type hints, and trailing colons for parameter hints.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2013,7 +2013,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.typeHints.enable": {
                         "markdownDescription": "Whether to show inlay type hints for variables.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2053,7 +2053,7 @@
                 "properties": {
                     "bsv_analyzer.joinLines.joinAssignments": {
                         "markdownDescription": "Join lines merges consecutive declaration and initialization of an assignment.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2063,7 +2063,7 @@
                 "properties": {
                     "bsv_analyzer.joinLines.joinElseIf": {
                         "markdownDescription": "Join lines inserts else between consecutive ifs.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2073,7 +2073,7 @@
                 "properties": {
                     "bsv_analyzer.joinLines.removeTrailingComma": {
                         "markdownDescription": "Join lines removes trailing commas.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2083,7 +2083,7 @@
                 "properties": {
                     "bsv_analyzer.joinLines.unwrapTrivialBlock": {
                         "markdownDescription": "Join lines unwraps trivial blocks.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2093,7 +2093,7 @@
                 "properties": {
                     "bsv_analyzer.lens.debug.enable": {
                         "markdownDescription": "Whether to show `Debug` lens. Only applies when\n`#rust-analyzer.lens.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2103,7 +2103,7 @@
                 "properties": {
                     "bsv_analyzer.lens.enable": {
                         "markdownDescription": "Whether to show CodeLens in Rust files.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2113,7 +2113,7 @@
                 "properties": {
                     "bsv_analyzer.lens.implementations.enable": {
                         "markdownDescription": "Whether to show `Implementations` lens. Only applies when\n`#rust-analyzer.lens.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2181,7 +2181,7 @@
                 "properties": {
                     "bsv_analyzer.lens.run.enable": {
                         "markdownDescription": "Whether to show `Run` lens. Only applies when\n`#rust-analyzer.lens.enable#` is set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2232,7 +2232,7 @@
                 "properties": {
                     "bsv_analyzer.notifications.cargoTomlNotFound": {
                         "markdownDescription": "Whether to show `can't find Cargo.toml` error message.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2272,7 +2272,7 @@
                 "properties": {
                     "bsv_analyzer.procMacro.attributes.enable": {
                         "markdownDescription": "Expand attribute macros. Requires `#rust-analyzer.procMacro.enable#` to be set.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2282,7 +2282,7 @@
                 "properties": {
                     "bsv_analyzer.procMacro.enable": {
                         "markdownDescription": "Enable support for procedural macros, implies `#rust-analyzer.cargo.buildScripts.enable#`.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2428,7 +2428,7 @@
                 "properties": {
                     "bsv_analyzer.semanticHighlighting.doc.comment.inject.enable": {
                         "markdownDescription": "Inject additional highlighting into doc comments.\n\nWhen enabled, rust-analyzer will highlight rust source in doc comments as well as intra\ndoc links.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2438,7 +2438,7 @@
                 "properties": {
                     "bsv_analyzer.semanticHighlighting.nonStandardTokens": {
                         "markdownDescription": "Whether the server is allowed to emit non-standard tokens and modifiers.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2448,7 +2448,7 @@
                 "properties": {
                     "bsv_analyzer.semanticHighlighting.operator.enable": {
                         "markdownDescription": "Use semantic tokens for operators.\n\nWhen disabled, rust-analyzer will emit semantic tokens only for operator tokens when\nthey are tagged with modifiers.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2498,7 +2498,7 @@
                 "properties": {
                     "bsv_analyzer.semanticHighlighting.strings.enable": {
                         "markdownDescription": "Use semantic tokens for strings.\n\nIn some editors (e.g. vscode) semantic tokens override other highlighting grammars.\nBy disabling semantic tokens for strings, other grammars can be used to highlight\ntheir contents.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2526,7 +2526,7 @@
                 "properties": {
                     "bsv_analyzer.signatureInfo.documentation.enable": {
                         "markdownDescription": "Show documentation.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }

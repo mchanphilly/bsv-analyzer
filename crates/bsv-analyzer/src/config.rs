@@ -87,45 +87,45 @@ config_data! {
 
 
         /// Enables highlighting of related references while the cursor is on `break`, `loop`, `while`, or `for` keywords.
-        highlightRelated_breakPoints_enable: bool = true,
+        highlightRelated_breakPoints_enable: bool = false,
         /// Enables highlighting of all captures of a closure while the cursor is on the `|` or move keyword of a closure.
-        highlightRelated_closureCaptures_enable: bool = true,
+        highlightRelated_closureCaptures_enable: bool = false,
         /// Enables highlighting of all exit points while the cursor is on any `return`, `?`, `fn`, or return type arrow (`->`).
-        highlightRelated_exitPoints_enable: bool = true,
+        highlightRelated_exitPoints_enable: bool = false,
         /// Enables highlighting of related references while the cursor is on any identifier.
-        highlightRelated_references_enable: bool = true,
+        highlightRelated_references_enable: bool = false,
         /// Enables highlighting of all break points for a loop or block context while the cursor is on any `async` or `await` keywords.
-        highlightRelated_yieldPoints_enable: bool = true,
+        highlightRelated_yieldPoints_enable: bool = false,
 
         /// Whether to show `Debug` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
-        hover_actions_debug_enable: bool           = true,
+        hover_actions_debug_enable: bool           = false,
         /// Whether to show HoverActions in Rust files.
-        hover_actions_enable: bool          = true,
+        hover_actions_enable: bool          = false,
         /// Whether to show `Go to Type Definition` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
-        hover_actions_gotoTypeDef_enable: bool     = true,
+        hover_actions_gotoTypeDef_enable: bool     = false,
         /// Whether to show `Implementations` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
-        hover_actions_implementations_enable: bool = true,
+        hover_actions_implementations_enable: bool = false,
         /// Whether to show `References` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
         hover_actions_references_enable: bool      = false,
         /// Whether to show `Run` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
-        hover_actions_run_enable: bool             = true,
+        hover_actions_run_enable: bool             = false,
 
         /// Whether to show documentation on hover.
-        hover_documentation_enable: bool           = true,
+        hover_documentation_enable: bool           = false,
         /// Whether to show keyword hover popups. Only applies when
         /// `#rust-analyzer.hover.documentation.enable#` is set.
-        hover_documentation_keywords_enable: bool  = true,
+        hover_documentation_keywords_enable: bool  = false,
         /// Use markdown syntax for links on hover.
-        hover_links_enable: bool = true,
+        hover_links_enable: bool = false,
         /// How to render the align information in a memory layout hover.
         hover_memoryLayout_alignment: Option<MemoryLayoutHoverRenderKindDef> = Some(MemoryLayoutHoverRenderKindDef::Hexadecimal),
         /// Whether to show memory layout data on hover.
-        hover_memoryLayout_enable: bool = true,
+        hover_memoryLayout_enable: bool = false,
         /// How to render the niche information in a memory layout hover.
         hover_memoryLayout_niches: Option<bool> = Some(false),
         /// How to render the offset information in a memory layout hover.
@@ -143,9 +143,9 @@ config_data! {
         /// Whether to show inlay type hints for binding modes.
         inlayHints_bindingModeHints_enable: bool                   = false,
         /// Whether to show inlay type hints for method chains.
-        inlayHints_chainingHints_enable: bool                      = true,
+        inlayHints_chainingHints_enable: bool                      = false,
         /// Whether to show inlay hints after a closing `}` to indicate what item it belongs to.
-        inlayHints_closingBraceHints_enable: bool                  = true,
+        inlayHints_closingBraceHints_enable: bool                  = false,
         /// Minimum number of lines required before the `}` until the hint is shown (set to 0 or 1
         /// to always show them).
         inlayHints_closingBraceHints_minLines: usize               = 25,
@@ -164,7 +164,7 @@ config_data! {
         /// Whether to show inlay hints as postfix ops (`.*` instead of `*`, etc).
         inlayHints_expressionAdjustmentHints_mode: AdjustmentHintsModeDef = AdjustmentHintsModeDef::Prefix,
         /// Whether to show const generic parameter name inlay hints.
-        inlayHints_genericParameterHints_const_enable: bool= true,
+        inlayHints_genericParameterHints_const_enable: bool= false,
         /// Whether to show generic lifetime parameter name inlay hints.
         inlayHints_genericParameterHints_lifetime_enable: bool = false,
         /// Whether to show generic type parameter name inlay hints.
@@ -179,16 +179,16 @@ config_data! {
         inlayHints_maxLength: Option<usize>                        = Some(25),
         /// Whether to show function parameter name inlay hints at the call
         /// site.
-        inlayHints_parameterHints_enable: bool                     = true,
+        inlayHints_parameterHints_enable: bool                     = false,
         /// Whether to show exclusive range inlay hints.
         inlayHints_rangeExclusiveHints_enable: bool                = false,
         /// Whether to show inlay hints for compiler inserted reborrows.
         /// This setting is deprecated in favor of #rust-analyzer.inlayHints.expressionAdjustmentHints.enable#.
         inlayHints_reborrowHints_enable: ReborrowHintsDef          = ReborrowHintsDef::Never,
         /// Whether to render leading colons for type hints, and trailing colons for parameter hints.
-        inlayHints_renderColons: bool                              = true,
+        inlayHints_renderColons: bool                              = false,
         /// Whether to show inlay type hints for variables.
-        inlayHints_typeHints_enable: bool                          = true,
+        inlayHints_typeHints_enable: bool                          = false,
         /// Whether to hide inlay type hints for `let` statements that initialize to a closure.
         /// Only applies to closures with blocks, same as `#rust-analyzer.inlayHints.closureReturnTypeHints.enable#`.
         inlayHints_typeHints_hideClosureInitialization: bool       = false,
@@ -199,22 +199,22 @@ config_data! {
         interpret_tests: bool = false,
 
         /// Join lines merges consecutive declaration and initialization of an assignment.
-        joinLines_joinAssignments: bool = true,
+        joinLines_joinAssignments: bool = false,
         /// Join lines inserts else between consecutive ifs.
-        joinLines_joinElseIf: bool = true,
+        joinLines_joinElseIf: bool = false,
         /// Join lines removes trailing commas.
-        joinLines_removeTrailingComma: bool = true,
+        joinLines_removeTrailingComma: bool = false,
         /// Join lines unwraps trivial blocks.
-        joinLines_unwrapTrivialBlock: bool = true,
+        joinLines_unwrapTrivialBlock: bool = false,
 
         /// Whether to show `Debug` lens. Only applies when
         /// `#rust-analyzer.lens.enable#` is set.
-        lens_debug_enable: bool            = true,
+        lens_debug_enable: bool            = false,
         /// Whether to show CodeLens in Rust files.
-        lens_enable: bool           = true,
+        lens_enable: bool           = false,
         /// Whether to show `Implementations` lens. Only applies when
         /// `#rust-analyzer.lens.enable#` is set.
-        lens_implementations_enable: bool  = true,
+        lens_implementations_enable: bool  = false,
         /// Where to render annotations.
         lens_location: AnnotationLocation = AnnotationLocation::AboveName,
         /// Whether to show `References` lens for Struct, Enum, and Union.
@@ -231,7 +231,7 @@ config_data! {
         lens_references_trait_enable: bool = false,
         /// Whether to show `Run` lens. Only applies when
         /// `#rust-analyzer.lens.enable#` is set.
-        lens_run_enable: bool              = true,
+        lens_run_enable: bool              = false,
 
         /// Disable project auto-discovery in favor of explicitly specified set
         /// of projects.
@@ -247,15 +247,15 @@ config_data! {
         lru_query_capacities: FxHashMap<Box<str>, u16> = FxHashMap::default(),
 
         /// Whether to show `can't find Cargo.toml` error message.
-        notifications_cargoTomlNotFound: bool      = true,
+        notifications_cargoTomlNotFound: bool      = false,
 
         /// How many worker threads in the main loop. The default `null` means to pick automatically.
         numThreads: Option<NumThreads> = None,
 
         /// Expand attribute macros. Requires `#rust-analyzer.procMacro.enable#` to be set.
-        procMacro_attributes_enable: bool = true,
+        procMacro_attributes_enable: bool = false,
         /// Enable support for procedural macros, implies `#rust-analyzer.cargo.buildScripts.enable#`.
-        procMacro_enable: bool                     = true,
+        procMacro_enable: bool                     = false,
         /// Internal config, path to proc-macro server executable.
         procMacro_server: Option<Utf8PathBuf>          = None,
 
@@ -269,14 +269,14 @@ config_data! {
         ///
         /// When enabled, rust-analyzer will highlight rust source in doc comments as well as intra
         /// doc links.
-        semanticHighlighting_doc_comment_inject_enable: bool = true,
+        semanticHighlighting_doc_comment_inject_enable: bool = false,
         /// Whether the server is allowed to emit non-standard tokens and modifiers.
-        semanticHighlighting_nonStandardTokens: bool = true,
+        semanticHighlighting_nonStandardTokens: bool = false,
         /// Use semantic tokens for operators.
         ///
         /// When disabled, rust-analyzer will emit semantic tokens only for operator tokens when
         /// they are tagged with modifiers.
-        semanticHighlighting_operator_enable: bool = true,
+        semanticHighlighting_operator_enable: bool = false,
         /// Use specialized semantic tokens for operators.
         ///
         /// When enabled, rust-analyzer will emit special token types for operator tokens instead
@@ -300,12 +300,12 @@ config_data! {
         /// In some editors (e.g. vscode) semantic tokens override other highlighting grammars.
         /// By disabling semantic tokens for strings, other grammars can be used to highlight
         /// their contents.
-        semanticHighlighting_strings_enable: bool = true,
+        semanticHighlighting_strings_enable: bool = false,
 
         /// Show full signature of the callable. Only shows parameters if disabled.
         signatureInfo_detail: SignatureDetail                           = SignatureDetail::Full,
         /// Show documentation.
-        signatureInfo_documentation_enable: bool                       = true,
+        signatureInfo_documentation_enable: bool                       = false,
 
         /// Whether to insert closing angle brackets when typing an opening angle bracket of a generic argument list.
         typing_autoClosingAngleBrackets_enable: bool = false,
@@ -417,7 +417,7 @@ config_data! {
         /// Placeholder expression to use for missing expressions in assists.
         assist_expressionFillDefault: ExprFillDefaultDef              = ExprFillDefaultDef::Todo,
         /// Enable borrow checking for term search code assists. If set to false, also there will be more suggestions, but some of them may not borrow-check.
-        assist_termSearch_borrowcheck: bool = true,
+        assist_termSearch_borrowcheck: bool = false,
         /// Term search fuel in "units of work" for assists (Defaults to 1800).
         assist_termSearch_fuel: usize = 1800,
 
@@ -425,13 +425,13 @@ config_data! {
         /// Whether to automatically add a semicolon when completing unit-returning functions.
         ///
         /// In `match` arms it completes a comma instead.
-        completion_addSemicolonToUnit: bool = true,
+        completion_addSemicolonToUnit: bool = false,
         /// Toggles the additional completions that automatically add imports when completed.
         /// Note that your client must specify the `additionalTextEdits` LSP client capability to truly have this feature enabled.
-        completion_autoimport_enable: bool       = true,
+        completion_autoimport_enable: bool       = false,
         /// Toggles the additional completions that automatically show method calls and field accesses
         /// with `self` prefixed to them when inside a method.
-        completion_autoself_enable: bool        = true,
+        completion_autoself_enable: bool        = false,
         /// Whether to add parenthesis and argument snippets when completing function.
         completion_callable_snippets: CallableCompletionDef  = CallableCompletionDef::FillArguments,
         /// Whether to show full function/method signatures in completion docs.
@@ -441,7 +441,7 @@ config_data! {
         /// Maximum number of completions to return. If `None`, the limit is infinite.
         completion_limit: Option<usize> = None,
         /// Whether to show postfix snippets like `dbg`, `if`, `not`, etc.
-        completion_postfix_enable: bool         = true,
+        completion_postfix_enable: bool         = false,
         /// Enables completions of private items and fields that are defined in the current workspace even if they are not visible at the current position.
         completion_privateEditable_enable: bool = false,
         /// Whether to enable term search based snippets like `Some(foo.bar().baz())`.
@@ -477,9 +477,9 @@ config_data! {
         /// How imports should be grouped into use statements.
         imports_granularity_group: ImportGranularityDef  = ImportGranularityDef::Crate,
         /// Group inserted imports by the https://rust-analyzer.github.io/manual.html#auto-import[following order]. Groups are separated by newlines.
-        imports_group_enable: bool                           = true,
+        imports_group_enable: bool                           = false,
         /// Whether to allow import insertion to merge new imports into single path glob imports like `use std::fmt::*;`.
-        imports_merge_glob: bool           = true,
+        imports_merge_glob: bool           = false,
         /// Prefer to unconditionally use imports of the core and alloc crate, over the std crate.
         imports_preferNoStd | imports_prefer_no_std: bool = false,
          /// Whether to prefer import paths containing a `prelude` module.
@@ -497,7 +497,7 @@ config_data! {
         cargo_allTargets: bool           = false,
         /// Automatically refresh project info via `cargo metadata` on
         /// `Cargo.toml` or `.cargo/config.toml` changes.
-        cargo_autoreload: bool           = true,
+        cargo_autoreload: bool           = false,
         /// Run build scripts (`build.rs`) for more precise code analysis.
         cargo_buildScripts_enable: bool  = false,
         /// Specifies the invocation strategy to use when running the build scripts command.
@@ -575,7 +575,7 @@ config_data! {
         cargo_targetDir | rust_analyzerTargetDir: Option<TargetDirectory> = None,
 
         /// Set `cfg(test)` for local crates. Defaults to true.
-        cfg_setTest: bool = true,
+        cfg_setTest: bool = false,
 
         /// Run the check command for diagnostics on save.
         checkOnSave | checkOnSave_enable: bool                         = false,
@@ -1691,30 +1691,31 @@ impl Config {
         self.workspace_discoverConfig().as_ref()
     }
 
-    fn discovered_projects(&self) -> Vec<ManifestOrProjectJson> {
-        let exclude_dirs: Vec<_> =
-            self.files_excludeDirs().iter().map(|p| self.root_path.join(p)).collect();
+    // TODO BSV
+    // fn discovered_projects(&self) -> Vec<ManifestOrProjectJson> {
+    //     let exclude_dirs: Vec<_> =
+    //         self.files_excludeDirs().iter().map(|p| self.root_path.join(p)).collect();
 
-        let mut projects = vec![];
-        for fs_proj in &self.discovered_projects_from_filesystem {
-            let manifest_path = fs_proj.manifest_path();
-            if exclude_dirs.iter().any(|p| manifest_path.starts_with(p)) {
-                continue;
-            }
+    //     let mut projects = vec![];
+    //     for fs_proj in &self.discovered_projects_from_filesystem {
+    //         let manifest_path = fs_proj.manifest_path();
+    //         if exclude_dirs.iter().any(|p| manifest_path.starts_with(p)) {
+    //             continue;
+    //         }
 
-            let buf: Utf8PathBuf = manifest_path.to_path_buf().into();
-            projects.push(ManifestOrProjectJson::Manifest(buf));
-        }
+    //         let buf: Utf8PathBuf = manifest_path.to_path_buf().into();
+    //         projects.push(ManifestOrProjectJson::Manifest(buf));
+    //     }
 
-        for dis_proj in &self.discovered_projects_from_command {
-            projects.push(ManifestOrProjectJson::DiscoveredProjectJson {
-                data: dis_proj.data.clone(),
-                buildfile: dis_proj.buildfile.clone(),
-            });
-        }
+    //     for dis_proj in &self.discovered_projects_from_command {
+    //         projects.push(ManifestOrProjectJson::DiscoveredProjectJson {
+    //             data: dis_proj.data.clone(),
+    //             buildfile: dis_proj.buildfile.clone(),
+    //         });
+    //     }
 
-        projects
-    }
+    //     projects
+    // }
 
     pub fn linked_or_discovered_projects(&self) -> Vec<LinkedProject> {
         // let linked_projects = self.linkedProjects();

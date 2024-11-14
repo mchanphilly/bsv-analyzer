@@ -38,7 +38,7 @@ pub fn server_capabilities(config: &Config) -> ServerCapabilities {
             will_save_wait_until: None,
             save: Some(SaveOptions::default().into()),
         })),
-        hover_provider: Some(HoverProviderCapability::Simple(true)),
+        hover_provider: Some(HoverProviderCapability::Simple(false)),
         completion_provider: Some(CompletionOptions {
             resolve_provider: config.caps().completions_resolve_provider(),
             trigger_characters: Some(vec![
@@ -99,7 +99,7 @@ pub fn server_capabilities(config: &Config) -> ServerCapabilities {
                         FileOperationFilter {
                             scheme: Some(String::from("file")),
                             pattern: FileOperationPattern {
-                                glob: String::from("**/*.rs"),
+                                glob: String::from("**/*.bsv"),
                                 matches: Some(FileOperationPatternKind::File),
                                 options: None,
                             },

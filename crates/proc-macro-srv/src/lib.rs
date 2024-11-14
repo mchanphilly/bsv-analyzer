@@ -19,8 +19,6 @@ extern crate proc_macro;
 #[cfg(feature = "in-rust-tree")]
 extern crate rustc_driver as _;
 
-extern crate bsv_lexer;
-
 mod dylib;
 mod proc_macros;
 mod server_impl;

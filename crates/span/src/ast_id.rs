@@ -195,8 +195,7 @@ impl AstIdMap {
 
     pub fn ast_id_for_ptr<N: AstIdNode>(&self, ptr: AstPtr<N>) -> FileAstId<N> {
         let ptr = ptr.syntax_node_ptr();
-        let hash = hash_ptr(&ptr);
-        match self.map.raw_entry().from_hash(hash, |&idx| self.arena[idx] == ptr) {
+        let hash = hash_ptr(&ptr);match self.map.raw_entry().from_hash(hash, |&idx| self.arena[idx] == ptr) {
             Some((&raw, &())) => FileAstId {
                 raw: ErasedFileAstId(raw.into_raw().into_u32()),
                 covariant: PhantomData,

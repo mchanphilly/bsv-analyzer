@@ -215,18 +215,18 @@ impl GlobalState {
             lsp_types::DocumentFilter {
                 language: None,
                 scheme: None,
-                pattern: Some("**/*.rs".into()),
+                pattern: Some("**/*.bsv".into()),
             },
-            lsp_types::DocumentFilter {
-                language: None,
-                scheme: None,
-                pattern: Some("**/Cargo.toml".into()),
-            },
-            lsp_types::DocumentFilter {
-                language: None,
-                scheme: None,
-                pattern: Some("**/Cargo.lock".into()),
-            },
+            // lsp_types::DocumentFilter {
+            //     language: None,
+            //     scheme: None,
+            //     pattern: Some("**/Cargo.toml".into()),
+            // },
+            // lsp_types::DocumentFilter {
+            //     language: None,
+            //     scheme: None,
+            //     pattern: Some("**/Cargo.lock".into()),
+            // },
         ];
         selectors.extend(additional_filters);
 

@@ -21,8 +21,6 @@
 
 #![cfg_attr(feature = "in-rust-tree", feature(rustc_private))]
 
-extern crate bsv_lexer;
-
 mod parsing;
 mod ptr;
 mod syntax_error;

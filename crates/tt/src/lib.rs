@@ -4,8 +4,6 @@
 
 #![cfg_attr(feature = "in-rust-tree", feature(rustc_private))]
 
-extern crate bsv_lexer;
-
 pub mod buffer;
 pub mod iter;
 

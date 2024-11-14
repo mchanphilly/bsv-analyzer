@@ -97,7 +97,7 @@ impl RatomlTest {
         self.server.notification::<DidOpenTextDocument>(DidOpenTextDocumentParams {
             text_document: TextDocumentItem {
                 uri: url.clone(),
-                language_id: "rust".to_owned(),
+                language_id: "bluespec".to_owned(),
                 version: 0,
                 text: String::new(),
             },
@@ -117,7 +117,7 @@ impl RatomlTest {
         self.server.notification::<DidOpenTextDocument>(DidOpenTextDocumentParams {
             text_document: TextDocumentItem {
                 uri: self.urls[file_idx].clone(),
-                language_id: "rust".to_owned(),
+                language_id: "bluespec".to_owned(),
                 version: 0,
                 text: "".to_owned(),
             },
@@ -134,7 +134,7 @@ impl RatomlTest {
         self.server.notification::<DidOpenTextDocument>(DidOpenTextDocumentParams {
             text_document: TextDocumentItem {
                 uri: self.urls[file_idx].clone(),
-                language_id: "rust".to_owned(),
+                language_id: "bluespec".to_owned(),
                 version: 0,
                 text: String::new(),
             },

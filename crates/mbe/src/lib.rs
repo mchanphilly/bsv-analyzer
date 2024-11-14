@@ -6,8 +6,6 @@
 //! The tests for this functionality live in another crate:
 //! `hir_def::macro_expansion_tests::mbe`.
 
-extern crate bsv_lexer;
-
 mod expander;
 mod parser;
 

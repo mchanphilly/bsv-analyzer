@@ -136,7 +136,7 @@ impl LsifManager<'_> {
         let path = self.vfs.file_path(id);
         let path = path.as_path().unwrap();
         let doc_id = self.add_vertex(lsif::Vertex::Document(lsif::Document {
-            language_id: "rust".to_owned(),
+            language_id: "bluespec".to_owned(),
             uri: lsp_types::Url::from_file_path(path).unwrap(),
         }));
         self.file_map.insert(id, doc_id);

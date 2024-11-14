@@ -533,9 +533,9 @@ impl GlobalState {
                         .flat_map(|include| {
                             include.into_iter().flat_map(|base| {
                                 [
-                                    (base.clone(), "**/*.rs"),
-                                    (base.clone(), "**/Cargo.{lock,toml}"),
-                                    (base, "**/bsv-analyzer.toml"),
+                                    (base, "**/*.bsv"),
+                                    // (base.clone(), "**/Cargo.{lock,toml}"),
+                                    // (base, "**/bsv-analyzer.toml"),
                                 ]
                             })
                         })
@@ -557,9 +557,9 @@ impl GlobalState {
                         .flat_map(|include| {
                             include.into_iter().flat_map(|base| {
                                 [
-                                    format!("{base}/**/*.rs"),
-                                    format!("{base}/**/Cargo.{{toml,lock}}"),
-                                    format!("{base}/**/bsv-analyzer.toml"),
+                                    format!("{base}/**/*.bsv"),
+                                    // format!("{base}/**/Cargo.{{toml,lock}}"),
+                                    // format!("{base}/**/bsv-analyzer.toml"),
                                 ]
                             })
                         })
@@ -740,31 +740,32 @@ impl GlobalState {
         self.reload_flycheck();
     }
 
+    // TODO BSV
     pub(super) fn fetch_workspace_error(&self) -> Result<(), String> {
-        let mut buf = String::new();
+        // let mut buf = String::new();
 
-        let Some(FetchWorkspaceResponse { workspaces, .. }) =
-            self.fetch_workspaces_queue.last_op_result()
-        else {
-            return Ok(());
-        };
+        // let Some(FetchWorkspaceResponse { workspaces, .. }) =
+        //     self.fetch_workspaces_queue.last_op_result()
+        // else {
+        //     return Ok(());
+        // };
 
         return Ok(());
-        if workspaces.is_empty() && self.config.discover_workspace_config().is_none() {
-            stdx::format_to!(buf, "bsv-analyzer failed to fetch workspace");
-        } else {
-            for ws in workspaces {
-                if let Err(err) = ws {
-                    stdx::format_to!(buf, "bsv-analyzer failed to load workspace: {:#}\n", err);
-                }
-            }
-        }
+        // if workspaces.is_empty() && self.config.discover_workspace_config().is_none() {
+        //     stdx::format_to!(buf, "bsv-analyzer failed to fetch workspace");
+        // } else {
+        //     for ws in workspaces {
+        //         if let Err(err) = ws {
+        //             stdx::format_to!(buf, "bsv-analyzer failed to load workspace: {:#}\n", err);
+        //         }
+        //     }
+        // }
 
-        if buf.is_empty() {
-            return Ok(());
-        }
+        // if buf.is_empty() {
+        //     return Ok(());
+        // }
 
-        Err(buf)
+        // Err(buf)
     }
 
     pub(super) fn fetch_build_data_error(&self) -> Result<(), String> {

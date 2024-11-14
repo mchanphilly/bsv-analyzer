@@ -9,7 +9,7 @@ for enum variants.
 --
 Placeholder expression to use for missing expressions in assists.
 --
-[[bsv_analyzer.assist.termSearch.borrowcheck]]bsv_analyzer.assist.termSearch.borrowcheck (default: `true`)::
+[[bsv_analyzer.assist.termSearch.borrowcheck]]bsv_analyzer.assist.termSearch.borrowcheck (default: `false`)::
 +
 --
 Enable borrow checking for term search code assists. If set to false, also there will be more suggestions, but some of them may not borrow-check.
@@ -34,7 +34,7 @@ How many worker threads to handle priming caches. The default `0` means to pick 
 --
 Pass `--all-targets` to cargo invocation.
 --
-[[bsv_analyzer.cargo.autoreload]]bsv_analyzer.cargo.autoreload (default: `true`)::
+[[bsv_analyzer.cargo.autoreload]]bsv_analyzer.cargo.autoreload (default: `false`)::
 +
 --
 Automatically refresh project info via `cargo metadata` on
@@ -158,7 +158,7 @@ building from locking the `Cargo.lock` at the expense of duplicating build artif
 Set to `true` to use a subdirectory of the existing target directory or
 set to a path relative to the workspace to use that path.
 --
-[[bsv_analyzer.cfg.setTest]]bsv_analyzer.cfg.setTest (default: `true`)::
+[[bsv_analyzer.cfg.setTest]]bsv_analyzer.cfg.setTest (default: `false`)::
 +
 --
 Set `cfg(test)` for local crates. Defaults to true.
@@ -266,20 +266,20 @@ Aliased as `"checkOnSave.targets"`.
 Whether `--workspace` should be passed to `cargo check`.
 If false, `-p <package>` will be passed instead.
 --
-[[bsv_analyzer.completion.addSemicolonToUnit]]bsv_analyzer.completion.addSemicolonToUnit (default: `true`)::
+[[bsv_analyzer.completion.addSemicolonToUnit]]bsv_analyzer.completion.addSemicolonToUnit (default: `false`)::
 +
 --
 Whether to automatically add a semicolon when completing unit-returning functions.
 
 In `match` arms it completes a comma instead.
 --
-[[bsv_analyzer.completion.autoimport.enable]]bsv_analyzer.completion.autoimport.enable (default: `true`)::
+[[bsv_analyzer.completion.autoimport.enable]]bsv_analyzer.completion.autoimport.enable (default: `false`)::
 +
 --
 Toggles the additional completions that automatically add imports when completed.
 Note that your client must specify the `additionalTextEdits` LSP client capability to truly have this feature enabled.
 --
-[[bsv_analyzer.completion.autoself.enable]]bsv_analyzer.completion.autoself.enable (default: `true`)::
+[[bsv_analyzer.completion.autoself.enable]]bsv_analyzer.completion.autoself.enable (default: `false`)::
 +
 --
 Toggles the additional completions that automatically show method calls and field accesses
@@ -305,7 +305,7 @@ Whether to omit deprecated items from autocompletion. By default they are marked
 --
 Maximum number of completions to return. If `None`, the limit is infinite.
 --
-[[bsv_analyzer.completion.postfix.enable]]bsv_analyzer.completion.postfix.enable (default: `true`)::
+[[bsv_analyzer.completion.postfix.enable]]bsv_analyzer.completion.postfix.enable (default: `false`)::
 +
 --
 Whether to show postfix snippets like `dbg`, `if`, `not`, etc.
@@ -430,49 +430,49 @@ also need to add the folders to Code's `files.watcherExclude`.
 --
 Controls file watching implementation.
 --
-[[bsv_analyzer.highlightRelated.breakPoints.enable]]bsv_analyzer.highlightRelated.breakPoints.enable (default: `true`)::
+[[bsv_analyzer.highlightRelated.breakPoints.enable]]bsv_analyzer.highlightRelated.breakPoints.enable (default: `false`)::
 +
 --
 Enables highlighting of related references while the cursor is on `break`, `loop`, `while`, or `for` keywords.
 --
-[[bsv_analyzer.highlightRelated.closureCaptures.enable]]bsv_analyzer.highlightRelated.closureCaptures.enable (default: `true`)::
+[[bsv_analyzer.highlightRelated.closureCaptures.enable]]bsv_analyzer.highlightRelated.closureCaptures.enable (default: `false`)::
 +
 --
 Enables highlighting of all captures of a closure while the cursor is on the `|` or move keyword of a closure.
 --
-[[bsv_analyzer.highlightRelated.exitPoints.enable]]bsv_analyzer.highlightRelated.exitPoints.enable (default: `true`)::
+[[bsv_analyzer.highlightRelated.exitPoints.enable]]bsv_analyzer.highlightRelated.exitPoints.enable (default: `false`)::
 +
 --
 Enables highlighting of all exit points while the cursor is on any `return`, `?`, `fn`, or return type arrow (`->`).
 --
-[[bsv_analyzer.highlightRelated.references.enable]]bsv_analyzer.highlightRelated.references.enable (default: `true`)::
+[[bsv_analyzer.highlightRelated.references.enable]]bsv_analyzer.highlightRelated.references.enable (default: `false`)::
 +
 --
 Enables highlighting of related references while the cursor is on any identifier.
 --
-[[bsv_analyzer.highlightRelated.yieldPoints.enable]]bsv_analyzer.highlightRelated.yieldPoints.enable (default: `true`)::
+[[bsv_analyzer.highlightRelated.yieldPoints.enable]]bsv_analyzer.highlightRelated.yieldPoints.enable (default: `false`)::
 +
 --
 Enables highlighting of all break points for a loop or block context while the cursor is on any `async` or `await` keywords.
 --
-[[bsv_analyzer.hover.actions.debug.enable]]bsv_analyzer.hover.actions.debug.enable (default: `true`)::
+[[bsv_analyzer.hover.actions.debug.enable]]bsv_analyzer.hover.actions.debug.enable (default: `false`)::
 +
 --
 Whether to show `Debug` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.actions.enable]]bsv_analyzer.hover.actions.enable (default: `true`)::
+[[bsv_analyzer.hover.actions.enable]]bsv_analyzer.hover.actions.enable (default: `false`)::
 +
 --
 Whether to show HoverActions in Rust files.
 --
-[[bsv_analyzer.hover.actions.gotoTypeDef.enable]]bsv_analyzer.hover.actions.gotoTypeDef.enable (default: `true`)::
+[[bsv_analyzer.hover.actions.gotoTypeDef.enable]]bsv_analyzer.hover.actions.gotoTypeDef.enable (default: `false`)::
 +
 --
 Whether to show `Go to Type Definition` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.actions.implementations.enable]]bsv_analyzer.hover.actions.implementations.enable (default: `true`)::
+[[bsv_analyzer.hover.actions.implementations.enable]]bsv_analyzer.hover.actions.implementations.enable (default: `false`)::
 +
 --
 Whether to show `Implementations` action. Only applies when
@@ -484,24 +484,24 @@ Whether to show `Implementations` action. Only applies when
 Whether to show `References` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.actions.run.enable]]bsv_analyzer.hover.actions.run.enable (default: `true`)::
+[[bsv_analyzer.hover.actions.run.enable]]bsv_analyzer.hover.actions.run.enable (default: `false`)::
 +
 --
 Whether to show `Run` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.documentation.enable]]bsv_analyzer.hover.documentation.enable (default: `true`)::
+[[bsv_analyzer.hover.documentation.enable]]bsv_analyzer.hover.documentation.enable (default: `false`)::
 +
 --
 Whether to show documentation on hover.
 --
-[[bsv_analyzer.hover.documentation.keywords.enable]]bsv_analyzer.hover.documentation.keywords.enable (default: `true`)::
+[[bsv_analyzer.hover.documentation.keywords.enable]]bsv_analyzer.hover.documentation.keywords.enable (default: `false`)::
 +
 --
 Whether to show keyword hover popups. Only applies when
 `#rust-analyzer.hover.documentation.enable#` is set.
 --
-[[bsv_analyzer.hover.links.enable]]bsv_analyzer.hover.links.enable (default: `true`)::
+[[bsv_analyzer.hover.links.enable]]bsv_analyzer.hover.links.enable (default: `false`)::
 +
 --
 Use markdown syntax for links on hover.
@@ -511,7 +511,7 @@ Use markdown syntax for links on hover.
 --
 How to render the align information in a memory layout hover.
 --
-[[bsv_analyzer.hover.memoryLayout.enable]]bsv_analyzer.hover.memoryLayout.enable (default: `true`)::
+[[bsv_analyzer.hover.memoryLayout.enable]]bsv_analyzer.hover.memoryLayout.enable (default: `false`)::
 +
 --
 Whether to show memory layout data on hover.
@@ -556,12 +556,12 @@ Whether to enforce the import granularity setting for all files. If set to false
 --
 How imports should be grouped into use statements.
 --
-[[bsv_analyzer.imports.group.enable]]bsv_analyzer.imports.group.enable (default: `true`)::
+[[bsv_analyzer.imports.group.enable]]bsv_analyzer.imports.group.enable (default: `false`)::
 +
 --
 Group inserted imports by the https://rust-analyzer.github.io/manual.html#auto-import[following order]. Groups are separated by newlines.
 --
-[[bsv_analyzer.imports.merge.glob]]bsv_analyzer.imports.merge.glob (default: `true`)::
+[[bsv_analyzer.imports.merge.glob]]bsv_analyzer.imports.merge.glob (default: `false`)::
 +
 --
 Whether to allow import insertion to merge new imports into single path glob imports like `use std::fmt::*;`.
@@ -591,12 +591,12 @@ Whether to prefix external (including std, core) crate imports with `::`. e.g. "
 --
 Whether to show inlay type hints for binding modes.
 --
-[[bsv_analyzer.inlayHints.chainingHints.enable]]bsv_analyzer.inlayHints.chainingHints.enable (default: `true`)::
+[[bsv_analyzer.inlayHints.chainingHints.enable]]bsv_analyzer.inlayHints.chainingHints.enable (default: `false`)::
 +
 --
 Whether to show inlay type hints for method chains.
 --
-[[bsv_analyzer.inlayHints.closingBraceHints.enable]]bsv_analyzer.inlayHints.closingBraceHints.enable (default: `true`)::
+[[bsv_analyzer.inlayHints.closingBraceHints.enable]]bsv_analyzer.inlayHints.closingBraceHints.enable (default: `false`)::
 +
 --
 Whether to show inlay hints after a closing `}` to indicate what item it belongs to.
@@ -642,7 +642,7 @@ Whether to hide inlay hints for type adjustments outside of `unsafe` blocks.
 --
 Whether to show inlay hints as postfix ops (`.*` instead of `*`, etc).
 --
-[[bsv_analyzer.inlayHints.genericParameterHints.const.enable]]bsv_analyzer.inlayHints.genericParameterHints.const.enable (default: `true`)::
+[[bsv_analyzer.inlayHints.genericParameterHints.const.enable]]bsv_analyzer.inlayHints.genericParameterHints.const.enable (default: `false`)::
 +
 --
 Whether to show const generic parameter name inlay hints.
@@ -677,7 +677,7 @@ Whether to prefer using parameter names as the name for elided lifetime hints if
 --
 Maximum length for inlay hints. Set to null to have an unlimited length.
 --
-[[bsv_analyzer.inlayHints.parameterHints.enable]]bsv_analyzer.inlayHints.parameterHints.enable (default: `true`)::
+[[bsv_analyzer.inlayHints.parameterHints.enable]]bsv_analyzer.inlayHints.parameterHints.enable (default: `false`)::
 +
 --
 Whether to show function parameter name inlay hints at the call
@@ -694,12 +694,12 @@ Whether to show exclusive range inlay hints.
 Whether to show inlay hints for compiler inserted reborrows.
 This setting is deprecated in favor of #rust-analyzer.inlayHints.expressionAdjustmentHints.enable#.
 --
-[[bsv_analyzer.inlayHints.renderColons]]bsv_analyzer.inlayHints.renderColons (default: `true`)::
+[[bsv_analyzer.inlayHints.renderColons]]bsv_analyzer.inlayHints.renderColons (default: `false`)::
 +
 --
 Whether to render leading colons for type hints, and trailing colons for parameter hints.
 --
-[[bsv_analyzer.inlayHints.typeHints.enable]]bsv_analyzer.inlayHints.typeHints.enable (default: `true`)::
+[[bsv_analyzer.inlayHints.typeHints.enable]]bsv_analyzer.inlayHints.typeHints.enable (default: `false`)::
 +
 --
 Whether to show inlay type hints for variables.
@@ -720,38 +720,38 @@ Whether to hide inlay type hints for constructors.
 --
 Enables the experimental support for interpreting tests.
 --
-[[bsv_analyzer.joinLines.joinAssignments]]bsv_analyzer.joinLines.joinAssignments (default: `true`)::
+[[bsv_analyzer.joinLines.joinAssignments]]bsv_analyzer.joinLines.joinAssignments (default: `false`)::
 +
 --
 Join lines merges consecutive declaration and initialization of an assignment.
 --
-[[bsv_analyzer.joinLines.joinElseIf]]bsv_analyzer.joinLines.joinElseIf (default: `true`)::
+[[bsv_analyzer.joinLines.joinElseIf]]bsv_analyzer.joinLines.joinElseIf (default: `false`)::
 +
 --
 Join lines inserts else between consecutive ifs.
 --
-[[bsv_analyzer.joinLines.removeTrailingComma]]bsv_analyzer.joinLines.removeTrailingComma (default: `true`)::
+[[bsv_analyzer.joinLines.removeTrailingComma]]bsv_analyzer.joinLines.removeTrailingComma (default: `false`)::
 +
 --
 Join lines removes trailing commas.
 --
-[[bsv_analyzer.joinLines.unwrapTrivialBlock]]bsv_analyzer.joinLines.unwrapTrivialBlock (default: `true`)::
+[[bsv_analyzer.joinLines.unwrapTrivialBlock]]bsv_analyzer.joinLines.unwrapTrivialBlock (default: `false`)::
 +
 --
 Join lines unwraps trivial blocks.
 --
-[[bsv_analyzer.lens.debug.enable]]bsv_analyzer.lens.debug.enable (default: `true`)::
+[[bsv_analyzer.lens.debug.enable]]bsv_analyzer.lens.debug.enable (default: `false`)::
 +
 --
 Whether to show `Debug` lens. Only applies when
 `#rust-analyzer.lens.enable#` is set.
 --
-[[bsv_analyzer.lens.enable]]bsv_analyzer.lens.enable (default: `true`)::
+[[bsv_analyzer.lens.enable]]bsv_analyzer.lens.enable (default: `false`)::
 +
 --
 Whether to show CodeLens in Rust files.
 --
-[[bsv_analyzer.lens.implementations.enable]]bsv_analyzer.lens.implementations.enable (default: `true`)::
+[[bsv_analyzer.lens.implementations.enable]]bsv_analyzer.lens.implementations.enable (default: `false`)::
 +
 --
 Whether to show `Implementations` lens. Only applies when
@@ -786,7 +786,7 @@ Whether to show `Method References` lens. Only applies when
 Whether to show `References` lens for Trait.
 Only applies when `#rust-analyzer.lens.enable#` is set.
 --
-[[bsv_analyzer.lens.run.enable]]bsv_analyzer.lens.run.enable (default: `true`)::
+[[bsv_analyzer.lens.run.enable]]bsv_analyzer.lens.run.enable (default: `false`)::
 +
 --
 Whether to show `Run` lens. Only applies when
@@ -812,7 +812,7 @@ Number of syntax trees rust-analyzer keeps in memory. Defaults to 128.
 --
 Sets the LRU capacity of the specified queries.
 --
-[[bsv_analyzer.notifications.cargoTomlNotFound]]bsv_analyzer.notifications.cargoTomlNotFound (default: `true`)::
+[[bsv_analyzer.notifications.cargoTomlNotFound]]bsv_analyzer.notifications.cargoTomlNotFound (default: `false`)::
 +
 --
 Whether to show `can't find Cargo.toml` error message.
@@ -822,12 +822,12 @@ Whether to show `can't find Cargo.toml` error message.
 --
 How many worker threads in the main loop. The default `null` means to pick automatically.
 --
-[[bsv_analyzer.procMacro.attributes.enable]]bsv_analyzer.procMacro.attributes.enable (default: `true`)::
+[[bsv_analyzer.procMacro.attributes.enable]]bsv_analyzer.procMacro.attributes.enable (default: `false`)::
 +
 --
 Expand attribute macros. Requires `#rust-analyzer.procMacro.enable#` to be set.
 --
-[[bsv_analyzer.procMacro.enable]]bsv_analyzer.procMacro.enable (default: `true`)::
+[[bsv_analyzer.procMacro.enable]]bsv_analyzer.procMacro.enable (default: `false`)::
 +
 --
 Enable support for procedural macros, implies `#rust-analyzer.cargo.buildScripts.enable#`.
@@ -916,7 +916,7 @@ Enables the use of rustfmt's unstable range formatting command for the
 `textDocument/rangeFormatting` request. The rustfmt option is unstable and only
 available on a nightly build.
 --
-[[bsv_analyzer.semanticHighlighting.doc.comment.inject.enable]]bsv_analyzer.semanticHighlighting.doc.comment.inject.enable (default: `true`)::
+[[bsv_analyzer.semanticHighlighting.doc.comment.inject.enable]]bsv_analyzer.semanticHighlighting.doc.comment.inject.enable (default: `false`)::
 +
 --
 Inject additional highlighting into doc comments.
@@ -924,12 +924,12 @@ Inject additional highlighting into doc comments.
 When enabled, rust-analyzer will highlight rust source in doc comments as well as intra
 doc links.
 --
-[[bsv_analyzer.semanticHighlighting.nonStandardTokens]]bsv_analyzer.semanticHighlighting.nonStandardTokens (default: `true`)::
+[[bsv_analyzer.semanticHighlighting.nonStandardTokens]]bsv_analyzer.semanticHighlighting.nonStandardTokens (default: `false`)::
 +
 --
 Whether the server is allowed to emit non-standard tokens and modifiers.
 --
-[[bsv_analyzer.semanticHighlighting.operator.enable]]bsv_analyzer.semanticHighlighting.operator.enable (default: `true`)::
+[[bsv_analyzer.semanticHighlighting.operator.enable]]bsv_analyzer.semanticHighlighting.operator.enable (default: `false`)::
 +
 --
 Use semantic tokens for operators.
@@ -967,7 +967,7 @@ Use specialized semantic tokens for punctuation.
 When enabled, rust-analyzer will emit special token types for punctuation tokens instead
 of the generic `punctuation` token type.
 --
-[[bsv_analyzer.semanticHighlighting.strings.enable]]bsv_analyzer.semanticHighlighting.strings.enable (default: `true`)::
+[[bsv_analyzer.semanticHighlighting.strings.enable]]bsv_analyzer.semanticHighlighting.strings.enable (default: `false`)::
 +
 --
 Use semantic tokens for strings.
@@ -981,7 +981,7 @@ their contents.
 --
 Show full signature of the callable. Only shows parameters if disabled.
 --
-[[bsv_analyzer.signatureInfo.documentation.enable]]bsv_analyzer.signatureInfo.documentation.enable (default: `true`)::
+[[bsv_analyzer.signatureInfo.documentation.enable]]bsv_analyzer.signatureInfo.documentation.enable (default: `false`)::
 +
 --
 Show documentation.
