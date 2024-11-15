@@ -78,8 +78,8 @@ pub fn server_capabilities(config: &Config) -> ServerCapabilities {
             first_trigger_character: "=".to_owned(),
             more_trigger_character: Some(more_trigger_character(config)),
         }),
-        selection_range_provider: Some(SelectionRangeProviderCapability::Simple(true)),
-        folding_range_provider: Some(FoldingRangeProviderCapability::Simple(true)),
+        selection_range_provider: Some(SelectionRangeProviderCapability::Simple(false)),  // TODO BSV
+        folding_range_provider: Some(FoldingRangeProviderCapability::Simple(false)),
         rename_provider: Some(OneOf::Right(RenameOptions {
             prepare_provider: Some(false),
             work_done_progress_options: WorkDoneProgressOptions { work_done_progress: None },
