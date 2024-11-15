@@ -61,7 +61,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "miniz_oxide",
- "object 0.36.3",
+ "object",
  "rustc-demangle",
 ]
 
@@ -973,16 +973,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
 
 [[package]]
-name = "libloading"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4979f22fdb869068da03c9f7528f8297c6fd2606bc3a4affe42e6a823fdb8da4"
-dependencies = [
- "cfg-if",
- "windows-targets 0.52.6",
-]
-
-[[package]]
 name = "libmimalloc-sys"
 version = "0.1.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1139,15 +1129,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
-name = "memmap2"
-version = "0.5.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83faa42c0a078c393f6b29d5db232d8be22776a891f8f56e5284faee4a20b327"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "memoffset"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1255,15 +1236,6 @@ checksum = "4161fcb6d602d4d2081af7c3a45852d875a03dd337a6bfdd6e06407b61342a43"
 dependencies = [
  "hermit-abi",
  "libc",
-]
-
-[[package]]
-name = "object"
-version = "0.33.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8dd6c0cdf9429bce006e1362bfce61fa1bfd8c898a643ed8d2b471934701d3d"
-dependencies = [
- "memchr",
 ]
 
 [[package]]
@@ -1413,42 +1385,6 @@ dependencies = [
  "stdx",
  "tracing",
  "tt",
-]
-
-[[package]]
-name = "proc-macro-srv"
-version = "0.0.0"
-dependencies = [
- "base-db",
- "bsv-lexer",
- "expect-test",
- "intern",
- "libloading",
- "memmap2",
- "object 0.33.0",
- "paths",
- "proc-macro-api",
- "proc-macro-test",
- "snap",
- "span",
- "stdx",
- "syntax-bridge",
- "tt",
-]
-
-[[package]]
-name = "proc-macro-srv-cli"
-version = "0.0.0"
-dependencies = [
- "proc-macro-api",
- "proc-macro-srv",
-]
-
-[[package]]
-name = "proc-macro-test"
-version = "0.0.0"
-dependencies = [
- "cargo_metadata",
 ]
 
 [[package]]
@@ -1885,12 +1821,6 @@ dependencies = [
  "borsh",
  "serde",
 ]
-
-[[package]]
-name = "snap"
-version = "1.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b6b67fb9a61334225b5b790716f609cd58395f895b3fe8b328786812a40bc3b"
 
 [[package]]
 name = "span"
