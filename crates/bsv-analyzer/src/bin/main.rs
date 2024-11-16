@@ -78,17 +78,18 @@ fn actual_main() -> anyhow::Result<ExitCode> {
             )?;
         }
         flags::BsvAnalyzerCmd::Parse(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::Symbols(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::Highlight(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::AnalysisStats(cmd) => cmd.run(verbosity)?,
-        flags::BsvAnalyzerCmd::Diagnostics(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::UnresolvedReferences(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::Ssr(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::Search(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::Lsif(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::Scip(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::RunTests(cmd) => cmd.run()?,
-        flags::BsvAnalyzerCmd::RustcTests(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::Symbols(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::Highlight(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::AnalysisStats(cmd) => cmd.run(verbosity)?,
+        // flags::BsvAnalyzerCmd::Diagnostics(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::UnresolvedReferences(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::Ssr(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::Search(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::Lsif(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::Scip(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::RunTests(cmd) => cmd.run()?,
+        // flags::BsvAnalyzerCmd::RustcTests(cmd) => cmd.run()?,
+        _ => (),
     }
     Ok(ExitCode::SUCCESS)
 }

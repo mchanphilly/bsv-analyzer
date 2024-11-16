@@ -80,12 +80,12 @@ pub fn visit_file_defs(
     module.impl_defs(db).into_iter().for_each(|impl_| cb(impl_.into()));
 
     let is_root = module.is_crate_root();
-    module
-        .legacy_macros(db)
-        .into_iter()
-        // don't show legacy macros declared in the crate-root that were already covered in declarations earlier
-        .filter(|it| !(is_root && it.is_macro_export(db)))
-        .for_each(|mac| cb(mac.into()));
+    // module
+    //     .legacy_macros(db)
+    //     .into_iter()
+    //     // don't show legacy macros declared in the crate-root that were already covered in declarations earlier
+    //     .filter(|it| !(is_root && it.is_macro_export(db)))
+    //     .for_each(|mac| cb(mac.into()));
 }
 
 /// Checks if the given lint is equal or is contained by the other lint which may or may not be a group.

@@ -567,11 +567,11 @@ impl Module {
             emit_def_diagnostic(db, acc, diag, edition);
         }
 
-        if !self.id.is_block_module() {
-            // These are reported by the body of block modules
-            let scope = &def_map[self.id.local_id].scope;
-            scope.all_macro_calls().for_each(|it| macro_call_diagnostics(db, it, acc));
-        }
+        // if !self.id.is_block_module() {
+        //     // These are reported by the body of block modules
+        //     let scope = &def_map[self.id.local_id].scope;
+        //     scope.all_macro_calls().for_each(|it| macro_call_diagnostics(db, it, acc));
+        // }
 
         for def in self.declarations(db) {
             match def {
@@ -591,9 +591,9 @@ impl Module {
                         item.diagnostics(db, acc, style_lints);
                     }
 
-                    t.all_macro_calls(db)
-                        .iter()
-                        .for_each(|&(_ast, call_id)| macro_call_diagnostics(db, call_id, acc));
+                    // t.all_macro_calls(db)
+                    //     .iter()
+                    //     .for_each(|&(_ast, call_id)| macro_call_diagnostics(db, call_id, acc));
 
                     acc.extend(def.diagnostics(db, style_lints))
                 }
@@ -620,11 +620,11 @@ impl Module {
                     }
                     acc.extend(def.diagnostics(db, style_lints))
                 }
-                ModuleDef::Macro(m) => emit_macro_def_diagnostics(db, acc, m),
+                // ModuleDef::Macro(m) => emit_macro_def_diagnostics(db, acc, m),
                 _ => acc.extend(def.diagnostics(db, style_lints)),
             }
         }
-        self.legacy_macros(db).into_iter().for_each(|m| emit_macro_def_diagnostics(db, acc, m));
+        // self.legacy_macros(db).into_iter().for_each(|m| emit_macro_def_diagnostics(db, acc, m));
 
         let inherent_impls = db.inherent_impls_in_crate(self.id.krate());
 
@@ -782,11 +782,11 @@ impl Module {
             .collect()
     }
 
-    pub fn legacy_macros(self, db: &dyn HirDatabase) -> Vec<Macro> {
-        let def_map = self.id.def_map(db.upcast());
-        let scope = &def_map[self.id.local_id].scope;
-        scope.legacy_macros().flat_map(|(_, it)| it).map(|&it| it.into()).collect()
-    }
+    // pub fn legacy_macros(self, db: &dyn HirDatabase) -> Vec<Macro> {
+    //     let def_map = self.id.def_map(db.upcast());
+    //     let scope = &def_map[self.id.local_id].scope;
+    //     scope.legacy_macros().flat_map(|(_, it)| it).map(|&it| it.into()).collect()
+    // }
 
     pub fn impl_defs(self, db: &dyn HirDatabase) -> Vec<Impl> {
         let def_map = self.id.def_map(db.upcast());
