@@ -273,59 +273,59 @@ impl LsifManager<'_> {
 
 impl flags::Lsif {
     pub fn run(self) -> anyhow::Result<()> {
-        let now = Instant::now();
-        let cargo_config = &CargoConfig {
-            sysroot: Some(RustLibSource::Discover),
-            all_targets: true,
-            set_test: true,
-            ..Default::default()
-        };
-        let no_progress = &|_| ();
-        let load_cargo_config = LoadCargoConfig {
-            load_out_dirs_from_check: true,
-            with_proc_macro_server: ProcMacroServerChoice::Sysroot,
-            prefill_caches: false,
-        };
-        let path = AbsPathBuf::assert_utf8(env::current_dir()?.join(self.path));
-        let root = ProjectManifest::discover_single(&path)?;
-        eprintln!("Generating LSIF for project at {root}");
-        let mut workspace = ProjectWorkspace::load(root, cargo_config, no_progress)?;
+        // let now = Instant::now();
+        // let cargo_config = &CargoConfig {
+        //     sysroot: Some(RustLibSource::Discover),
+        //     all_targets: true,
+        //     set_test: true,
+        //     ..Default::default()
+        // };
+        // let no_progress = &|_| ();
+        // let load_cargo_config = LoadCargoConfig {
+        //     load_out_dirs_from_check: true,
+        //     with_proc_macro_server: ProcMacroServerChoice::Sysroot,
+        //     prefill_caches: false,
+        // };
+        // let path = AbsPathBuf::assert_utf8(env::current_dir()?.join(self.path));
+        // let root = ProjectManifest::discover_single(&path)?;
+        // eprintln!("Generating LSIF for project at {root}");
+        // let mut workspace = ProjectWorkspace::load(root, cargo_config, no_progress)?;
 
-        let build_scripts = workspace.run_build_scripts(cargo_config, no_progress)?;
-        workspace.set_build_scripts(build_scripts);
+        // let build_scripts = workspace.run_build_scripts(cargo_config, no_progress)?;
+        // workspace.set_build_scripts(build_scripts);
 
-        let (db, vfs, _proc_macro) =
-            load_workspace(workspace, &cargo_config.extra_env, &load_cargo_config)?;
-        let host = AnalysisHost::with_database(db);
-        let db = host.raw_database();
-        let analysis = host.analysis();
+        // let (db, vfs, _proc_macro) =
+        //     load_workspace(workspace, &cargo_config.extra_env, &load_cargo_config)?;
+        // let host = AnalysisHost::with_database(db);
+        // let db = host.raw_database();
+        // let analysis = host.analysis();
 
-        let vendored_libs_config = if self.exclude_vendored_libraries {
-            VendoredLibrariesConfig::Excluded
-        } else {
-            VendoredLibrariesConfig::Included { workspace_root: &path.clone().into() }
-        };
+        // let vendored_libs_config = if self.exclude_vendored_libraries {
+        //     VendoredLibrariesConfig::Excluded
+        // } else {
+        //     VendoredLibrariesConfig::Included { workspace_root: &path.clone().into() }
+        // };
 
-        let si = StaticIndex::compute(&analysis, vendored_libs_config);
+        // let si = StaticIndex::compute(&analysis, vendored_libs_config);
 
-        let mut lsif = LsifManager::new(&analysis, db, &vfs);
-        lsif.add_vertex(lsif::Vertex::MetaData(lsif::MetaData {
-            version: String::from("0.5.0"),
-            project_root: lsp_types::Url::from_file_path(path).unwrap(),
-            position_encoding: lsif::Encoding::Utf16,
-            tool_info: Some(lsp_types::lsif::ToolInfo {
-                name: "bsv_analyzer".to_owned(),
-                args: vec![],
-                version: Some(version().to_string()),
-            }),
-        }));
-        for file in si.files {
-            lsif.add_file(file);
-        }
-        for (id, token) in si.tokens.iter() {
-            lsif.add_token(id, token);
-        }
-        eprintln!("Generating LSIF finished in {:?}", now.elapsed());
+        // let mut lsif = LsifManager::new(&analysis, db, &vfs);
+        // lsif.add_vertex(lsif::Vertex::MetaData(lsif::MetaData {
+        //     version: String::from("0.5.0"),
+        //     project_root: lsp_types::Url::from_file_path(path).unwrap(),
+        //     position_encoding: lsif::Encoding::Utf16,
+        //     tool_info: Some(lsp_types::lsif::ToolInfo {
+        //         name: "bsv_analyzer".to_owned(),
+        //         args: vec![],
+        //         version: Some(version().to_string()),
+        //     }),
+        // }));
+        // for file in si.files {
+        //     lsif.add_file(file);
+        // }
+        // for (id, token) in si.tokens.iter() {
+        //     lsif.add_token(id, token);
+        // }
+        // eprintln!("Generating LSIF finished in {:?}", now.elapsed());
         Ok(())
     }
 }

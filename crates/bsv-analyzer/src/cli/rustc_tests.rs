@@ -287,32 +287,32 @@ const SUPPORTED_DIAGNOSTICS: &[DiagnosticCode] = &[
 
 impl flags::RustcTests {
     pub fn run(self) -> Result<()> {
-        let mut tester = Tester::new()?;
-        let walk_dir = WalkDir::new(self.rustc_repo.join("tests/ui"));
-        eprintln!("Running tests for tests/ui");
-        for i in walk_dir {
-            let i = i?;
-            let p = i.into_path();
-            if let Some(f) = &self.filter {
-                if !p.as_os_str().to_string_lossy().contains(f) {
-                    continue;
-                }
-            }
-            if p.extension().map_or(true, |x| x != "rs") {
-                continue;
-            }
-            if let Err(e) = std::panic::catch_unwind({
-                let tester = AssertUnwindSafe(&mut tester);
-                let p = p.clone();
-                move || {
-                    let _guard = stdx::panic_context::enter(p.display().to_string());
-                    { tester }.0.test(p);
-                }
-            }) {
-                std::panic::resume_unwind(e);
-            }
-        }
-        tester.report();
+        // let mut tester = Tester::new()?;
+        // let walk_dir = WalkDir::new(self.rustc_repo.join("tests/ui"));
+        // eprintln!("Running tests for tests/ui");
+        // for i in walk_dir {
+        //     let i = i?;
+        //     let p = i.into_path();
+        //     if let Some(f) = &self.filter {
+        //         if !p.as_os_str().to_string_lossy().contains(f) {
+        //             continue;
+        //         }
+        //     }
+        //     if p.extension().map_or(true, |x| x != "rs") {
+        //         continue;
+        //     }
+        //     if let Err(e) = std::panic::catch_unwind({
+        //         let tester = AssertUnwindSafe(&mut tester);
+        //         let p = p.clone();
+        //         move || {
+        //             let _guard = stdx::panic_context::enter(p.display().to_string());
+        //             { tester }.0.test(p);
+        //         }
+        //     }) {
+        //         std::panic::resume_unwind(e);
+        //     }
+        // }
+        // tester.report();
         Ok(())
     }
 }

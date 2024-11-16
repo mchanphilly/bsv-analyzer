@@ -20,206 +20,206 @@ use crate::{
 
 impl flags::Scip {
     pub fn run(self) -> anyhow::Result<()> {
-        eprintln!("Generating SCIP start...");
-        let now = Instant::now();
+        // eprintln!("Generating SCIP start...");
+        // let now = Instant::now();
 
-        let no_progress = &|s| (eprintln!("bsv_analyzer: Loading {s}"));
-        let root =
-            vfs::AbsPathBuf::assert_utf8(std::env::current_dir()?.join(&self.path)).normalize();
+        // let no_progress = &|s| (eprintln!("bsv_analyzer: Loading {s}"));
+        // let root =
+        //     vfs::AbsPathBuf::assert_utf8(std::env::current_dir()?.join(&self.path)).normalize();
 
-        let mut config = crate::config::Config::new(
-            root.clone(),
-            lsp_types::ClientCapabilities::default(),
-            vec![],
-            None,
-        );
+        // let mut config = crate::config::Config::new(
+        //     root.clone(),
+        //     lsp_types::ClientCapabilities::default(),
+        //     vec![],
+        //     None,
+        // );
 
-        if let Some(p) = self.config_path {
-            let mut file = std::io::BufReader::new(std::fs::File::open(p)?);
-            let json = serde_json::from_reader(&mut file)?;
-            let mut change = ConfigChange::default();
-            change.change_client_config(json);
+        // if let Some(p) = self.config_path {
+        //     let mut file = std::io::BufReader::new(std::fs::File::open(p)?);
+        //     let json = serde_json::from_reader(&mut file)?;
+        //     let mut change = ConfigChange::default();
+        //     change.change_client_config(json);
 
-            let error_sink;
-            (config, error_sink, _) = config.apply_change(change);
+        //     let error_sink;
+        //     (config, error_sink, _) = config.apply_change(change);
 
-            // FIXME @alibektas : What happens to errors without logging?
-            error!(?error_sink, "Config Error(s)");
-        }
-        let load_cargo_config = LoadCargoConfig {
-            load_out_dirs_from_check: true,
-            with_proc_macro_server: ProcMacroServerChoice::Sysroot,
-            prefill_caches: true,
-        };
-        let cargo_config = config.cargo(None);
-        let (db, vfs, _) = load_workspace_at(
-            root.as_path().as_ref(),
-            &cargo_config,
-            &load_cargo_config,
-            &no_progress,
-        )?;
-        let host = AnalysisHost::with_database(db);
-        let db = host.raw_database();
-        let analysis = host.analysis();
+        //     // FIXME @alibektas : What happens to errors without logging?
+        //     error!(?error_sink, "Config Error(s)");
+        // }
+        // let load_cargo_config = LoadCargoConfig {
+        //     load_out_dirs_from_check: true,
+        //     with_proc_macro_server: ProcMacroServerChoice::Sysroot,
+        //     prefill_caches: true,
+        // };
+        // let cargo_config = config.cargo(None);
+        // let (db, vfs, _) = load_workspace_at(
+        //     root.as_path().as_ref(),
+        //     &cargo_config,
+        //     &load_cargo_config,
+        //     &no_progress,
+        // )?;
+        // let host = AnalysisHost::with_database(db);
+        // let db = host.raw_database();
+        // let analysis = host.analysis();
 
-        let vendored_libs_config = if self.exclude_vendored_libraries {
-            VendoredLibrariesConfig::Excluded
-        } else {
-            VendoredLibrariesConfig::Included { workspace_root: &root.clone().into() }
-        };
+        // let vendored_libs_config = if self.exclude_vendored_libraries {
+        //     VendoredLibrariesConfig::Excluded
+        // } else {
+        //     VendoredLibrariesConfig::Included { workspace_root: &root.clone().into() }
+        // };
 
-        let si = StaticIndex::compute(&analysis, vendored_libs_config);
+        // let si = StaticIndex::compute(&analysis, vendored_libs_config);
 
-        let metadata = scip_types::Metadata {
-            version: scip_types::ProtocolVersion::UnspecifiedProtocolVersion.into(),
-            tool_info: Some(scip_types::ToolInfo {
-                name: "bsv_analyzer".to_owned(),
-                version: format!("{}", crate::version::version()),
-                arguments: vec![],
-                special_fields: Default::default(),
-            })
-            .into(),
-            project_root: format!("file://{root}"),
-            text_document_encoding: scip_types::TextEncoding::UTF8.into(),
-            special_fields: Default::default(),
-        };
-        let mut documents = Vec::new();
+        // let metadata = scip_types::Metadata {
+        //     version: scip_types::ProtocolVersion::UnspecifiedProtocolVersion.into(),
+        //     tool_info: Some(scip_types::ToolInfo {
+        //         name: "bsv_analyzer".to_owned(),
+        //         version: format!("{}", crate::version::version()),
+        //         arguments: vec![],
+        //         special_fields: Default::default(),
+        //     })
+        //     .into(),
+        //     project_root: format!("file://{root}"),
+        //     text_document_encoding: scip_types::TextEncoding::UTF8.into(),
+        //     special_fields: Default::default(),
+        // };
+        // let mut documents = Vec::new();
 
-        let mut symbols_emitted: FxHashSet<TokenId> = FxHashSet::default();
-        let mut tokens_to_symbol: FxHashMap<TokenId, String> = FxHashMap::default();
-        let mut tokens_to_enclosing_symbol: FxHashMap<TokenId, Option<String>> =
-            FxHashMap::default();
+        // let mut symbols_emitted: FxHashSet<TokenId> = FxHashSet::default();
+        // let mut tokens_to_symbol: FxHashMap<TokenId, String> = FxHashMap::default();
+        // let mut tokens_to_enclosing_symbol: FxHashMap<TokenId, Option<String>> =
+        //     FxHashMap::default();
 
-        for StaticIndexedFile { file_id, tokens, .. } in si.files {
-            let mut local_count = 0;
-            let mut new_local_symbol = || {
-                let new_symbol = scip::types::Symbol::new_local(local_count);
-                local_count += 1;
+        // for StaticIndexedFile { file_id, tokens, .. } in si.files {
+        //     let mut local_count = 0;
+        //     let mut new_local_symbol = || {
+        //         let new_symbol = scip::types::Symbol::new_local(local_count);
+        //         local_count += 1;
 
-                new_symbol
-            };
+        //         new_symbol
+        //     };
 
-            let relative_path = match get_relative_filepath(&vfs, &root, file_id) {
-                Some(relative_path) => relative_path,
-                None => continue,
-            };
+        //     let relative_path = match get_relative_filepath(&vfs, &root, file_id) {
+        //         Some(relative_path) => relative_path,
+        //         None => continue,
+        //     };
 
-            let line_index = LineIndex {
-                index: db.line_index(file_id),
-                encoding: PositionEncoding::Utf8,
-                endings: LineEndings::Unix,
-            };
+        //     let line_index = LineIndex {
+        //         index: db.line_index(file_id),
+        //         encoding: PositionEncoding::Utf8,
+        //         endings: LineEndings::Unix,
+        //     };
 
-            let mut occurrences = Vec::new();
-            let mut symbols = Vec::new();
+        //     let mut occurrences = Vec::new();
+        //     let mut symbols = Vec::new();
 
-            tokens.into_iter().for_each(|(text_range, id)| {
-                let token = si.tokens.get(id).unwrap();
+        //     tokens.into_iter().for_each(|(text_range, id)| {
+        //         let token = si.tokens.get(id).unwrap();
 
-                let range = text_range_to_scip_range(&line_index, text_range);
-                let symbol = tokens_to_symbol
-                    .entry(id)
-                    .or_insert_with(|| {
-                        let symbol = token
-                            .moniker
-                            .as_ref()
-                            .map(moniker_to_symbol)
-                            .unwrap_or_else(&mut new_local_symbol);
-                        scip::symbol::format_symbol(symbol)
-                    })
-                    .clone();
-                let enclosing_symbol = tokens_to_enclosing_symbol
-                    .entry(id)
-                    .or_insert_with(|| {
-                        token
-                            .enclosing_moniker
-                            .as_ref()
-                            .map(moniker_to_symbol)
-                            .map(scip::symbol::format_symbol)
-                    })
-                    .clone();
+        //         let range = text_range_to_scip_range(&line_index, text_range);
+        //         let symbol = tokens_to_symbol
+        //             .entry(id)
+        //             .or_insert_with(|| {
+        //                 let symbol = token
+        //                     .moniker
+        //                     .as_ref()
+        //                     .map(moniker_to_symbol)
+        //                     .unwrap_or_else(&mut new_local_symbol);
+        //                 scip::symbol::format_symbol(symbol)
+        //             })
+        //             .clone();
+        //         let enclosing_symbol = tokens_to_enclosing_symbol
+        //             .entry(id)
+        //             .or_insert_with(|| {
+        //                 token
+        //                     .enclosing_moniker
+        //                     .as_ref()
+        //                     .map(moniker_to_symbol)
+        //                     .map(scip::symbol::format_symbol)
+        //             })
+        //             .clone();
 
-                let mut symbol_roles = Default::default();
+        //         let mut symbol_roles = Default::default();
 
-                if let Some(def) = token.definition {
-                    // if the range of the def and the range of the token are the same, this must be the definition.
-                    // they also must be in the same file. See https://github.com/rust-lang/rust-analyzer/pull/17988
-                    if def.file_id == file_id && def.range == text_range {
-                        symbol_roles |= scip_types::SymbolRole::Definition as i32;
-                    }
+        //         if let Some(def) = token.definition {
+        //             // if the range of the def and the range of the token are the same, this must be the definition.
+        //             // they also must be in the same file. See https://github.com/rust-lang/rust-analyzer/pull/17988
+        //             if def.file_id == file_id && def.range == text_range {
+        //                 symbol_roles |= scip_types::SymbolRole::Definition as i32;
+        //             }
 
-                    if symbols_emitted.insert(id) {
-                        let documentation = match &token.documentation {
-                            Some(doc) => vec![doc.as_str().to_owned()],
-                            None => vec![],
-                        };
+        //             if symbols_emitted.insert(id) {
+        //                 let documentation = match &token.documentation {
+        //                     Some(doc) => vec![doc.as_str().to_owned()],
+        //                     None => vec![],
+        //                 };
 
-                        let position_encoding =
-                            scip_types::PositionEncoding::UTF8CodeUnitOffsetFromLineStart.into();
-                        let signature_documentation =
-                            token.signature.clone().map(|text| scip_types::Document {
-                                relative_path: relative_path.clone(),
-                                language: "rust".to_owned(),
-                                text,
-                                position_encoding,
-                                ..Default::default()
-                            });
-                        let symbol_info = scip_types::SymbolInformation {
-                            symbol: symbol.clone(),
-                            documentation,
-                            relationships: Vec::new(),
-                            special_fields: Default::default(),
-                            kind: symbol_kind(token.kind).into(),
-                            display_name: token.display_name.clone().unwrap_or_default(),
-                            signature_documentation: signature_documentation.into(),
-                            enclosing_symbol: enclosing_symbol.unwrap_or_default(),
-                        };
+        //                 let position_encoding =
+        //                     scip_types::PositionEncoding::UTF8CodeUnitOffsetFromLineStart.into();
+        //                 let signature_documentation =
+        //                     token.signature.clone().map(|text| scip_types::Document {
+        //                         relative_path: relative_path.clone(),
+        //                         language: "rust".to_owned(),
+        //                         text,
+        //                         position_encoding,
+        //                         ..Default::default()
+        //                     });
+        //                 let symbol_info = scip_types::SymbolInformation {
+        //                     symbol: symbol.clone(),
+        //                     documentation,
+        //                     relationships: Vec::new(),
+        //                     special_fields: Default::default(),
+        //                     kind: symbol_kind(token.kind).into(),
+        //                     display_name: token.display_name.clone().unwrap_or_default(),
+        //                     signature_documentation: signature_documentation.into(),
+        //                     enclosing_symbol: enclosing_symbol.unwrap_or_default(),
+        //                 };
 
-                        symbols.push(symbol_info)
-                    }
-                }
+        //                 symbols.push(symbol_info)
+        //             }
+        //         }
 
-                occurrences.push(scip_types::Occurrence {
-                    range,
-                    symbol,
-                    symbol_roles,
-                    override_documentation: Vec::new(),
-                    syntax_kind: Default::default(),
-                    diagnostics: Vec::new(),
-                    special_fields: Default::default(),
-                    enclosing_range: Vec::new(),
-                });
-            });
+        //         occurrences.push(scip_types::Occurrence {
+        //             range,
+        //             symbol,
+        //             symbol_roles,
+        //             override_documentation: Vec::new(),
+        //             syntax_kind: Default::default(),
+        //             diagnostics: Vec::new(),
+        //             special_fields: Default::default(),
+        //             enclosing_range: Vec::new(),
+        //         });
+        //     });
 
-            if occurrences.is_empty() {
-                continue;
-            }
+        //     if occurrences.is_empty() {
+        //         continue;
+        //     }
 
-            let position_encoding =
-                scip_types::PositionEncoding::UTF8CodeUnitOffsetFromLineStart.into();
-            documents.push(scip_types::Document {
-                relative_path,
-                language: "rust".to_owned(),
-                occurrences,
-                symbols,
-                text: String::new(),
-                position_encoding,
-                special_fields: Default::default(),
-            });
-        }
+        //     let position_encoding =
+        //         scip_types::PositionEncoding::UTF8CodeUnitOffsetFromLineStart.into();
+        //     documents.push(scip_types::Document {
+        //         relative_path,
+        //         language: "rust".to_owned(),
+        //         occurrences,
+        //         symbols,
+        //         text: String::new(),
+        //         position_encoding,
+        //         special_fields: Default::default(),
+        //     });
+        // }
 
-        let index = scip_types::Index {
-            metadata: Some(metadata).into(),
-            documents,
-            external_symbols: Vec::new(),
-            special_fields: Default::default(),
-        };
+        // let index = scip_types::Index {
+        //     metadata: Some(metadata).into(),
+        //     documents,
+        //     external_symbols: Vec::new(),
+        //     special_fields: Default::default(),
+        // };
 
-        let out_path = self.output.unwrap_or_else(|| PathBuf::from(r"index.scip"));
-        scip::write_message_to_file(out_path, index)
-            .map_err(|err| anyhow::format_err!("Failed to write scip to file: {}", err))?;
+        // let out_path = self.output.unwrap_or_else(|| PathBuf::from(r"index.scip"));
+        // scip::write_message_to_file(out_path, index)
+        //     .map_err(|err| anyhow::format_err!("Failed to write scip to file: {}", err))?;
 
-        eprintln!("Generating SCIP finished {:?}", now.elapsed());
+        // eprintln!("Generating SCIP finished {:?}", now.elapsed());
         Ok(())
     }
 }

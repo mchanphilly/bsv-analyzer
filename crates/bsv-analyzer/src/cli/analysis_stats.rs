@@ -54,230 +54,230 @@ impl<DB: ParallelDatabase> Clone for Snap<salsa::Snapshot<DB>> {
 
 impl flags::AnalysisStats {
     pub fn run(self, verbosity: Verbosity) -> anyhow::Result<()> {
-        let mut rng = {
-            let seed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
-            Rand32::new(seed)
-        };
+        // let mut rng = {
+        //     let seed = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
+        //     Rand32::new(seed)
+        // };
 
-        let cargo_config = CargoConfig {
-            sysroot: match self.no_sysroot {
-                true => None,
-                false => Some(RustLibSource::Discover),
-            },
-            all_targets: true,
-            set_test: true,
-            ..Default::default()
-        };
-        let no_progress = &|_| ();
+        // let cargo_config = CargoConfig {
+        //     sysroot: match self.no_sysroot {
+        //         true => None,
+        //         false => Some(RustLibSource::Discover),
+        //     },
+        //     all_targets: true,
+        //     set_test: true,
+        //     ..Default::default()
+        // };
+        // let no_progress = &|_| ();
 
-        let mut db_load_sw = self.stop_watch();
+        // let mut db_load_sw = self.stop_watch();
 
-        let path = AbsPathBuf::assert_utf8(env::current_dir()?.join(&self.path));
-        let manifest = ProjectManifest::discover_single(&path)?;
+        // let path = AbsPathBuf::assert_utf8(env::current_dir()?.join(&self.path));
+        // let manifest = ProjectManifest::discover_single(&path)?;
 
-        let mut workspace = ProjectWorkspace::load(manifest, &cargo_config, no_progress)?;
-        let metadata_time = db_load_sw.elapsed();
-        let load_cargo_config = LoadCargoConfig {
-            load_out_dirs_from_check: !self.disable_build_scripts,
-            with_proc_macro_server: if self.disable_proc_macros {
-                ProcMacroServerChoice::None
-            } else {
-                match self.proc_macro_srv {
-                    Some(ref path) => {
-                        let path = vfs::AbsPathBuf::assert_utf8(path.to_owned());
-                        ProcMacroServerChoice::Explicit(path)
-                    }
-                    None => ProcMacroServerChoice::Sysroot,
-                }
-            },
-            prefill_caches: false,
-        };
+        // let mut workspace = ProjectWorkspace::load(manifest, &cargo_config, no_progress)?;
+        // let metadata_time = db_load_sw.elapsed();
+        // let load_cargo_config = LoadCargoConfig {
+        //     load_out_dirs_from_check: !self.disable_build_scripts,
+        //     with_proc_macro_server: if self.disable_proc_macros {
+        //         ProcMacroServerChoice::None
+        //     } else {
+        //         match self.proc_macro_srv {
+        //             Some(ref path) => {
+        //                 let path = vfs::AbsPathBuf::assert_utf8(path.to_owned());
+        //                 ProcMacroServerChoice::Explicit(path)
+        //             }
+        //             None => ProcMacroServerChoice::Sysroot,
+        //         }
+        //     },
+        //     prefill_caches: false,
+        // };
 
-        let build_scripts_time = if self.disable_build_scripts {
-            None
-        } else {
-            let mut build_scripts_sw = self.stop_watch();
-            let bs = workspace.run_build_scripts(&cargo_config, no_progress)?;
-            workspace.set_build_scripts(bs);
-            Some(build_scripts_sw.elapsed())
-        };
+        // let build_scripts_time = if self.disable_build_scripts {
+        //     None
+        // } else {
+        //     let mut build_scripts_sw = self.stop_watch();
+        //     let bs = workspace.run_build_scripts(&cargo_config, no_progress)?;
+        //     workspace.set_build_scripts(bs);
+        //     Some(build_scripts_sw.elapsed())
+        // };
 
-        let (db, vfs, _proc_macro) =
-            load_workspace(workspace.clone(), &cargo_config.extra_env, &load_cargo_config)?;
-        eprint!("{:<20} {}", "Database loaded:", db_load_sw.elapsed());
-        eprint!(" (metadata {metadata_time}");
-        if let Some(build_scripts_time) = build_scripts_time {
-            eprint!("; build {build_scripts_time}");
-        }
-        eprintln!(")");
+        // let (db, vfs, _proc_macro) =
+        //     load_workspace(workspace.clone(), &cargo_config.extra_env, &load_cargo_config)?;
+        // eprint!("{:<20} {}", "Database loaded:", db_load_sw.elapsed());
+        // eprint!(" (metadata {metadata_time}");
+        // if let Some(build_scripts_time) = build_scripts_time {
+        //     eprint!("; build {build_scripts_time}");
+        // }
+        // eprintln!(")");
 
-        let host = AnalysisHost::with_database(db);
-        let db = host.raw_database();
+        // let host = AnalysisHost::with_database(db);
+        // let db = host.raw_database();
 
-        let mut analysis_sw = self.stop_watch();
+        // let mut analysis_sw = self.stop_watch();
 
-        let mut krates = Crate::all(db);
-        if self.randomize {
-            shuffle(&mut rng, &mut krates);
-        }
+        // let mut krates = Crate::all(db);
+        // if self.randomize {
+        //     shuffle(&mut rng, &mut krates);
+        // }
 
-        let mut item_tree_sw = self.stop_watch();
-        let mut num_item_trees = 0;
-        let source_roots =
-            krates.iter().cloned().map(|krate| db.file_source_root(krate.root_file(db))).unique();
-        for source_root_id in source_roots {
-            let source_root = db.source_root(source_root_id);
-            if !source_root.is_library || self.with_deps {
-                for file_id in source_root.iter() {
-                    if let Some(p) = source_root.path_for_file(&file_id) {
-                        if let Some((_, Some("rs"))) = p.name_and_extension() {
-                            db.file_item_tree(EditionedFileId::current_edition(file_id).into());
-                            num_item_trees += 1;
-                        }
-                    }
-                }
-            }
-        }
-        eprintln!("  item trees: {num_item_trees}");
-        let item_tree_time = item_tree_sw.elapsed();
-        eprintln!("{:<20} {}", "Item Tree Collection:", item_tree_time);
-        report_metric("item tree time", item_tree_time.time.as_millis() as u64, "ms");
+        // let mut item_tree_sw = self.stop_watch();
+        // let mut num_item_trees = 0;
+        // let source_roots =
+        //     krates.iter().cloned().map(|krate| db.file_source_root(krate.root_file(db))).unique();
+        // for source_root_id in source_roots {
+        //     let source_root = db.source_root(source_root_id);
+        //     if !source_root.is_library || self.with_deps {
+        //         for file_id in source_root.iter() {
+        //             if let Some(p) = source_root.path_for_file(&file_id) {
+        //                 if let Some((_, Some("rs"))) = p.name_and_extension() {
+        //                     db.file_item_tree(EditionedFileId::current_edition(file_id).into());
+        //                     num_item_trees += 1;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        // eprintln!("  item trees: {num_item_trees}");
+        // let item_tree_time = item_tree_sw.elapsed();
+        // eprintln!("{:<20} {}", "Item Tree Collection:", item_tree_time);
+        // report_metric("item tree time", item_tree_time.time.as_millis() as u64, "ms");
 
-        let mut crate_def_map_sw = self.stop_watch();
-        let mut num_crates = 0;
-        let mut visited_modules = FxHashSet::default();
-        let mut visit_queue = Vec::new();
-        for krate in krates {
-            let module = krate.root_module();
-            let file_id = module.definition_source_file_id(db);
-            let file_id = file_id.original_file(db);
-            let source_root = db.file_source_root(file_id.into());
-            let source_root = db.source_root(source_root);
-            if !source_root.is_library || self.with_deps {
-                num_crates += 1;
-                visit_queue.push(module);
-            }
-        }
+        // let mut crate_def_map_sw = self.stop_watch();
+        // let mut num_crates = 0;
+        // let mut visited_modules = FxHashSet::default();
+        // let mut visit_queue = Vec::new();
+        // for krate in krates {
+        //     let module = krate.root_module();
+        //     let file_id = module.definition_source_file_id(db);
+        //     let file_id = file_id.original_file(db);
+        //     let source_root = db.file_source_root(file_id.into());
+        //     let source_root = db.source_root(source_root);
+        //     if !source_root.is_library || self.with_deps {
+        //         num_crates += 1;
+        //         visit_queue.push(module);
+        //     }
+        // }
 
-        if self.randomize {
-            shuffle(&mut rng, &mut visit_queue);
-        }
+        // if self.randomize {
+        //     shuffle(&mut rng, &mut visit_queue);
+        // }
 
-        eprint!("  crates: {num_crates}");
-        let mut num_decls = 0;
-        let mut bodies = Vec::new();
-        let mut adts = Vec::new();
-        let mut consts = Vec::new();
-        let mut file_ids = Vec::new();
-        while let Some(module) = visit_queue.pop() {
-            if visited_modules.insert(module) {
-                file_ids.extend(module.as_source_file_id(db));
-                visit_queue.extend(module.children(db));
+        // eprint!("  crates: {num_crates}");
+        // let mut num_decls = 0;
+        // let mut bodies = Vec::new();
+        // let mut adts = Vec::new();
+        // let mut consts = Vec::new();
+        // let mut file_ids = Vec::new();
+        // while let Some(module) = visit_queue.pop() {
+        //     if visited_modules.insert(module) {
+        //         file_ids.extend(module.as_source_file_id(db));
+        //         visit_queue.extend(module.children(db));
 
-                for decl in module.declarations(db) {
-                    num_decls += 1;
-                    match decl {
-                        ModuleDef::Function(f) => bodies.push(DefWithBody::from(f)),
-                        ModuleDef::Adt(a) => {
-                            if let Adt::Enum(e) = a {
-                                for v in e.variants(db) {
-                                    bodies.push(DefWithBody::from(v));
-                                }
-                            }
-                            adts.push(a)
-                        }
-                        ModuleDef::Const(c) => {
-                            bodies.push(DefWithBody::from(c));
-                            consts.push(c)
-                        }
-                        ModuleDef::Static(s) => bodies.push(DefWithBody::from(s)),
-                        _ => (),
-                    };
-                }
+        //         for decl in module.declarations(db) {
+        //             num_decls += 1;
+        //             match decl {
+        //                 ModuleDef::Function(f) => bodies.push(DefWithBody::from(f)),
+        //                 ModuleDef::Adt(a) => {
+        //                     if let Adt::Enum(e) = a {
+        //                         for v in e.variants(db) {
+        //                             bodies.push(DefWithBody::from(v));
+        //                         }
+        //                     }
+        //                     adts.push(a)
+        //                 }
+        //                 ModuleDef::Const(c) => {
+        //                     bodies.push(DefWithBody::from(c));
+        //                     consts.push(c)
+        //                 }
+        //                 ModuleDef::Static(s) => bodies.push(DefWithBody::from(s)),
+        //                 _ => (),
+        //             };
+        //         }
 
-                for impl_def in module.impl_defs(db) {
-                    for item in impl_def.items(db) {
-                        num_decls += 1;
-                        match item {
-                            AssocItem::Function(f) => bodies.push(DefWithBody::from(f)),
-                            AssocItem::Const(c) => {
-                                bodies.push(DefWithBody::from(c));
-                                consts.push(c);
-                            }
-                            _ => (),
-                        }
-                    }
-                }
-            }
-        }
-        eprintln!(
-            ", mods: {}, decls: {num_decls}, bodies: {}, adts: {}, consts: {}",
-            visited_modules.len(),
-            bodies.len(),
-            adts.len(),
-            consts.len(),
-        );
-        let crate_def_map_time = crate_def_map_sw.elapsed();
-        eprintln!("{:<20} {}", "Item Collection:", crate_def_map_time);
-        report_metric("crate def map time", crate_def_map_time.time.as_millis() as u64, "ms");
+        //         for impl_def in module.impl_defs(db) {
+        //             for item in impl_def.items(db) {
+        //                 num_decls += 1;
+        //                 match item {
+        //                     AssocItem::Function(f) => bodies.push(DefWithBody::from(f)),
+        //                     AssocItem::Const(c) => {
+        //                         bodies.push(DefWithBody::from(c));
+        //                         consts.push(c);
+        //                     }
+        //                     _ => (),
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        // eprintln!(
+        //     ", mods: {}, decls: {num_decls}, bodies: {}, adts: {}, consts: {}",
+        //     visited_modules.len(),
+        //     bodies.len(),
+        //     adts.len(),
+        //     consts.len(),
+        // );
+        // let crate_def_map_time = crate_def_map_sw.elapsed();
+        // eprintln!("{:<20} {}", "Item Collection:", crate_def_map_time);
+        // report_metric("crate def map time", crate_def_map_time.time.as_millis() as u64, "ms");
 
-        if self.randomize {
-            shuffle(&mut rng, &mut bodies);
-        }
+        // if self.randomize {
+        //     shuffle(&mut rng, &mut bodies);
+        // }
 
-        if !self.skip_lowering {
-            self.run_body_lowering(db, &vfs, &bodies, verbosity);
-        }
+        // if !self.skip_lowering {
+        //     self.run_body_lowering(db, &vfs, &bodies, verbosity);
+        // }
 
-        if !self.skip_inference {
-            self.run_inference(db, &vfs, &bodies, verbosity);
-        }
+        // if !self.skip_inference {
+        //     self.run_inference(db, &vfs, &bodies, verbosity);
+        // }
 
-        if !self.skip_mir_stats {
-            self.run_mir_lowering(db, &bodies, verbosity);
-        }
+        // if !self.skip_mir_stats {
+        //     self.run_mir_lowering(db, &bodies, verbosity);
+        // }
 
-        if !self.skip_data_layout {
-            self.run_data_layout(db, &adts, verbosity);
-        }
+        // if !self.skip_data_layout {
+        //     self.run_data_layout(db, &adts, verbosity);
+        // }
 
-        if !self.skip_const_eval {
-            self.run_const_eval(db, &consts, verbosity);
-        }
+        // if !self.skip_const_eval {
+        //     self.run_const_eval(db, &consts, verbosity);
+        // }
 
-        if self.run_all_ide_things {
-            self.run_ide_things(host.analysis(), file_ids.clone());
-        }
+        // if self.run_all_ide_things {
+        //     self.run_ide_things(host.analysis(), file_ids.clone());
+        // }
 
-        if self.run_term_search {
-            self.run_term_search(&workspace, db, &vfs, file_ids, verbosity);
-        }
+        // if self.run_term_search {
+        //     self.run_term_search(&workspace, db, &vfs, file_ids, verbosity);
+        // }
 
-        let total_span = analysis_sw.elapsed();
-        eprintln!("{:<20} {total_span}", "Total:");
-        report_metric("total time", total_span.time.as_millis() as u64, "ms");
-        if let Some(instructions) = total_span.instructions {
-            report_metric("total instructions", instructions, "#instr");
-        }
-        report_metric("total memory", total_span.memory.allocated.megabytes() as u64, "MB");
+        // let total_span = analysis_sw.elapsed();
+        // eprintln!("{:<20} {total_span}", "Total:");
+        // report_metric("total time", total_span.time.as_millis() as u64, "ms");
+        // if let Some(instructions) = total_span.instructions {
+        //     report_metric("total instructions", instructions, "#instr");
+        // }
+        // report_metric("total memory", total_span.memory.allocated.megabytes() as u64, "MB");
 
-        if self.source_stats {
-            let mut total_file_size = Bytes::default();
-            for e in ide_db::base_db::ParseQuery.in_db(db).entries::<Vec<_>>() {
-                total_file_size += syntax_len(db.parse(e.key).syntax_node())
-            }
+        // if self.source_stats {
+        //     let mut total_file_size = Bytes::default();
+        //     for e in ide_db::base_db::ParseQuery.in_db(db).entries::<Vec<_>>() {
+        //         total_file_size += syntax_len(db.parse(e.key).syntax_node())
+        //     }
 
-            let mut total_macro_file_size = Bytes::default();
-            for e in hir::db::ParseMacroExpansionQuery.in_db(db).entries::<Vec<_>>() {
-                let val = db.parse_macro_expansion(e.key).value.0;
-                total_macro_file_size += syntax_len(val.syntax_node())
-            }
-            eprintln!("source files: {total_file_size}, macro files: {total_macro_file_size}");
-        }
+        //     let mut total_macro_file_size = Bytes::default();
+        //     for e in hir::db::ParseMacroExpansionQuery.in_db(db).entries::<Vec<_>>() {
+        //         let val = db.parse_macro_expansion(e.key).value.0;
+        //         total_macro_file_size += syntax_len(val.syntax_node())
+        //     }
+        //     eprintln!("source files: {total_file_size}, macro files: {total_macro_file_size}");
+        // }
 
-        if verbosity.is_verbose() {
-            print_memory_usage(host, vfs);
-        }
+        // if verbosity.is_verbose() {
+        //     print_memory_usage(host, vfs);
+        // }
 
         Ok(())
     }

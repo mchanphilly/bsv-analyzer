@@ -371,27 +371,27 @@ impl GlobalState {
                 }
             }
             Event::Flycheck(message) => {
-                let _p = tracing::info_span!("GlobalState::handle_event/flycheck").entered();
-                self.handle_flycheck_msg(message);
-                // Coalesce many flycheck updates into a single loop turn
-                while let Ok(message) = self.flycheck_receiver.try_recv() {
-                    self.handle_flycheck_msg(message);
-                }
+                let _p = tracing::info_span!("GlobalState::handle_event/flycheck (Disabled)").entered();
+                // self.handle_flycheck_msg(message);
+                // // Coalesce many flycheck updates into a single loop turn
+                // while let Ok(message) = self.flycheck_receiver.try_recv() {
+                //     self.handle_flycheck_msg(message);
+                // }
             }
             Event::TestResult(message) => {
-                let _p = tracing::info_span!("GlobalState::handle_event/test_result").entered();
-                self.handle_cargo_test_msg(message);
-                // Coalesce many test result event into a single loop turn
-                while let Ok(message) = self.test_run_receiver.try_recv() {
-                    self.handle_cargo_test_msg(message);
-                }
+                let _p = tracing::info_span!("GlobalState::handle_event/test_result (Disabled)").entered();
+                // self.handle_cargo_test_msg(message);
+                // // Coalesce many test result event into a single loop turn
+                // while let Ok(message) = self.test_run_receiver.try_recv() {
+                //     self.handle_cargo_test_msg(message);
+                // }
             }
             Event::DiscoverProject(message) => {
-                self.handle_discover_msg(message);
-                // Coalesce many project discovery events into a single loop turn.
-                while let Ok(message) = self.discover_receiver.try_recv() {
-                    self.handle_discover_msg(message);
-                }
+                // self.handle_discover_msg(message);
+                // // Coalesce many project discovery events into a single loop turn.
+                // while let Ok(message) = self.discover_receiver.try_recv() {
+                //     self.handle_discover_msg(message);
+                // }
             }
         }
         let event_handling_duration = loop_start.elapsed();
@@ -416,65 +416,65 @@ impl GlobalState {
                 }
             }
 
-            let client_refresh = became_quiescent || state_changed;
-            if client_refresh {
-                // Refresh semantic tokens if the client supports it.
-                if self.config.semantic_tokens_refresh() {
-                    self.semantic_tokens_cache.lock().clear();
-                    self.send_request::<lsp_types::request::SemanticTokensRefresh>((), |_, _| ());
-                }
+            // let client_refresh = became_quiescent || state_changed;
+            // if client_refresh {
+            //     // Refresh semantic tokens if the client supports it.
+            //     if self.config.semantic_tokens_refresh() {
+            //         self.semantic_tokens_cache.lock().clear();
+            //         self.send_request::<lsp_types::request::SemanticTokensRefresh>((), |_, _| ());
+            //     }
 
-                // Refresh code lens if the client supports it.
-                if self.config.code_lens_refresh() {
-                    self.send_request::<lsp_types::request::CodeLensRefresh>((), |_, _| ());
-                }
+            //     // Refresh code lens if the client supports it.
+            //     if self.config.code_lens_refresh() {
+            //         self.send_request::<lsp_types::request::CodeLensRefresh>((), |_, _| ());
+            //     }
 
-                // Refresh inlay hints if the client supports it.
-                if self.config.inlay_hints_refresh() {
-                    self.send_request::<lsp_types::request::InlayHintRefreshRequest>((), |_, _| ());
-                }
-            }
+            //     // Refresh inlay hints if the client supports it.
+            //     if self.config.inlay_hints_refresh() {
+            //         self.send_request::<lsp_types::request::InlayHintRefreshRequest>((), |_, _| ());
+            //     }
+            // }
 
             let project_or_mem_docs_changed =
                 became_quiescent || state_changed || memdocs_added_or_removed;
             if project_or_mem_docs_changed && self.config.publish_diagnostics(None) {
-                self.update_diagnostics();
+                // self.update_diagnostics();
             }
             if project_or_mem_docs_changed && self.config.test_explorer() {
-                self.update_tests();
+                // self.update_tests();
             }
         }
 
-        if let Some(diagnostic_changes) = self.diagnostics.take_changes() {
-            for file_id in diagnostic_changes {
-                let uri = file_id_to_url(&self.vfs.read().0, file_id);
-                let version = from_proto::vfs_path(&uri)
-                    .ok()
-                    .and_then(|path| self.mem_docs.get(&path).map(|it| it.version));
+        // if let Some(diagnostic_changes) = self.diagnostics.take_changes() {
+        //     for file_id in diagnostic_changes {
+        //         let uri = file_id_to_url(&self.vfs.read().0, file_id);
+        //         let version = from_proto::vfs_path(&uri)
+        //             .ok()
+        //             .and_then(|path| self.mem_docs.get(&path).map(|it| it.version));
 
-                let diagnostics =
-                    self.diagnostics.diagnostics_for(file_id).cloned().collect::<Vec<_>>();
-                self.publish_diagnostics(uri, version, diagnostics);
-            }
-        }
+        //         let diagnostics =
+        //             self.diagnostics.diagnostics_for(file_id).cloned().collect::<Vec<_>>();
+        //         self.publish_diagnostics(uri, version, diagnostics);
+        //     }
+        // }
 
-        if self.config.cargo_autoreload_config(None)
-            || self.config.discover_workspace_config().is_some()
-        {
-            if let Some((cause, FetchWorkspaceRequest { path, force_crate_graph_reload })) =
-                self.fetch_workspaces_queue.should_start_op()
-            {
-                self.fetch_workspaces(cause, path, force_crate_graph_reload);
-            }
-        }
+        // if self.config.cargo_autoreload_config(None)
+        //     || self.config.discover_workspace_config().is_some()
+        // {
+        //     if let Some((cause, FetchWorkspaceRequest { path, force_crate_graph_reload })) =
+        //         self.fetch_workspaces_queue.should_start_op()
+        //     {
+        //         self.fetch_workspaces(cause, path, force_crate_graph_reload);
+        //     }
+        // }
 
-        if !self.fetch_workspaces_queue.op_in_progress() {
-            if let Some((cause, ())) = self.fetch_build_data_queue.should_start_op() {
-                self.fetch_build_data(cause);
-            } else if let Some((cause, paths)) = self.fetch_proc_macros_queue.should_start_op() {
-                self.fetch_proc_macros(cause, paths);
-            }
-        }
+        // if !self.fetch_workspaces_queue.op_in_progress() {
+        //     if let Some((cause, ())) = self.fetch_build_data_queue.should_start_op() {
+        //         self.fetch_build_data(cause);
+        //     } else if let Some((cause, paths)) = self.fetch_proc_macros_queue.should_start_op() {
+        //         self.fetch_proc_macros(cause, paths);
+        //     }
+        // }
 
         if let Some((cause, ())) = self.prime_caches_queue.should_start_op() {
             self.prime_caches(cause);
@@ -511,137 +511,137 @@ impl GlobalState {
     }
 
     fn update_diagnostics(&mut self) {
-        let db = self.analysis_host.raw_database();
-        let generation = self.diagnostics.next_generation();
-        let subscriptions = {
-            let vfs = &self.vfs.read().0;
-            self.mem_docs
-                .iter()
-                .map(|path| vfs.file_id(path).unwrap())
-                .filter(|&file_id| {
-                    let source_root = db.file_source_root(file_id);
-                    // Only publish diagnostics for files in the workspace, not from crates.io deps
-                    // or the sysroot.
-                    // While theoretically these should never have errors, we have quite a few false
-                    // positives particularly in the stdlib, and those diagnostics would stay around
-                    // forever if we emitted them here.
-                    !db.source_root(source_root).is_library
-                })
-                .collect::<std::sync::Arc<_>>()
-        };
-        tracing::trace!("updating notifications for {:?}", subscriptions);
-        // Split up the work on multiple threads, but we don't wanna fill the entire task pool with
-        // diagnostic tasks, so we limit the number of tasks to a quarter of the total thread pool.
-        let max_tasks = self.config.main_loop_num_threads().div(4).max(1);
-        let chunk_length = subscriptions.len() / max_tasks;
-        let remainder = subscriptions.len() % max_tasks;
+        // let db = self.analysis_host.raw_database();
+        // let generation = self.diagnostics.next_generation();
+        // let subscriptions = {
+        //     let vfs = &self.vfs.read().0;
+        //     self.mem_docs
+        //         .iter()
+        //         .map(|path| vfs.file_id(path).unwrap())
+        //         .filter(|&file_id| {
+        //             let source_root = db.file_source_root(file_id);
+        //             // Only publish diagnostics for files in the workspace, not from crates.io deps
+        //             // or the sysroot.
+        //             // While theoretically these should never have errors, we have quite a few false
+        //             // positives particularly in the stdlib, and those diagnostics would stay around
+        //             // forever if we emitted them here.
+        //             !db.source_root(source_root).is_library
+        //         })
+        //         .collect::<std::sync::Arc<_>>()
+        // };
+        // tracing::trace!("updating notifications for {:?}", subscriptions);
+        // // Split up the work on multiple threads, but we don't wanna fill the entire task pool with
+        // // diagnostic tasks, so we limit the number of tasks to a quarter of the total thread pool.
+        // let max_tasks = self.config.main_loop_num_threads().div(4).max(1);
+        // let chunk_length = subscriptions.len() / max_tasks;
+        // let remainder = subscriptions.len() % max_tasks;
 
-        let mut start = 0;
-        for task_idx in 0..max_tasks {
-            let extra = if task_idx < remainder { 1 } else { 0 };
-            let end = start + chunk_length + extra;
-            let slice = start..end;
-            if slice.is_empty() {
-                break;
-            }
-            // Diagnostics are triggered by the user typing
-            // so we run them on a latency sensitive thread.
-            let snapshot = self.snapshot();
-            self.task_pool.handle.spawn_with_sender(ThreadIntent::LatencySensitive, {
-                let subscriptions = subscriptions.clone();
-                // Do not fetch semantic diagnostics (and populate query results) if we haven't even
-                // loaded the initial workspace yet.
-                let fetch_semantic =
-                    self.vfs_done && self.fetch_workspaces_queue.last_op_result().is_some();
-                move |sender| {
-                    // We aren't observing the semantics token cache here
-                    let snapshot = AssertUnwindSafe(&snapshot);
-                    let Ok(diags) = std::panic::catch_unwind(|| {
-                        fetch_native_diagnostics(
-                            &snapshot,
-                            subscriptions.clone(),
-                            slice.clone(),
-                            NativeDiagnosticsFetchKind::Syntax,
-                        )
-                    }) else {
-                        return;
-                    };
-                    sender
-                        .send(Task::Diagnostics(DiagnosticsTaskKind::Syntax(generation, diags)))
-                        .unwrap();
+        // let mut start = 0;
+        // for task_idx in 0..max_tasks {
+        //     let extra = if task_idx < remainder { 1 } else { 0 };
+        //     let end = start + chunk_length + extra;
+        //     let slice = start..end;
+        //     if slice.is_empty() {
+        //         break;
+        //     }
+        //     // Diagnostics are triggered by the user typing
+        //     // so we run them on a latency sensitive thread.
+        //     let snapshot = self.snapshot();
+        //     self.task_pool.handle.spawn_with_sender(ThreadIntent::LatencySensitive, {
+        //         let subscriptions = subscriptions.clone();
+        //         // Do not fetch semantic diagnostics (and populate query results) if we haven't even
+        //         // loaded the initial workspace yet.
+        //         let fetch_semantic =
+        //             self.vfs_done && self.fetch_workspaces_queue.last_op_result().is_some();
+        //         move |sender| {
+        //             // We aren't observing the semantics token cache here
+        //             let snapshot = AssertUnwindSafe(&snapshot);
+        //             let Ok(diags) = std::panic::catch_unwind(|| {
+        //                 fetch_native_diagnostics(
+        //                     &snapshot,
+        //                     subscriptions.clone(),
+        //                     slice.clone(),
+        //                     NativeDiagnosticsFetchKind::Syntax,
+        //                 )
+        //             }) else {
+        //                 return;
+        //             };
+        //             sender
+        //                 .send(Task::Diagnostics(DiagnosticsTaskKind::Syntax(generation, diags)))
+        //                 .unwrap();
 
-                    if fetch_semantic {
-                        let Ok(diags) = std::panic::catch_unwind(|| {
-                            fetch_native_diagnostics(
-                                &snapshot,
-                                subscriptions.clone(),
-                                slice.clone(),
-                                NativeDiagnosticsFetchKind::Semantic,
-                            )
-                        }) else {
-                            return;
-                        };
-                        sender
-                            .send(Task::Diagnostics(DiagnosticsTaskKind::Semantic(
-                                generation, diags,
-                            )))
-                            .unwrap();
-                    }
-                }
-            });
-            start = end;
-        }
+        //             if fetch_semantic {
+        //                 let Ok(diags) = std::panic::catch_unwind(|| {
+        //                     fetch_native_diagnostics(
+        //                         &snapshot,
+        //                         subscriptions.clone(),
+        //                         slice.clone(),
+        //                         NativeDiagnosticsFetchKind::Semantic,
+        //                     )
+        //                 }) else {
+        //                     return;
+        //                 };
+        //                 sender
+        //                     .send(Task::Diagnostics(DiagnosticsTaskKind::Semantic(
+        //                         generation, diags,
+        //                     )))
+        //                     .unwrap();
+        //             }
+        //         }
+        //     });
+        //     start = end;
+        // }
     }
 
-    fn update_tests(&mut self) {
-        if !self.vfs_done {
-            return;
-        }
-        let db = self.analysis_host.raw_database();
-        let subscriptions = self
-            .mem_docs
-            .iter()
-            .map(|path| self.vfs.read().0.file_id(path).unwrap())
-            .filter(|&file_id| {
-                let source_root = db.file_source_root(file_id);
-                !db.source_root(source_root).is_library
-            })
-            .collect::<Vec<_>>();
-        tracing::trace!("updating tests for {:?}", subscriptions);
+    // fn update_tests(&mut self) {
+    //     if !self.vfs_done {
+    //         return;
+    //     }
+    //     let db = self.analysis_host.raw_database();
+    //     let subscriptions = self
+    //         .mem_docs
+    //         .iter()
+    //         .map(|path| self.vfs.read().0.file_id(path).unwrap())
+    //         .filter(|&file_id| {
+    //             let source_root = db.file_source_root(file_id);
+    //             !db.source_root(source_root).is_library
+    //         })
+    //         .collect::<Vec<_>>();
+    //     tracing::trace!("updating tests for {:?}", subscriptions);
 
-        // Updating tests are triggered by the user typing
-        // so we run them on a latency sensitive thread.
-        self.task_pool.handle.spawn(ThreadIntent::LatencySensitive, {
-            let snapshot = self.snapshot();
-            move || {
-                let tests = subscriptions
-                    .iter()
-                    .copied()
-                    .filter_map(|f| snapshot.analysis.discover_tests_in_file(f).ok())
-                    .flatten()
-                    .collect::<Vec<_>>();
-                for t in &tests {
-                    hack_recover_crate_name::insert_name(t.id.clone());
-                }
-                Task::DiscoverTest(lsp_ext::DiscoverTestResults {
-                    tests: tests
-                        .into_iter()
-                        .filter_map(|t| {
-                            let line_index = t.file.and_then(|f| snapshot.file_line_index(f).ok());
-                            to_proto::test_item(&snapshot, t, line_index.as_ref())
-                        })
-                        .collect(),
-                    scope: None,
-                    scope_file: Some(
-                        subscriptions
-                            .into_iter()
-                            .map(|f| TextDocumentIdentifier { uri: to_proto::url(&snapshot, f) })
-                            .collect(),
-                    ),
-                })
-            }
-        });
-    }
+    //     // Updating tests are triggered by the user typing
+    //     // so we run them on a latency sensitive thread.
+    //     self.task_pool.handle.spawn(ThreadIntent::LatencySensitive, {
+    //         let snapshot = self.snapshot();
+    //         move || {
+    //             let tests = subscriptions
+    //                 .iter()
+    //                 .copied()
+    //                 .filter_map(|f| snapshot.analysis.discover_tests_in_file(f).ok())
+    //                 .flatten()
+    //                 .collect::<Vec<_>>();
+    //             for t in &tests {
+    //                 hack_recover_crate_name::insert_name(t.id.clone());
+    //             }
+    //             Task::DiscoverTest(lsp_ext::DiscoverTestResults {
+    //                 tests: tests
+    //                     .into_iter()
+    //                     .filter_map(|t| {
+    //                         let line_index = t.file.and_then(|f| snapshot.file_line_index(f).ok());
+    //                         to_proto::test_item(&snapshot, t, line_index.as_ref())
+    //                     })
+    //                     .collect(),
+    //                 scope: None,
+    //                 scope_file: Some(
+    //                     subscriptions
+    //                         .into_iter()
+    //                         .map(|f| TextDocumentIdentifier { uri: to_proto::url(&snapshot, f) })
+    //                         .collect(),
+    //                 ),
+    //             })
+    //         }
+    //     });
+    // }
 
     fn update_status_or_notify(&mut self) {
         let status = self.current_status();
@@ -755,25 +755,26 @@ impl GlobalState {
                     self.report_progress("Building build-artifacts", state, msg, None, None);
                 }
             }
-            Task::LoadProcMacros(progress) => {
-                let (state, msg) = match progress {
-                    ProcMacroProgress::Begin => (Some(Progress::Begin), None),
-                    ProcMacroProgress::Report(msg) => (Some(Progress::Report), Some(msg)),
-                    ProcMacroProgress::End(proc_macro_load_result) => {
-                        self.fetch_proc_macros_queue.op_completed(true);
-                        self.set_proc_macros(proc_macro_load_result);
-                        (Some(Progress::End), None)
-                    }
-                };
+            // Task::LoadProcMacros(progress) => {
+            //     let (state, msg) = match progress {
+            //         ProcMacroProgress::Begin => (Some(Progress::Begin), None),
+            //         ProcMacroProgress::Report(msg) => (Some(Progress::Report), Some(msg)),
+            //         ProcMacroProgress::End(proc_macro_load_result) => {
+            //             self.fetch_proc_macros_queue.op_completed(true);
+            //             self.set_proc_macros(proc_macro_load_result);
+            //             (Some(Progress::End), None)
+            //         }
+            //     };
 
-                if let Some(state) = state {
-                    self.report_progress("Loading proc-macros", state, msg, None, None);
-                }
-            }
+            //     if let Some(state) = state {
+            //         self.report_progress("Loading proc-macros", state, msg, None, None);
+            //     }
+            // }
             Task::BuildDepsHaveChanged => self.build_deps_changed = true,
             Task::DiscoverTest(tests) => {
                 self.send_notification::<lsp_ext::DiscoveredTests>(tests);
             }
+            _ => ()  // Do nothing for tasks.
         }
     }
 
@@ -860,154 +861,155 @@ impl GlobalState {
                     }
                 });
             }
-            QueuedTask::CheckProcMacroSources(modified_rust_files) => {
-                let crate_graph = self.analysis_host.raw_database().crate_graph();
-                let snap = self.snapshot();
-                self.task_pool.handle.spawn_with_sender(stdx::thread::ThreadIntent::Worker, {
-                    move |sender| {
-                        if modified_rust_files.into_iter().any(|file_id| {
-                            // FIXME: Check whether these files could be build script related
-                            match snap.analysis.crates_for(file_id) {
-                                Ok(crates) => {
-                                    crates.iter().any(|&krate| crate_graph[krate].is_proc_macro)
-                                }
-                                _ => false,
-                            }
-                        }) {
-                            sender.send(Task::BuildDepsHaveChanged).unwrap();
-                        }
-                    }
-                });
-            }
+            // QueuedTask::CheckProcMacroSources(modified_rust_files) => {
+            //     let crate_graph = self.analysis_host.raw_database().crate_graph();
+            //     let snap = self.snapshot();
+            //     self.task_pool.handle.spawn_with_sender(stdx::thread::ThreadIntent::Worker, {
+            //         move |sender| {
+            //             if modified_rust_files.into_iter().any(|file_id| {
+            //                 // FIXME: Check whether these files could be build script related
+            //                 match snap.analysis.crates_for(file_id) {
+            //                     Ok(crates) => {
+            //                         crates.iter().any(|&krate| crate_graph[krate].is_proc_macro)
+            //                     }
+            //                     _ => false,
+            //                 }
+            //             }) {
+            //                 sender.send(Task::BuildDepsHaveChanged).unwrap();
+            //             }
+            //         }
+            //     });
+            // }
+            _ => ()  // Do nothing for tasks.
         }
     }
 
-    fn handle_discover_msg(&mut self, message: DiscoverProjectMessage) {
-        let title = self
-            .config
-            .discover_workspace_config()
-            .map(|cfg| cfg.progress_label.clone())
-            .expect("No title could be found; this is a bug");
-        match message {
-            DiscoverProjectMessage::Finished { project, buildfile } => {
-                self.discover_handle = None;
-                self.report_progress(&title, Progress::End, None, None, None);
-                self.discover_workspace_queue.op_completed(());
+    // fn handle_discover_msg(&mut self, message: DiscoverProjectMessage) {
+    //     let title = self
+    //         .config
+    //         .discover_workspace_config()
+    //         .map(|cfg| cfg.progress_label.clone())
+    //         .expect("No title could be found; this is a bug");
+    //     match message {
+    //         DiscoverProjectMessage::Finished { project, buildfile } => {
+    //             self.discover_handle = None;
+    //             self.report_progress(&title, Progress::End, None, None, None);
+    //             self.discover_workspace_queue.op_completed(());
 
-                let mut config = Config::clone(&*self.config);
-                config.add_discovered_project_from_command(project, buildfile);
-                self.update_configuration(config);
-            }
-            DiscoverProjectMessage::Progress { message } => {
-                self.report_progress(&title, Progress::Report, Some(message), None, None)
-            }
-            DiscoverProjectMessage::Error { error, source } => {
-                self.discover_handle = None;
-                let message = format!("Project discovery failed: {error}");
-                self.discover_workspace_queue.op_completed(());
-                self.show_and_log_error(message.clone(), source);
-                self.report_progress(&title, Progress::End, Some(message), None, None)
-            }
-        }
-    }
+    //             let mut config = Config::clone(&*self.config);
+    //             config.add_discovered_project_from_command(project, buildfile);
+    //             self.update_configuration(config);
+    //         }
+    //         DiscoverProjectMessage::Progress { message } => {
+    //             self.report_progress(&title, Progress::Report, Some(message), None, None)
+    //         }
+    //         DiscoverProjectMessage::Error { error, source } => {
+    //             self.discover_handle = None;
+    //             let message = format!("Project discovery failed: {error}");
+    //             self.discover_workspace_queue.op_completed(());
+    //             self.show_and_log_error(message.clone(), source);
+    //             self.report_progress(&title, Progress::End, Some(message), None, None)
+    //         }
+    //     }
+    // }
 
-    fn handle_cargo_test_msg(&mut self, message: CargoTestMessage) {
-        match message {
-            CargoTestMessage::Test { name, state } => {
-                let state = match state {
-                    TestState::Started => lsp_ext::TestState::Started,
-                    TestState::Ignored => lsp_ext::TestState::Skipped,
-                    TestState::Ok => lsp_ext::TestState::Passed,
-                    TestState::Failed { stdout } => lsp_ext::TestState::Failed { message: stdout },
-                };
-                let Some(test_id) = hack_recover_crate_name::lookup_name(name) else {
-                    return;
-                };
-                self.send_notification::<lsp_ext::ChangeTestState>(
-                    lsp_ext::ChangeTestStateParams { test_id, state },
-                );
-            }
-            CargoTestMessage::Suite => (),
-            CargoTestMessage::Finished => {
-                self.test_run_remaining_jobs = self.test_run_remaining_jobs.saturating_sub(1);
-                if self.test_run_remaining_jobs == 0 {
-                    self.send_notification::<lsp_ext::EndRunTest>(());
-                    self.test_run_session = None;
-                }
-            }
-            CargoTestMessage::Custom { text } => {
-                self.send_notification::<lsp_ext::AppendOutputToRunTest>(text);
-            }
-        }
-    }
+    // fn handle_cargo_test_msg(&mut self, message: CargoTestMessage) {
+    //     match message {
+    //         CargoTestMessage::Test { name, state } => {
+    //             let state = match state {
+    //                 TestState::Started => lsp_ext::TestState::Started,
+    //                 TestState::Ignored => lsp_ext::TestState::Skipped,
+    //                 TestState::Ok => lsp_ext::TestState::Passed,
+    //                 TestState::Failed { stdout } => lsp_ext::TestState::Failed { message: stdout },
+    //             };
+    //             let Some(test_id) = hack_recover_crate_name::lookup_name(name) else {
+    //                 return;
+    //             };
+    //             self.send_notification::<lsp_ext::ChangeTestState>(
+    //                 lsp_ext::ChangeTestStateParams { test_id, state },
+    //             );
+    //         }
+    //         CargoTestMessage::Suite => (),
+    //         CargoTestMessage::Finished => {
+    //             self.test_run_remaining_jobs = self.test_run_remaining_jobs.saturating_sub(1);
+    //             if self.test_run_remaining_jobs == 0 {
+    //                 self.send_notification::<lsp_ext::EndRunTest>(());
+    //                 self.test_run_session = None;
+    //             }
+    //         }
+    //         CargoTestMessage::Custom { text } => {
+    //             self.send_notification::<lsp_ext::AppendOutputToRunTest>(text);
+    //         }
+    //     }
+    // }
 
-    fn handle_flycheck_msg(&mut self, message: FlycheckMessage) {
-        match message {
-            FlycheckMessage::AddDiagnostic { id, workspace_root, diagnostic } => {
-                let snap = self.snapshot();
-                let diagnostics = crate::diagnostics::to_proto::map_rust_diagnostic_to_lsp(
-                    &self.config.diagnostics_map(None),
-                    &diagnostic,
-                    &workspace_root,
-                    &snap,
-                );
-                for diag in diagnostics {
-                    match url_to_file_id(&self.vfs.read().0, &diag.url) {
-                        Ok(file_id) => self.diagnostics.add_check_diagnostic(
-                            id,
-                            file_id,
-                            diag.diagnostic,
-                            diag.fix,
-                        ),
-                        Err(err) => {
-                            error!(
-                                "flycheck {id}: File with cargo diagnostic not found in VFS: {}",
-                                err
-                            );
-                        }
-                    };
-                }
-            }
+    // fn handle_flycheck_msg(&mut self, message: FlycheckMessage) {
+    //     match message {
+    //         FlycheckMessage::AddDiagnostic { id, workspace_root, diagnostic } => {
+    //             let snap = self.snapshot();
+    //             let diagnostics = crate::diagnostics::to_proto::map_rust_diagnostic_to_lsp(
+    //                 &self.config.diagnostics_map(None),
+    //                 &diagnostic,
+    //                 &workspace_root,
+    //                 &snap,
+    //             );
+    //             for diag in diagnostics {
+    //                 match url_to_file_id(&self.vfs.read().0, &diag.url) {
+    //                     Ok(file_id) => self.diagnostics.add_check_diagnostic(
+    //                         id,
+    //                         file_id,
+    //                         diag.diagnostic,
+    //                         diag.fix,
+    //                     ),
+    //                     Err(err) => {
+    //                         error!(
+    //                             "flycheck {id}: File with cargo diagnostic not found in VFS: {}",
+    //                             err
+    //                         );
+    //                     }
+    //                 };
+    //             }
+    //         }
 
-            FlycheckMessage::ClearDiagnostics { id } => self.diagnostics.clear_check(id),
+    //         FlycheckMessage::ClearDiagnostics { id } => self.diagnostics.clear_check(id),
 
-            FlycheckMessage::Progress { id, progress } => {
-                let (state, message) = match progress {
-                    flycheck::Progress::DidStart => (Progress::Begin, None),
-                    flycheck::Progress::DidCheckCrate(target) => (Progress::Report, Some(target)),
-                    flycheck::Progress::DidCancel => {
-                        self.last_flycheck_error = None;
-                        (Progress::End, None)
-                    }
-                    flycheck::Progress::DidFailToRestart(err) => {
-                        self.last_flycheck_error =
-                            Some(format!("cargo check failed to start: {err}"));
-                        return;
-                    }
-                    flycheck::Progress::DidFinish(result) => {
-                        self.last_flycheck_error =
-                            result.err().map(|err| format!("cargo check failed to start: {err}"));
-                        (Progress::End, None)
-                    }
-                };
+    //         FlycheckMessage::Progress { id, progress } => {
+    //             let (state, message) = match progress {
+    //                 flycheck::Progress::DidStart => (Progress::Begin, None),
+    //                 flycheck::Progress::DidCheckCrate(target) => (Progress::Report, Some(target)),
+    //                 flycheck::Progress::DidCancel => {
+    //                     self.last_flycheck_error = None;
+    //                     (Progress::End, None)
+    //                 }
+    //                 flycheck::Progress::DidFailToRestart(err) => {
+    //                     self.last_flycheck_error =
+    //                         Some(format!("cargo check failed to start: {err}"));
+    //                     return;
+    //                 }
+    //                 flycheck::Progress::DidFinish(result) => {
+    //                     self.last_flycheck_error =
+    //                         result.err().map(|err| format!("cargo check failed to start: {err}"));
+    //                     (Progress::End, None)
+    //                 }
+    //             };
 
-                // When we're running multiple flychecks, we have to include a disambiguator in
-                // the title, or the editor complains. Note that this is a user-facing string.
-                let title = if self.flycheck.len() == 1 {
-                    format!("{}", self.config.flycheck(None))
-                } else {
-                    format!("{} (#{})", self.config.flycheck(None), id + 1)
-                };
-                self.report_progress(
-                    &title,
-                    state,
-                    message,
-                    None,
-                    Some(format!("bsv-analyzer/flycheck/{id}")),
-                );
-            }
-        }
-    }
+    //             // When we're running multiple flychecks, we have to include a disambiguator in
+    //             // the title, or the editor complains. Note that this is a user-facing string.
+    //             let title = if self.flycheck.len() == 1 {
+    //                 format!("{}", self.config.flycheck(None))
+    //             } else {
+    //                 format!("{} (#{})", self.config.flycheck(None), id + 1)
+    //             };
+    //             self.report_progress(
+    //                 &title,
+    //                 state,
+    //                 message,
+    //                 None,
+    //                 Some(format!("bsv-analyzer/flycheck/{id}")),
+    //             );
+    //         }
+    //     }
+    // }
 
     /// Registers and handles a request. This should only be called once per incoming request.
     fn on_new_request(&mut self, request_received: Instant, req: Request) {
