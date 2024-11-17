@@ -12,7 +12,7 @@ use std::{
 use cfg::{CfgAtom, CfgDiff};
 use hir::Symbol;
 use ide::{
-    AssistConfig, CallableSnippets, CompletionConfig, CompletionFieldsToResolve, DiagnosticsConfig,
+    CallableSnippets, CompletionConfig, CompletionFieldsToResolve, DiagnosticsConfig,
     ExprFillDefaultMode, GenericParameterHints, HighlightConfig, HighlightRelatedConfig,
     HoverConfig, HoverDocFormat, InlayFieldsToResolve, InlayHintsConfig, JoinLinesConfig,
     MemoryLayoutHoverConfig, MemoryLayoutHoverRenderKind, Snippet, SnippetScope, SourceRootId,
@@ -1397,19 +1397,19 @@ impl Config {
 }
 
 impl Config {
-    pub fn assist(&self, source_root: Option<SourceRootId>) -> AssistConfig {
-        AssistConfig {
-            snippet_cap: self.snippet_cap(),
-            allowed: None,
-            insert_use: self.insert_use_config(source_root),
-            prefer_no_std: self.imports_preferNoStd(source_root).to_owned(),
-            assist_emit_must_use: self.assist_emitMustUse(source_root).to_owned(),
-            prefer_prelude: self.imports_preferPrelude(source_root).to_owned(),
-            prefer_absolute: self.imports_prefixExternPrelude(source_root).to_owned(),
-            term_search_fuel: self.assist_termSearch_fuel(source_root).to_owned() as u64,
-            term_search_borrowck: self.assist_termSearch_borrowcheck(source_root).to_owned(),
-        }
-    }
+    // pub fn assist(&self, source_root: Option<SourceRootId>) -> AssistConfig {
+    //     AssistConfig {
+    //         snippet_cap: self.snippet_cap(),
+    //         allowed: None,
+    //         insert_use: self.insert_use_config(source_root),
+    //         prefer_no_std: self.imports_preferNoStd(source_root).to_owned(),
+    //         assist_emit_must_use: self.assist_emitMustUse(source_root).to_owned(),
+    //         prefer_prelude: self.imports_preferPrelude(source_root).to_owned(),
+    //         prefer_absolute: self.imports_prefixExternPrelude(source_root).to_owned(),
+    //         term_search_fuel: self.assist_termSearch_fuel(source_root).to_owned() as u64,
+    //         term_search_borrowck: self.assist_termSearch_borrowcheck(source_root).to_owned(),
+    //     }
+    // }
 
     pub fn completion(&self, source_root: Option<SourceRootId>) -> CompletionConfig {
         let client_capability_fields = self.completion_resolve_support_properties();

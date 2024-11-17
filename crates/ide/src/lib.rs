@@ -115,8 +115,8 @@ pub use crate::{
     test_explorer::{TestItem, TestItemKind},
 };
 pub use hir::Semantics;
-pub use ide_assists::{
-    Assist, AssistConfig, AssistId, AssistKind, AssistResolveStrategy, SingleResolve,
+pub use ide_db::assists::{
+    Assist, AssistId, AssistKind, AssistResolveStrategy, SingleResolve,
 };
 pub use ide_completion::{
     CallableSnippets, CompletionConfig, CompletionFieldsToResolve, CompletionItem,
@@ -712,38 +712,35 @@ impl Analysis {
     }
 
     /// Convenience function to return assists + quick fixes for diagnostics
-    pub fn assists_with_fixes(
-        &self,
-        assist_config: &AssistConfig,
-        diagnostics_config: &DiagnosticsConfig,
-        resolve: AssistResolveStrategy,
-        frange: FileRange,
-    ) -> Cancellable<Vec<Assist>> {
-        let include_fixes = match &assist_config.allowed {
-            Some(it) => it.iter().any(|&it| it == AssistKind::None || it == AssistKind::QuickFix),
-            None => true,
-        };
+    // pub fn assists_with_fixes(
+    //     &self,
+    //     // assist_config: &AssistConfig,
+    //     diagnostics_config: &DiagnosticsConfig,
+    //     resolve: AssistResolveStrategy,
+    //     frange: FileRange,
+    // ) -> Cancellable<Vec<Assist>> {
+    //     let include_fixes = match &assist_config.allowed {
+    //         Some(it) => it.iter().any(|&it| it == AssistKind::None || it == AssistKind::QuickFix),
+    //         None => true,
+    //     };
 
-        self.with_db(|db| {
-            let diagnostic_assists = if diagnostics_config.enabled && include_fixes {
-                ide_diagnostics::full_diagnostics(db, diagnostics_config, &resolve, frange.file_id)
-                    .into_iter()
-                    .flat_map(|it| it.fixes.unwrap_or_default())
-                    .filter(|it| it.target.intersect(frange.range).is_some())
-                    .collect()
-            } else {
-                Vec::new()
-            };
-            let ssr_assists = ssr::ssr_assists(db, &resolve, frange);
-            let assists = ide_assists::assists(db, assist_config, resolve, frange);
+    //     self.with_db(|db| {
+    //         let diagnostic_assists = if diagnostics_config.enabled && include_fixes {
+    //             ide_diagnostics::full_diagnostics(db, diagnostics_config, &resolve, frange.file_id)
+    //                 .into_iter()
+    //                 .flat_map(|it| it.fixes.unwrap_or_default())
+    //                 .filter(|it| it.target.intersect(frange.range).is_some())
+    //                 .collect()
+    //         } else {
+    //             Vec::new()
+    //         };
+    //         let ssr_assists = ssr::ssr_assists(db, &resolve, frange);
+    //         let mut res = diagnostic_assists;
+    //         res.extend(ssr_assists);
 
-            let mut res = diagnostic_assists;
-            res.extend(ssr_assists);
-            res.extend(assists);
-
-            res
-        })
-    }
+    //         res
+    //     })
+    // }
 
     /// Returns the edit required to rename reference at the position to the new
     /// name.

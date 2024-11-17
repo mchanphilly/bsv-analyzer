@@ -164,85 +164,85 @@ pub(crate) enum NativeDiagnosticsFetchKind {
     Semantic,
 }
 
-pub(crate) fn fetch_native_diagnostics(
-    snapshot: &GlobalStateSnapshot,
-    subscriptions: std::sync::Arc<[FileId]>,
-    slice: std::ops::Range<usize>,
-    kind: NativeDiagnosticsFetchKind,
-) -> Vec<(FileId, Vec<lsp_types::Diagnostic>)> {
-    let _p = tracing::info_span!("fetch_native_diagnostics").entered();
-    let _ctx = stdx::panic_context::enter("fetch_native_diagnostics".to_owned());
+// pub(crate) fn fetch_native_diagnostics(
+//     snapshot: &GlobalStateSnapshot,
+//     subscriptions: std::sync::Arc<[FileId]>,
+//     slice: std::ops::Range<usize>,
+//     kind: NativeDiagnosticsFetchKind,
+// ) -> Vec<(FileId, Vec<lsp_types::Diagnostic>)> {
+//     let _p = tracing::info_span!("fetch_native_diagnostics").entered();
+//     let _ctx = stdx::panic_context::enter("fetch_native_diagnostics".to_owned());
 
-    let convert_diagnostic =
-        |line_index: &crate::line_index::LineIndex, d: ide::Diagnostic| lsp_types::Diagnostic {
-            range: lsp::to_proto::range(line_index, d.range.range),
-            severity: Some(lsp::to_proto::diagnostic_severity(d.severity)),
-            code: Some(lsp_types::NumberOrString::String(d.code.as_str().to_owned())),
-            code_description: Some(lsp_types::CodeDescription {
-                href: lsp_types::Url::parse(&d.code.url()).unwrap(),
-            }),
-            source: Some("bsv_analyzer".to_owned()),
-            message: d.message,
-            related_information: None,
-            tags: d.unused.then(|| vec![lsp_types::DiagnosticTag::UNNECESSARY]),
-            data: None,
-        };
+//     let convert_diagnostic =
+//         |line_index: &crate::line_index::LineIndex, d: ide::Diagnostic| lsp_types::Diagnostic {
+//             range: lsp::to_proto::range(line_index, d.range.range),
+//             severity: Some(lsp::to_proto::diagnostic_severity(d.severity)),
+//             code: Some(lsp_types::NumberOrString::String(d.code.as_str().to_owned())),
+//             code_description: Some(lsp_types::CodeDescription {
+//                 href: lsp_types::Url::parse(&d.code.url()).unwrap(),
+//             }),
+//             source: Some("bsv_analyzer".to_owned()),
+//             message: d.message,
+//             related_information: None,
+//             tags: d.unused.then(|| vec![lsp_types::DiagnosticTag::UNNECESSARY]),
+//             data: None,
+//         };
 
-    // the diagnostics produced may point to different files not requested by the concrete request,
-    // put those into here and filter later
-    let mut odd_ones = Vec::new();
-    let mut diagnostics = subscriptions[slice]
-        .iter()
-        .copied()
-        .filter_map(|file_id| {
-            let line_index = snapshot.file_line_index(file_id).ok()?;
-            let source_root = snapshot.analysis.source_root_id(file_id).ok()?;
+//     // the diagnostics produced may point to different files not requested by the concrete request,
+//     // put those into here and filter later
+//     let mut odd_ones = Vec::new();
+//     let mut diagnostics = subscriptions[slice]
+//         .iter()
+//         .copied()
+//         .filter_map(|file_id| {
+//             let line_index = snapshot.file_line_index(file_id).ok()?;
+//             let source_root = snapshot.analysis.source_root_id(file_id).ok()?;
 
-            let config = &snapshot.config.diagnostics(Some(source_root));
-            let diagnostics = match kind {
-                NativeDiagnosticsFetchKind::Syntax => {
-                    snapshot.analysis.syntax_diagnostics(config, file_id).ok()?
-                }
-                NativeDiagnosticsFetchKind::Semantic => snapshot
-                    .analysis
-                    .semantic_diagnostics(config, ide::AssistResolveStrategy::None, file_id)
-                    .ok()?,
-            };
-            let diagnostics = diagnostics
-                .into_iter()
-                .filter_map(|d| {
-                    if d.range.file_id == file_id {
-                        Some(convert_diagnostic(&line_index, d))
-                    } else {
-                        odd_ones.push(d);
-                        None
-                    }
-                })
-                .collect::<Vec<_>>();
-            Some((file_id, diagnostics))
-        })
-        .collect::<Vec<_>>();
+//             let config = &snapshot.config.diagnostics(Some(source_root));
+//             let diagnostics = match kind {
+//                 NativeDiagnosticsFetchKind::Syntax => {
+//                     snapshot.analysis.syntax_diagnostics(config, file_id).ok()?
+//                 }
+//                 NativeDiagnosticsFetchKind::Semantic => snapshot
+//                     .analysis
+//                     .semantic_diagnostics(config, ide::AssistResolveStrategy::None, file_id)
+//                     .ok()?,
+//             };
+//             let diagnostics = diagnostics
+//                 .into_iter()
+//                 .filter_map(|d| {
+//                     if d.range.file_id == file_id {
+//                         Some(convert_diagnostic(&line_index, d))
+//                     } else {
+//                         odd_ones.push(d);
+//                         None
+//                     }
+//                 })
+//                 .collect::<Vec<_>>();
+//             Some((file_id, diagnostics))
+//         })
+//         .collect::<Vec<_>>();
 
-    // Add back any diagnostics that point to files we are subscribed to
-    for (file_id, group) in odd_ones
-        .into_iter()
-        .sorted_by_key(|it| it.range.file_id)
-        .group_by(|it| it.range.file_id)
-        .into_iter()
-    {
-        if !subscriptions.contains(&file_id) {
-            continue;
-        }
-        let Some((_, diagnostics)) = diagnostics.iter_mut().find(|&&mut (id, _)| id == file_id)
-        else {
-            continue;
-        };
-        let Some(line_index) = snapshot.file_line_index(file_id).ok() else {
-            break;
-        };
-        for diagnostic in group {
-            diagnostics.push(convert_diagnostic(&line_index, diagnostic));
-        }
-    }
-    diagnostics
-}
+//     // Add back any diagnostics that point to files we are subscribed to
+//     for (file_id, group) in odd_ones
+//         .into_iter()
+//         .sorted_by_key(|it| it.range.file_id)
+//         .group_by(|it| it.range.file_id)
+//         .into_iter()
+//     {
+//         if !subscriptions.contains(&file_id) {
+//             continue;
+//         }
+//         let Some((_, diagnostics)) = diagnostics.iter_mut().find(|&&mut (id, _)| id == file_id)
+//         else {
+//             continue;
+//         };
+//         let Some(line_index) = snapshot.file_line_index(file_id).ok() else {
+//             break;
+//         };
+//         for diagnostic in group {
+//             diagnostics.push(convert_diagnostic(&line_index, diagnostic));
+//         }
+//     }
+//     diagnostics
+// }
