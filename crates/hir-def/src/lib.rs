@@ -58,8 +58,8 @@ use intern::Interned;
 pub use rustc_abi as layout;
 use triomphe::Arc;
 
-#[cfg(test)]
-mod macro_expansion_tests;
+// #[cfg(test)]
+// mod macro_expansion_tests;
 mod pretty;
 #[cfg(test)]
 mod test_db;

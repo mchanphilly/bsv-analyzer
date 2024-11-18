@@ -825,7 +825,7 @@ fn lint_attrs<'a>(
                 "forbid" | "deny" => Some(Either::Left(iter::once((Severity::Error, value)))),
                 "cfg_attr" => {
                     let mut lint_attrs = Vec::new();
-                    cfg_attr_lint_attrs(sema, &value, &mut lint_attrs);
+                    // cfg_attr_lint_attrs(sema, &value, &mut lint_attrs);
                     Some(Either::Right(lint_attrs.into_iter()))
                 }
                 _ => None,
@@ -845,57 +845,57 @@ fn lint_attrs<'a>(
         })
 }
 
-fn cfg_attr_lint_attrs(
-    sema: &Semantics<'_, RootDatabase>,
-    value: &ast::TokenTree,
-    lint_attrs: &mut Vec<(Severity, ast::TokenTree)>,
-) {
-    let prev_len = lint_attrs.len();
+// fn cfg_attr_lint_attrs(
+//     sema: &Semantics<'_, RootDatabase>,
+//     value: &ast::TokenTree,
+//     lint_attrs: &mut Vec<(Severity, ast::TokenTree)>,
+// ) {
+//     let prev_len = lint_attrs.len();
 
-    let mut iter = value.token_trees_and_tokens().filter(|it| match it {
-        NodeOrToken::Node(_) => true,
-        NodeOrToken::Token(it) => !it.kind().is_trivia(),
-    });
+//     let mut iter = value.token_trees_and_tokens().filter(|it| match it {
+//         NodeOrToken::Node(_) => true,
+//         NodeOrToken::Token(it) => !it.kind().is_trivia(),
+//     });
 
-    // Skip the condition.
-    for value in &mut iter {
-        if value.as_token().is_some_and(|it| it.kind() == T![,]) {
-            break;
-        }
-    }
+//     // Skip the condition.
+//     for value in &mut iter {
+//         if value.as_token().is_some_and(|it| it.kind() == T![,]) {
+//             break;
+//         }
+//     }
 
-    while let Some(value) = iter.next() {
-        if let Some(token) = value.as_token() {
-            if token.kind() == SyntaxKind::IDENT {
-                let severity = match token.text() {
-                    "allow" | "expect" => Some(Severity::Allow),
-                    "warn" => Some(Severity::Warning),
-                    "forbid" | "deny" => Some(Severity::Error),
-                    "cfg_attr" => {
-                        if let Some(NodeOrToken::Node(value)) = iter.next() {
-                            cfg_attr_lint_attrs(sema, &value, lint_attrs);
-                        }
-                        None
-                    }
-                    _ => None,
-                };
-                if let Some(severity) = severity {
-                    let lints = iter.next();
-                    if let Some(NodeOrToken::Node(lints)) = lints {
-                        lint_attrs.push((severity, lints));
-                    }
-                }
-            }
-        }
-    }
+//     while let Some(value) = iter.next() {
+//         if let Some(token) = value.as_token() {
+//             if token.kind() == SyntaxKind::IDENT {
+//                 let severity = match token.text() {
+//                     "allow" | "expect" => Some(Severity::Allow),
+//                     "warn" => Some(Severity::Warning),
+//                     "forbid" | "deny" => Some(Severity::Error),
+//                     "cfg_attr" => {
+//                         if let Some(NodeOrToken::Node(value)) = iter.next() {
+//                             cfg_attr_lint_attrs(sema, &value, lint_attrs);
+//                         }
+//                         None
+//                     }
+//                     _ => None,
+//                 };
+//                 if let Some(severity) = severity {
+//                     let lints = iter.next();
+//                     if let Some(NodeOrToken::Node(lints)) = lints {
+//                         lint_attrs.push((severity, lints));
+//                     }
+//                 }
+//             }
+//         }
+//     }
 
-    if prev_len != lint_attrs.len() {
-        if let Some(false) | None = sema.check_cfg_attr(value) {
-            // Discard the attributes when the condition is false.
-            lint_attrs.truncate(prev_len);
-        }
-    }
-}
+//     if prev_len != lint_attrs.len() {
+//         if let Some(false) | None = sema.check_cfg_attr(value) {
+//             // Discard the attributes when the condition is false.
+//             lint_attrs.truncate(prev_len);
+//         }
+//     }
+// }
 
 fn lint_groups(lint: &DiagnosticCode) -> &'static [&'static str] {
     match lint {
