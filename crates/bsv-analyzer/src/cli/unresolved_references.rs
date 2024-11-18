@@ -15,16 +15,15 @@ use crate::cli::flags;
 
 impl flags::UnresolvedReferences {
     pub fn run(self) -> anyhow::Result<()> {
-        // const STACK_SIZE: usize = 1024 * 1024 * 8;
+        const STACK_SIZE: usize = 1024 * 1024 * 8;
 
-        // let handle = stdx::thread::Builder::new(stdx::thread::ThreadIntent::LatencySensitive)
-        //     .name("BIG_STACK_THREAD".into())
-        //     .stack_size(STACK_SIZE)
-        //     .spawn(|| self.run_())
-        //     .unwrap();
+        let handle = stdx::thread::Builder::new(stdx::thread::ThreadIntent::LatencySensitive)
+            .name("BIG_STACK_THREAD".into())
+            .stack_size(STACK_SIZE)
+            .spawn(|| self.run_())
+            .unwrap();
 
-        // handle.join()
-        Ok(())
+        handle.join()
     }
 
     fn run_(self) -> anyhow::Result<()> {
@@ -164,10 +163,10 @@ fn all_unresolved_references(
             continue;
         }
 
-        // if we couldn't classify it, but it's in an attr, ignore it. See #10935
-        if descended_name_ref.syntax().ancestors().any(|it| it.kind() == SyntaxKind::ATTR) {
-            continue;
-        }
+        // // if we couldn't classify it, but it's in an attr, ignore it. See #10935
+        // if descended_name_ref.syntax().ancestors().any(|it| it.kind() == SyntaxKind::ATTR) {
+        //     continue;
+        // }
 
         // otherwise, it's unresolved
         unresolved_references.push(name_ref.syntax().text_range());

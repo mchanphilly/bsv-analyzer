@@ -11,7 +11,6 @@ mod parse;
 mod run_tests;
 mod rustc_tests;
 mod scip;
-mod ssr;
 mod symbols;
 mod unresolved_references;
 
