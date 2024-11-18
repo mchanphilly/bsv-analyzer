@@ -44,7 +44,6 @@ mod references;
 mod rename;
 mod runnables;
 mod signature_help;
-mod ssr;
 mod static_index;
 mod status;
 mod syntax_highlighting;
@@ -388,12 +387,12 @@ impl Analysis {
 
     /// Returns an edit to remove all newlines in the range, cleaning up minor
     /// stuff like trailing commas.
-    pub fn join_lines(&self, config: &JoinLinesConfig, frange: FileRange) -> Cancellable<TextEdit> {
-        self.with_db(|db| {
-            let parse = db.parse(EditionedFileId::current_edition(frange.file_id));
-            join_lines::join_lines(config, &parse.tree(), frange.range)
-        })
-    }
+    // pub fn join_lines(&self, config: &JoinLinesConfig, frange: FileRange) -> Cancellable<TextEdit> {
+    //     self.with_db(|db| {
+    //         let parse = db.parse(EditionedFileId::current_edition(frange.file_id));
+    //         join_lines::join_lines(config, &parse.tree(), frange.range)
+    //     })
+    // }
 
     /// Returns an edit which should be applied when opening a new line, fixing
     /// up minor stuff like continuing the comment.

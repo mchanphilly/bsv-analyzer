@@ -392,30 +392,31 @@ pub(crate) fn handle_matching_brace(
         .collect()
 }
 
-pub(crate) fn handle_join_lines(
-    snap: GlobalStateSnapshot,
-    params: lsp_ext::JoinLinesParams,
-) -> anyhow::Result<Vec<lsp_types::TextEdit>> {
-    let _p = tracing::info_span!("handle_join_lines").entered();
+// TODO BSV Join lines
+// pub(crate) fn handle_join_lines(
+//     snap: GlobalStateSnapshot,
+//     params: lsp_ext::JoinLinesParams,
+// ) -> anyhow::Result<Vec<lsp_types::TextEdit>> {
+//     let _p = tracing::info_span!("handle_join_lines").entered();
 
-    let file_id = from_proto::file_id(&snap, &params.text_document.uri)?;
-    let config = snap.config.join_lines();
-    let line_index = snap.file_line_index(file_id)?;
+//     let file_id = from_proto::file_id(&snap, &params.text_document.uri)?;
+//     let config = snap.config.join_lines();
+//     let line_index = snap.file_line_index(file_id)?;
 
-    let mut res = TextEdit::default();
-    for range in params.ranges {
-        let range = from_proto::text_range(&line_index, range)?;
-        let edit = snap.analysis.join_lines(&config, FileRange { file_id, range })?;
-        match res.union(edit) {
-            Ok(()) => (),
-            Err(_edit) => {
-                // just ignore overlapping edits
-            }
-        }
-    }
+//     let mut res = TextEdit::default();
+//     for range in params.ranges {
+//         let range = from_proto::text_range(&line_index, range)?;
+//         let edit = snap.analysis.join_lines(&config, FileRange { file_id, range })?;
+//         match res.union(edit) {
+//             Ok(()) => (),
+//             Err(_edit) => {
+//                 // just ignore overlapping edits
+//             }
+//         }
+//     }
 
-    Ok(to_proto::text_edit_vec(&line_index, res))
-}
+//     Ok(to_proto::text_edit_vec(&line_index, res))
+// }
 
 pub(crate) fn handle_on_enter(
     snap: GlobalStateSnapshot,

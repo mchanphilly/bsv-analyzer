@@ -722,7 +722,6 @@ dependencies = [
  "either",
  "expect-test",
  "hir",
- "ide-assists",
  "ide-completion",
  "ide-db",
  "ide-diagnostics",
@@ -745,25 +744,6 @@ dependencies = [
  "tracing",
  "triomphe",
  "url",
-]
-
-[[package]]
-name = "ide-assists"
-version = "0.0.0"
-dependencies = [
- "cov-mark",
- "either",
- "expect-test",
- "hir",
- "ide-db",
- "itertools",
- "smallvec",
- "stdx",
- "syntax",
- "test-fixture",
- "test-utils",
- "text-edit",
- "tracing",
 ]
 
 [[package]]

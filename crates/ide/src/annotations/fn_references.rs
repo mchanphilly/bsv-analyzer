@@ -2,7 +2,7 @@
 //! We have to skip tests, so cannot reuse file_structure module.
 
 use hir::Semantics;
-use ide_assists::utils::test_related_attribute_syn;
+// use ide_assists::utils::test_related_attribute_syn;
 use ide_db::RootDatabase;
 use syntax::{ast, ast::HasName, AstNode, SyntaxNode, TextRange};
 
@@ -19,14 +19,15 @@ pub(super) fn find_all_methods(
 
 fn method_range(item: SyntaxNode) -> Option<(TextRange, Option<TextRange>)> {
     ast::Fn::cast(item).and_then(|fn_def| {
-        if test_related_attribute_syn(&fn_def).is_some() {
-            None
-        } else {
-            Some((
-                fn_def.syntax().text_range(),
-                fn_def.name().map(|name| name.syntax().text_range()),
-            ))
-        }
+        // TODO BSV: This used to ignore test functions so we didn't get them
+        // in the result.
+        // if test_related_attribute_syn(&fn_def).is_some() {
+        //     None
+        // } else {
+        Some((
+            fn_def.syntax().text_range(),
+            fn_def.name().map(|name| name.syntax().text_range()),
+        ))
     })
 }
 

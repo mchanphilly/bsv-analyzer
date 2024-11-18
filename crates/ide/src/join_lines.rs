@@ -1,4 +1,4 @@
-use ide_assists::utils::extract_trivial_expression;
+// use ide_assists::utils::extract_trivial_expression;
 use ide_db::syntax_helpers::node_ext::expr_as_name_ref;
 use itertools::Itertools;
 use syntax::{
@@ -175,9 +175,9 @@ fn remove_newline(
         // ```
         //
         // into `my_function(<some-expr>)`
-        if join_single_expr_block(edit, token).is_some() {
-            return;
-        }
+        // if join_single_expr_block(edit, token).is_some() {
+        //     return;
+        // }
         // ditto for
         //
         // ```
@@ -206,27 +206,27 @@ fn remove_newline(
     edit.replace(token.text_range(), compute_ws(prev.kind(), next.kind()).to_owned());
 }
 
-fn join_single_expr_block(edit: &mut TextEditBuilder, token: &SyntaxToken) -> Option<()> {
-    let block_expr = ast::BlockExpr::cast(token.parent_ancestors().nth(1)?)?;
-    if !block_expr.is_standalone() {
-        return None;
-    }
-    let expr = extract_trivial_expression(&block_expr)?;
+// fn join_single_expr_block(edit: &mut TextEditBuilder, token: &SyntaxToken) -> Option<()> {
+//     let block_expr = ast::BlockExpr::cast(token.parent_ancestors().nth(1)?)?;
+//     if !block_expr.is_standalone() {
+//         return None;
+//     }
+//     let expr = extract_trivial_expression(&block_expr)?;
 
-    let block_range = block_expr.syntax().text_range();
-    let mut buf = expr.syntax().text().to_string();
+//     let block_range = block_expr.syntax().text_range();
+//     let mut buf = expr.syntax().text().to_string();
 
-    // Match block needs to have a comma after the block
-    if let Some(match_arm) = block_expr.syntax().parent().and_then(ast::MatchArm::cast) {
-        if match_arm.comma_token().is_none() {
-            buf.push(',');
-        }
-    }
+//     // Match block needs to have a comma after the block
+//     if let Some(match_arm) = block_expr.syntax().parent().and_then(ast::MatchArm::cast) {
+//         if match_arm.comma_token().is_none() {
+//             buf.push(',');
+//         }
+//     }
 
-    edit.replace(block_range, buf);
+//     edit.replace(block_range, buf);
 
-    Some(())
-}
+//     Some(())
+// }
 
 fn join_single_use_tree(edit: &mut TextEditBuilder, token: &SyntaxToken) -> Option<()> {
     let use_tree_list = ast::UseTreeList::cast(token.parent()?)?;

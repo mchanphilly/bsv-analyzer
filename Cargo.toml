@@ -59,7 +59,6 @@ hir-def = { path = "./crates/hir-def", version = "0.0.0" }
 hir-expand = { path = "./crates/hir-expand", version = "0.0.0" }
 hir-ty = { path = "./crates/hir-ty", version = "0.0.0" }
 ide = { path = "./crates/ide", version = "0.0.0" }
-ide-assists = { path = "./crates/ide-assists", version = "0.0.0" }
 ide-completion = { path = "./crates/ide-completion", version = "0.0.0" }
 ide-db = { path = "./crates/ide-db", version = "0.0.0" }
 ide-diagnostics = { path = "./crates/ide-diagnostics", version = "0.0.0" }

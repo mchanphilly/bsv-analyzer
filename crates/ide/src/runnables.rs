@@ -6,7 +6,7 @@ use hir::{
     db::HirDatabase, sym, AsAssocItem, AttrsWithOwner, HasAttrs, HasCrate, HasSource, HirFileIdExt,
     Semantics,
 };
-use ide_assists::utils::{has_test_related_attribute, test_related_attribute_syn};
+// use ide_assists::utils::{has_test_related_attribute, test_related_attribute_syn};
 use ide_db::{
     defs::Definition,
     documentation::docs_from_attrs,
@@ -297,12 +297,13 @@ fn find_related_tests_in_module(
 }
 
 fn as_test_runnable(sema: &Semantics<'_, RootDatabase>, fn_def: &ast::Fn) -> Option<Runnable> {
-    if test_related_attribute_syn(fn_def).is_some() {
-        let function = sema.to_def(fn_def)?;
-        runnable_fn(sema, function)
-    } else {
-        None
-    }
+    None  // TODO BSV
+    // if test_related_attribute_syn(fn_def).is_some() {
+    //     let function = sema.to_def(fn_def)?;
+    //     runnable_fn(sema, function)
+    // } else {
+    //     None
+    // }
 }
 
 fn parent_test_module(sema: &Semantics<'_, RootDatabase>, fn_def: &ast::Fn) -> Option<hir::Module> {
@@ -563,9 +564,10 @@ fn has_test_function_or_multiple_test_submodules(
     for item in module.declarations(sema.db) {
         match item {
             hir::ModuleDef::Function(f) => {
-                if has_test_related_attribute(&f.attrs(sema.db)) {
-                    return true;
-                }
+                // TODO BSV (May not need to mind anyway, but may do unnecessary work)
+                // if has_test_related_attribute(&f.attrs(sema.db)) {
+                //     return true;
+                // }
                 if consider_exported_main && f.exported_main(sema.db) {
                     // an exported main in a test module can be considered a test wrt to custom test
                     // runners

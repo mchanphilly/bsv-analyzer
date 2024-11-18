@@ -30,7 +30,6 @@ rustc_apfloat = "0.2.0"
 
 # local deps
 cfg.workspace = true
-ide-assists.workspace = true
 ide-completion.workspace = true
 ide-db.workspace = true
 ide-diagnostics.workspace = true
