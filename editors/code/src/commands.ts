@@ -23,7 +23,7 @@ import {
     sleep,
     isBsvEditor,
     type BsvEditor,
-    type RustDocument,
+    type BsvDocument,
     unwrapUndefinable,
 } from "./util";
 import { startDebugSession, makeDebugConfig } from "./debug";
@@ -328,7 +328,7 @@ export function revealDependency(ctx: CtxInit): Cmd {
  * &emsp;|- ...\
  * std
  */
-async function revealParentChain(document: RustDocument, ctx: CtxInit) {
+async function revealParentChain(document: BsvDocument, ctx: CtxInit) {
     let documentPath = document.uri.fsPath;
     const maxDepth = documentPath.split(path.sep).length - 1;
     const parentChain: DependencyId[] = [{ id: documentPath.toLowerCase() }];
