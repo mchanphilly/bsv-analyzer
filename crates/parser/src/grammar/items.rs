@@ -53,7 +53,7 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
 
 pub(super) fn item_bsv(p: &mut Parser<'_>, stop_on_r_curly: bool) {
     let m = p.start();
-    // attributes::outer_attrs(p);  // TODO BSV truly add support for outer_attrs
+    attributes::outer_attrs_bsv(p);  // TODO BSV truly add support for outer_attrs
 
     let m = match opt_item(p, m) {
         Ok(()) => {

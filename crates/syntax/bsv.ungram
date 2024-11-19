@@ -28,6 +28,14 @@ Import =
 Package =
   'package' Name ';'
 
+// TODO Extract out the cyclops symbols. Need to fiddle with macros to get it to work.
+Attr_bsv =
+  '(' '*' fields:(AttrMeta_bsv (',' AttrMeta_bsv)*) '*' ')'
+
+AttrMeta_bsv =
+  key:NameRef ('=' value:Literal)?
+
+
 //*************************//
 //         Paths           //
 //*************************//

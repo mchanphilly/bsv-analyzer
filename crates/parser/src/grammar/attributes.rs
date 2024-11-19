@@ -1,3 +1,5 @@
+use expressions::literal;
+
 use super::*;
 
 pub(super) const ATTRIBUTE_FIRST: TokenSet = TokenSet::new(&[T![#]]);
@@ -5,6 +7,28 @@ pub(super) const ATTRIBUTE_FIRST: TokenSet = TokenSet::new(&[T![#]]);
 pub(super) fn inner_attrs(p: &mut Parser<'_>) {
     while p.at(T![#]) && p.nth(1) == T![!] {
         attr(p, true);
+    }
+}
+
+pub(super) fn outer_attrs_bsv(p: &mut Parser<'_>) {
+    if p.at(T!['(']) && p.nth(1) == T![*] {
+        let m = p.start();
+        p.bump(T!['(']);
+        p.bump(T![*]);
+
+        // Not at end of file or end of attribute.
+        // TODO BSV resilience
+        let mut cont = true;
+        while cont {
+            meta_bsv(p);
+            cont = p.eat(T![,]);
+            // TODO BSV: Shouldn't have trailing commas
+        }
+
+        // TODO BSV resilience
+        p.eat(T![*]);
+        p.eat(T![')']);
+        m.complete(p, ATTR_BSV);
     }
 }
 
@@ -34,6 +58,21 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
         p.error("expected `[`");
     }
     attr.complete(p, ATTR);
+}
+
+// test meta_bsv
+// (* synthesize *)
+// (* fire_when_enabled, no_implicit_conditions *)
+// (* descending_urgency = "pRqTransfer, flushTransfer" *)
+pub(super) fn meta_bsv(p: &mut Parser<'_>) {
+    if p.current() == IDENT {
+        let meta = p.start();
+        name_ref(p);
+        if p.eat(T![=]) {  // if it has a value
+            literal(p);
+        }
+        meta.complete(p, ATTR_META_BSV);
+    }
 }
 
 // test metas

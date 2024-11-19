@@ -319,6 +319,32 @@ impl Attr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AttrMeta_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AttrMeta_bsv {
+    #[inline]
+    pub fn key(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![=]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Attr_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Attr_bsv {
+    #[inline]
+    pub fn fields(&self) -> AstChildren<AttrMeta_bsv> { support::children(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn star_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![*]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AwaitExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2739,6 +2765,34 @@ impl AstNode for AssocTypeArg {
 impl AstNode for Attr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == ATTR }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for AttrMeta_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATTR_META_BSV }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Attr_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ATTR_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6717,6 +6771,16 @@ impl std::fmt::Display for AssocTypeArg {
     }
 }
 impl std::fmt::Display for Attr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for AttrMeta_bsv {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Attr_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

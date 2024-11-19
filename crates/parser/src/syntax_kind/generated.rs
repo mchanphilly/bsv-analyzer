@@ -182,6 +182,8 @@ pub enum SyntaxKind {
     ASSOC_ITEM_LIST,
     ASSOC_TYPE_ARG,
     ATTR,
+    ATTR_BSV,
+    ATTR_META_BSV,
     AWAIT_EXPR,
     BECOME_EXPR,
     BIN_EXPR,
