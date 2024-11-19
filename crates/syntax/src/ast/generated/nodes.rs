@@ -849,6 +849,23 @@ impl ImplTraitType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Import {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Import {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    #[inline]
+    pub fn star_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![*]) }
+    #[inline]
+    pub fn coloncolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![::]) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn import_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![import]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IndexExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1281,6 +1298,18 @@ pub struct OrPat {
 impl OrPat {
     #[inline]
     pub fn pats(&self) -> AstChildren<Pat> { support::children(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Package {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for Package {}
+impl Package {
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn package_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![package]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3197,6 +3226,20 @@ impl AstNode for ImplTraitType {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Import {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == IMPORT }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for IndexExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == INDEX_EXPR }
@@ -3648,6 +3691,20 @@ impl AstNode for OffsetOfExpr {
 impl AstNode for OrPat {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == OR_PAT }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Package {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PACKAGE }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6240,6 +6297,7 @@ impl AstNode for AnyHasName {
                 | MACRO_DEF
                 | MACRO_RULES
                 | MODULE
+                | PACKAGE
                 | RECORD_FIELD
                 | RENAME
                 | SELF_PARAM
@@ -6299,6 +6357,10 @@ impl From<MacroRules> for AnyHasName {
 impl From<Module> for AnyHasName {
     #[inline]
     fn from(node: Module) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<Package> for AnyHasName {
+    #[inline]
+    fn from(node: Package) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<RecordField> for AnyHasName {
     #[inline]
@@ -6829,6 +6891,11 @@ impl std::fmt::Display for ImplTraitType {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Import {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for IndexExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -6990,6 +7057,11 @@ impl std::fmt::Display for OffsetOfExpr {
     }
 }
 impl std::fmt::Display for OrPat {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Package {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

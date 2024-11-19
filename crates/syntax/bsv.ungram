@@ -19,6 +19,16 @@
 //   label:A     -- suggested name for field of AST node
 
 //*************************//
+//        Bluespec         //
+//*************************//
+
+Import =
+  'import' NameRef '::' '*' ';'
+
+Package =
+  'package' Name ';'
+
+//*************************//
 //         Paths           //
 //*************************//
 

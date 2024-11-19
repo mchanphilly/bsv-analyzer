@@ -6,7 +6,7 @@ pub(super) fn use_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![import]);
     use_tree(p, true);
     p.expect(T![;]);
-    m.complete(p, USE);
+    m.complete(p, IMPORT);
 }
 
 // test use_tree

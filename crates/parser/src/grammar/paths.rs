@@ -7,6 +7,14 @@ pub(super) fn is_path_start(p: &Parser<'_>) -> bool {
     is_use_path_start(p) || p.at(T![<]) || p.at(T![Self])
 }
 
+pub(super) fn is_import_path_start_bsv(p: &Parser<'_>) -> bool {
+    match p.current() {
+        IDENT => true,
+        T![:] if p.at(T![::]) => true,
+        _ => false,
+    }
+}
+
 pub(super) fn is_use_path_start(p: &Parser<'_>) -> bool {
     match p.current() {
         IDENT | T![self] | T![super] | T![crate] => true,
@@ -15,8 +23,12 @@ pub(super) fn is_use_path_start(p: &Parser<'_>) -> bool {
     }
 }
 
+pub(super) fn import_path_bsv(p: &mut Parser<'_>) {
+    path(p, Mode::Import);
+}
+
 pub(super) fn use_path(p: &mut Parser<'_>) {
-    path(p, Mode::Use);
+    path(p, Mode::Import);
 }
 
 pub(crate) fn type_path(p: &mut Parser<'_>) {
@@ -36,7 +48,7 @@ pub(crate) fn type_path_for_qualifier(
 
 #[derive(Clone, Copy, Eq, PartialEq)]
 enum Mode {
-    Use,
+    Import,
     Type,
     Expr,
 }
@@ -54,7 +66,7 @@ fn path_for_qualifier(
     mut qual: CompletedMarker,
 ) -> CompletedMarker {
     loop {
-        let use_tree = mode == Mode::Use && matches!(p.nth(2), T![*] | T!['{']);
+        let use_tree = mode == Mode::Import && matches!(p.nth(2), T![*] | T!['{']);
         if p.at(T![::]) && !use_tree {
             let path = qual.precede(p);
             p.bump(T![::]);
@@ -113,7 +125,7 @@ fn path_segment(p: &mut Parser<'_>, mode: Mode, first: bool) {
             }
             _ => {
                 let recover_set = match mode {
-                    Mode::Use => items::ITEM_RECOVERY_SET,
+                    Mode::Import => items::ITEM_RECOVERY_SET,
                     Mode::Type => TYPE_PATH_SEGMENT_RECOVERY_SET,
                     Mode::Expr => EXPR_PATH_SEGMENT_RECOVERY_SET,
                 };
@@ -132,7 +144,7 @@ fn path_segment(p: &mut Parser<'_>, mode: Mode, first: bool) {
 
 fn opt_path_type_args(p: &mut Parser<'_>, mode: Mode) {
     match mode {
-        Mode::Use => {}
+        Mode::Import => {}
         Mode::Type => {
             // test typepathfn_with_coloncolon
             // type F = Start::(Middle) -> (Middle)::End;

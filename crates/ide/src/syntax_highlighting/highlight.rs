@@ -648,7 +648,7 @@ fn highlight_name_by_syntax(name: ast::Name) -> Highlight {
         TYPE_ALIAS => SymbolKind::TypeAlias,
         TYPE_PARAM => SymbolKind::TypeParam,
         RECORD_FIELD => SymbolKind::Field,
-        MODULE => SymbolKind::Module,
+        PACKAGE => SymbolKind::Module,
         FN => SymbolKind::Function,
         CONST => SymbolKind::Const,
         STATIC => SymbolKind::Static,

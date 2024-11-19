@@ -254,7 +254,7 @@ fn is_search_permitted(node: &SyntaxNode) -> bool {
     // and the code is `use foo::{baz, bar}`, we'll match `bar`, since it resolves to `foo::bar`.
     // However we'll then replace just the part we matched `bar`. We probably need to instead remove
     // `bar` and insert a new use declaration.
-    node.kind() != SyntaxKind::USE
+    node.kind() != SyntaxKind::IMPORT
 }
 
 impl UsageCache {

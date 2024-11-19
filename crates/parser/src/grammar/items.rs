@@ -11,6 +11,16 @@ pub(crate) use self::{
 };
 use super::*;
 
+// test package_contents
+// package Top;
+// import FIFOF::*;
+// import BRAM   ::   *;
+pub(super) fn package_contents_bsv(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+    while !(p.at(EOF)) {
+        item_bsv(p, stop_on_r_curly);
+    }
+}
+
 // test mod_contents
 // fn foo() {}
 // macro_rules! foo {}
@@ -40,6 +50,51 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![macro],
     T![;],
 ]);
+
+pub(super) fn item_bsv(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+    let m = p.start();
+    // attributes::outer_attrs(p);  // TODO BSV truly add support for outer_attrs
+
+    let m = match opt_item(p, m) {
+        Ok(()) => {
+            if p.at(T![;]) {
+                p.err_and_bump(
+                    "expected item, found `;`\n\
+                     consider removing this semicolon",
+                );
+            }
+            return;
+        }
+        Err(m) => m,
+    };
+
+    // test import
+    // import FIFOF::*;
+    // import BRAM   ::   *   ;
+
+    // test_err import
+    // import FIFOF::*;
+    // import BRAM::*
+    // import BRAM2::*
+    if paths::is_import_path_start_bsv(p) {
+        macro_call_bsv(p, m);
+        return;
+    }
+
+    m.abandon(p);
+    match p.current() {
+        T!['{'] => error_block(p, "expected an item"),
+        T!['}'] if !stop_on_r_curly => {
+            let e = p.start();
+            p.error("unmatched `}`");
+            p.bump(T!['}']);
+            e.complete(p, ERROR);
+        }
+        EOF | T!['}'] => p.error("expected an item"),
+        T![let] => error_let_stmt(p, "expected an item"),
+        _ => p.err_and_bump("expected an item"),
+    }
+}
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
     let m = p.start();
@@ -280,7 +335,7 @@ pub(crate) fn package_item(p: &mut Parser<'_>, m: Marker) {
     } else if !p.eat(T![;]) {
         p.error("expected `;` or `{`");
     }
-    m.complete(p, MODULE);
+    m.complete(p, PACKAGE);
 }
 
 // test type_alias
@@ -406,6 +461,13 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         expressions::block_expr(p);
     }
     m.complete(p, FN);
+}
+
+fn macro_call_bsv(p: &mut Parser<'_>, m: Marker) {
+    assert!(paths::is_import_path_start_bsv(p));
+    paths::import_path_bsv(p);
+    p.expect(T![;]);
+    m.complete(p, MACRO_CALL);
 }
 
 fn macro_call(p: &mut Parser<'_>, m: Marker) {

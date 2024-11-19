@@ -158,7 +158,7 @@ fn ws_before(position: &Position, new: &SyntaxElement) -> Option<SyntaxToken> {
         PositionRepr::After(it) => it,
     };
 
-    if prev.kind() == T!['{'] && new.kind() == SyntaxKind::USE {
+    if prev.kind() == T!['{'] && new.kind() == SyntaxKind::IMPORT {
         if let Some(item_list) = prev.parent().and_then(ast::ItemList::cast) {
             let mut indent = IndentLevel::from_element(&item_list.syntax().clone().into());
             indent.0 += 1;
@@ -200,9 +200,9 @@ fn ws_between(left: &SyntaxElement, right: &SyntaxElement) -> Option<SyntaxToken
         return None;
     }
 
-    if right.kind() == SyntaxKind::USE {
+    if right.kind() == SyntaxKind::IMPORT {
         let mut indent = IndentLevel::from_element(left);
-        if left.kind() == SyntaxKind::USE {
+        if left.kind() == SyntaxKind::IMPORT {
             indent.0 = IndentLevel::from_element(right).0.max(indent.0);
         }
         return Some(make::tokens::whitespace(&format!("\n{indent}")));

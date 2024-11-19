@@ -93,8 +93,7 @@ pub(crate) mod entry {
 
         pub(crate) fn source_file(p: &mut Parser<'_>) {
             let m = p.start();
-            // p.eat(SHEBANG);  // not applicable to Bluespec
-            items::mod_contents(p, false);
+            items::package_contents_bsv(p, false);
             m.complete(p, SOURCE_FILE);
         }
 
