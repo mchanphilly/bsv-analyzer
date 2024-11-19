@@ -10,7 +10,6 @@ pub(super) fn is_path_start(p: &Parser<'_>) -> bool {
 pub(super) fn is_import_path_start_bsv(p: &Parser<'_>) -> bool {
     match p.current() {
         IDENT => true,
-        T![:] if p.at(T![::]) => true,
         _ => false,
     }
 }

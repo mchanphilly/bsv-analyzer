@@ -1,12 +1,20 @@
 use super::*;
 
-// test use_item
-// use std::collections;
-pub(super) fn use_(p: &mut Parser<'_>, m: Marker) {
+// test import_
+// import FIFO::*;
+pub(super) fn import_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![import]);
-    use_tree(p, true);
-    p.expect(T![;]);
-    m.complete(p, IMPORT);
+    name_ref(p);
+    if p.current() == T![:] && p.at(T![::]) && p.nth(2) == T![*] {
+        p.bump(T![::]);
+        p.bump(T![*]);
+        p.expect(T![;]);
+        m.complete(p, IMPORT);
+    } else {
+        m.abandon(p);
+        let msg = "expected one of `::` and `*`";
+        p.err_recover(msg, ITEM_RECOVERY_SET);
+    }
 }
 
 // test use_tree
