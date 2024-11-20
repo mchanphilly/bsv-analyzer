@@ -603,6 +603,15 @@ impl ExprStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Expr_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Expr_bsv {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExternBlock {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1248,6 +1257,64 @@ impl Module {
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     #[inline]
     pub fn package_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![package]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ModuleCall {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasArgList for ModuleCall {}
+impl ModuleCall {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ModuleInst {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ModuleInst {
+    #[inline]
+    pub fn module_call(&self) -> Option<ModuleCall> { support::child(&self.syntax) }
+    #[inline]
+    pub fn typed_var(&self) -> Option<TypedVar> { support::child(&self.syntax) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ModuleStmt {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ModuleStmt {
+    #[inline]
+    pub fn module_inst(&self) -> Option<ModuleInst> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Module_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for Module_bsv {}
+impl Module_bsv {
+    #[inline]
+    pub fn module_stmts(&self) -> AstChildren<ModuleStmt> { support::children(&self.syntax) }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn endmodule_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endmodule])
+    }
+    #[inline]
+    pub fn module_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![module]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2081,6 +2148,27 @@ impl TypeParam {
     pub fn default_type(&self) -> Option<Type> { support::child(&self.syntax) }
     #[inline]
     pub fn eq_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![=]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Type_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Type_bsv {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TypedVar {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for TypedVar {}
+impl TypedVar {
+    #[inline]
+    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
+    #[inline]
+    pub fn let_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![let]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3056,6 +3144,20 @@ impl AstNode for ExprStmt {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Expr_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == EXPR_BSV }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for ExternBlock {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == EXTERN_BLOCK }
@@ -3675,6 +3777,62 @@ impl AstNode for MethodCallExpr {
 impl AstNode for Module {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ModuleCall {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_CALL }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ModuleInst {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_INST }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for ModuleStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_STMT }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Module_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -4487,6 +4645,34 @@ impl AstNode for TypeBoundList {
 impl AstNode for TypeParam {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == TYPE_PARAM }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Type_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPE_BSV }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for TypedVar {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPED_VAR }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -5673,7 +5859,9 @@ impl AnyHasArgList {
 }
 impl AstNode for AnyHasArgList {
     #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, CALL_EXPR | METHOD_CALL_EXPR) }
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, CALL_EXPR | METHOD_CALL_EXPR | MODULE_CALL)
+    }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         Self::can_cast(syntax.kind()).then_some(AnyHasArgList { syntax })
@@ -5688,6 +5876,10 @@ impl From<CallExpr> for AnyHasArgList {
 impl From<MethodCallExpr> for AnyHasArgList {
     #[inline]
     fn from(node: MethodCallExpr) -> AnyHasArgList { AnyHasArgList { syntax: node.syntax } }
+}
+impl From<ModuleCall> for AnyHasArgList {
+    #[inline]
+    fn from(node: ModuleCall) -> AnyHasArgList { AnyHasArgList { syntax: node.syntax } }
 }
 impl AnyHasAttrs {
     #[inline]
@@ -6351,6 +6543,7 @@ impl AstNode for AnyHasName {
                 | MACRO_DEF
                 | MACRO_RULES
                 | MODULE
+                | MODULE_BSV
                 | PACKAGE
                 | RECORD_FIELD
                 | RENAME
@@ -6361,6 +6554,7 @@ impl AstNode for AnyHasName {
                 | TRAIT_ALIAS
                 | TYPE_ALIAS
                 | TYPE_PARAM
+                | TYPED_VAR
                 | UNION
                 | VARIANT
         )
@@ -6412,6 +6606,10 @@ impl From<Module> for AnyHasName {
     #[inline]
     fn from(node: Module) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
+impl From<Module_bsv> for AnyHasName {
+    #[inline]
+    fn from(node: Module_bsv) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
 impl From<Package> for AnyHasName {
     #[inline]
     fn from(node: Package) -> AnyHasName { AnyHasName { syntax: node.syntax } }
@@ -6451,6 +6649,10 @@ impl From<TypeAlias> for AnyHasName {
 impl From<TypeParam> for AnyHasName {
     #[inline]
     fn from(node: TypeParam) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<TypedVar> for AnyHasName {
+    #[inline]
+    fn from(node: TypedVar) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<Union> for AnyHasName {
     #[inline]
@@ -6875,6 +7077,11 @@ impl std::fmt::Display for ExprStmt {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Expr_bsv {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for ExternBlock {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -7096,6 +7303,26 @@ impl std::fmt::Display for MethodCallExpr {
     }
 }
 impl std::fmt::Display for Module {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ModuleCall {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ModuleInst {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ModuleStmt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Module_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -7386,6 +7613,16 @@ impl std::fmt::Display for TypeBoundList {
     }
 }
 impl std::fmt::Display for TypeParam {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Type_bsv {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for TypedVar {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

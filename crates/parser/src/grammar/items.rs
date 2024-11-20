@@ -15,9 +15,9 @@ use super::*;
 // package Top;
 // import FIFOF::*;
 // import BRAM   ::   *;
-pub(super) fn package_contents_bsv(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+pub(super) fn package_contents_bsv(p: &mut Parser<'_>, end: Option<SyntaxKind>) {
     while !(p.at(EOF)) {
-        item_bsv(p, stop_on_r_curly);
+        item_or_stmt_bsv(p, end);
     }
 }
 
@@ -51,7 +51,8 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![;],
 ]);
 
-pub(super) fn item_bsv(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+// May also accept a statement.
+pub(super) fn item_or_stmt_bsv(p: &mut Parser<'_>, end: Option<SyntaxKind>) {
     let m = p.start();
     attributes::outer_attrs_bsv(p);  // TODO BSV truly add support for outer_attrs
 
@@ -76,20 +77,34 @@ pub(super) fn item_bsv(p: &mut Parser<'_>, stop_on_r_curly: bool) {
     // import FIFOF::*;
     // import BRAM::*
     // import BRAM2::*
-    if paths::is_import_path_start_bsv(p) {
-        macro_call_bsv(p, m);
+    if p.eat(IMPORT_KW) {
+        name_ref(p);
+        p.expect(T![::]);
+        p.expect(T![*]);
+        m.complete(p, IMPORT);
         return;
     }
 
     m.abandon(p);
-    match p.current() {
-        T!['{'] => error_block(p, "expected an item"),
-        T!['}'] if !stop_on_r_curly => {
+
+    if let Some(end_token) = end {
+        if p.current() == end_token {
             let e = p.start();
-            p.error("unmatched `}`");
-            p.bump(T!['}']);
+            p.error("Unmatched end token");
+            p.bump_any(); // Consume the token
             e.complete(p, ERROR);
+            return;
         }
+    }
+
+    match p.current() {
+        // T!['{'] => error_block(p, "expected an item"),
+        // T!['}'] if !stop_on_r_curly => {
+        //     let e = p.start();
+        //     p.error("unmatched `}`");
+        //     p.bump(T!['}']);
+        //     e.complete(p, ERROR);
+        // }
         EOF | T!['}'] => p.error("expected an item"),
         T![let] => error_let_stmt(p, "expected an item"),
         _ => p.err_and_bump("expected an item"),
@@ -250,6 +265,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
         T![type] => type_alias(p, m),
 
+        T![module] => traits::module_(p, m),
         // test extern_block
         // unsafe extern "C" {}
         // extern {}
@@ -270,6 +286,12 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         _ => return Err(m),
     }
     Ok(())
+}
+
+pub(super) fn module_stmt(p: &mut Parser<'_>) {
+    let m = p.start();
+    expressions::module_inst(p);
+    m.complete(p, MODULE_STMT);
 }
 
 fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
@@ -328,13 +350,7 @@ fn extern_crate(p: &mut Parser<'_>, m: Marker) {
 pub(crate) fn package_item(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![package]);
     name(p);
-    if p.at(T!['{']) {
-        // test package_item_curly
-        // package b { }
-        item_list(p);
-    } else if !p.eat(T![;]) {
-        p.error("expected `;` or `{`");
-    }
+    p.expect(T![;]);
     m.complete(p, PACKAGE);
 }
 
@@ -461,13 +477,6 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
         expressions::block_expr(p);
     }
     m.complete(p, FN);
-}
-
-fn macro_call_bsv(p: &mut Parser<'_>, m: Marker) {
-    assert!(paths::is_import_path_start_bsv(p));
-    paths::import_path_bsv(p);
-    p.expect(T![;]);
-    m.complete(p, MACRO_CALL);
 }
 
 fn macro_call(p: &mut Parser<'_>, m: Marker) {

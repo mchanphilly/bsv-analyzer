@@ -35,6 +35,90 @@ Attr_bsv =
 AttrMeta_bsv =
   key:NameRef ('=' value:Literal)?
 
+// TODO BSV: can a module support more than one interface?
+// TODO BSV: Add ModuleParams?
+Module_bsv =
+  'module' Name '(' NameRef ')' ';'
+  ModuleStmt*
+  'endmodule' (':' Name)?
+
+ModuleStmt =
+  ModuleInst
+// | Rule
+
+ModuleInst =
+  TypedVar op:('<-') ModuleCall ';'
+
+// TODO BSV add polymorphism
+// TODO BSV check whether `let` permitted in ModuleInst
+TypedVar =
+  (Type_bsv | 'let') Name
+
+// TODO add polymorphism
+ModuleCall =
+  NameRef ArgList
+
+// ArgList_bsv =
+// '(' args:(Expr_bsv (',' Expr_bsv)* ','?)? ')'
+
+Type_bsv =
+  NameRef  // TODO BSV, not sophisticated enough?
+
+//   ArrayType
+// | DynTraitType
+// | FnPtrType
+// | ForType
+// | ImplTraitType
+// | InferType
+// | MacroType
+// | NeverType
+// | ParenType
+// | PathType
+// | PtrType
+// | RefType
+// | SliceType
+// | TupleType
+
+Expr_bsv =
+  Literal
+
+//   ArrayExpr
+// | AsmExpr
+// | AwaitExpr
+// | BinExpr
+// | BlockExpr
+// | BreakExpr
+// | CallExpr
+// | CastExpr
+// | ClosureExpr
+// | ContinueExpr
+// | FieldExpr
+// | ForExpr
+// | FormatArgsExpr
+// | IfExpr
+// | IndexExpr
+// | Literal
+// | LoopExpr
+// | MacroExpr
+// | MatchExpr
+// | MethodCallExpr
+// | OffsetOfExpr
+// | ParenExpr
+// | PathExpr
+// | PrefixExpr
+// | RangeExpr
+// | RecordExpr
+// | RefExpr
+// | ReturnExpr
+// | BecomeExpr
+// | TryExpr
+// | TupleExpr
+// | WhileExpr
+// | YieldExpr
+// | YeetExpr
+// | LetExpr
+// | UnderscoreExpr
+
 
 //*************************//
 //         Paths           //

@@ -93,7 +93,7 @@ pub(crate) mod entry {
 
         pub(crate) fn source_file(p: &mut Parser<'_>) {
             let m = p.start();
-            items::package_contents_bsv(p, false);
+            items::package_contents_bsv(p, None);
             m.complete(p, SOURCE_FILE);
         }
 

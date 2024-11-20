@@ -27,6 +27,30 @@ pub(super) const TYPE_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![pub],
 ]);
 
+// TODO BSV: Support polymorphic # types
+pub(crate) fn typed_var_bsv(p: &mut Parser<'_>) {
+    let typed_var = p.start();
+
+    match p.current() {  // the type
+        T![let] => p.bump(T![let]),
+        _ => type_bsv(p),
+    }
+    name(p);  // the variable
+
+    typed_var.complete(p, TYPED_VAR);
+}
+
+pub(crate) fn type_bsv(p: &mut Parser<'_>) {
+    let bsv_type = p.start();
+    name_ref(p);
+    if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
+        p.expect(T!['(']);
+        type_bsv(p);
+        p.expect(T![')']);
+    }
+    bsv_type.complete(p, TYPE_BSV);
+}
+
 pub(crate) fn type_(p: &mut Parser<'_>) {
     type_with_bounds_cond(p, true);
 }

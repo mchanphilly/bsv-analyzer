@@ -6,6 +6,7 @@ use super::*;
 
 pub(crate) use atom::{block_expr, match_arm_list};
 pub(super) use atom::{literal, LITERAL_FIRST};
+use types::typed_var_bsv;
 
 #[derive(PartialEq, Eq)]
 pub(super) enum Semicolon {
@@ -158,6 +159,24 @@ pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
             p.expect(T![;]);
         }
     }
+}
+
+pub(super) fn module_inst(p: &mut Parser<'_>) {
+    let m = p.start();
+    typed_var_bsv(p);
+    p.expect(T![<-]);
+    module_call_bsv(p);
+    p.expect(T![;]);
+    m.complete(p, MODULE_INST);
+}
+
+pub(super) fn module_call_bsv(p: &mut Parser<'_>) {
+    let m = p.start();
+    name_ref(p);
+    if p.at(T!['(']) {
+        arg_list(p);  // TODO BSV: Migrate over to BSV arg_list
+    }
+    m.complete(p, MODULE_CALL);
 }
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {

@@ -7,23 +7,12 @@ pub(super) fn is_path_start(p: &Parser<'_>) -> bool {
     is_use_path_start(p) || p.at(T![<]) || p.at(T![Self])
 }
 
-pub(super) fn is_import_path_start_bsv(p: &Parser<'_>) -> bool {
-    match p.current() {
-        IDENT => true,
-        _ => false,
-    }
-}
-
 pub(super) fn is_use_path_start(p: &Parser<'_>) -> bool {
     match p.current() {
         IDENT | T![self] | T![super] | T![crate] => true,
         T![:] if p.at(T![::]) => true,
         _ => false,
     }
-}
-
-pub(super) fn import_path_bsv(p: &mut Parser<'_>) {
-    path(p, Mode::Import);
 }
 
 pub(super) fn use_path(p: &mut Parser<'_>) {

@@ -73,6 +73,35 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, IMPL);
 }
 
+// test module_item
+// module mkTop (Empty);
+// endmodule : mkTop
+pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
+    // TODO BSV: Consider consuming the signature separately
+    p.bump(T![module]);
+
+    name_r(p, ITEM_RECOVERY_SET);
+
+    // Interface name
+    if p.eat(T!['(']) {
+        name_ref(p);
+    } else {
+        p.error("expected `{`");
+    }
+    p.expect(T![')']);
+    p.expect(T![;]);
+
+    while !(p.at(EOF) || p.at(T![endmodule])) && p.at(IDENT) {
+        module_stmt(p);  // TODO BSV open up to different kinds
+    }
+
+    p.expect(T![endmodule]);
+    if p.eat(T![:]) {  // optional end tag
+        name(p);
+    }
+    m.complete(p, MODULE_BSV);
+}
+
 // test assoc_item_list
 // impl F {
 //     type A = i32;
@@ -134,6 +163,19 @@ fn not_a_qualified_path(p: &Parser<'_>) -> bool {
 pub(crate) fn impl_type(p: &mut Parser<'_>) {
     if p.at(T![impl]) {
         p.error("expected trait or type");
+        return;
+    }
+    types::type_(p);
+}
+
+// test_err impl_type
+// impl Type {}
+// impl Trait1 for T {}
+// impl impl NotType {}
+// impl Trait2 for impl NotType {}
+pub(crate) fn module_type(p: &mut Parser<'_>) {
+    if p.at(T![module]) {
+        p.error("expected type");
         return;
     }
     types::type_(p);
