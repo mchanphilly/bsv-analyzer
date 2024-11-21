@@ -1271,25 +1271,6 @@ impl Meta {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Method {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Method {
-    #[inline]
-    pub fn guard(&self) -> Option<Guard> { support::child(&self.syntax) }
-    #[inline]
-    pub fn method_signature(&self) -> Option<MethodSignature> { support::child(&self.syntax) }
-    #[inline]
-    pub fn stmt_list_bsv(&self) -> Option<StmtList_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn endmethod_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![endmethod])
-    }
-    #[inline]
-    pub fn if_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![if]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MethodCallExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1314,6 +1295,23 @@ impl MethodDecl {
     pub fn method_signature(&self) -> Option<MethodSignature> { support::child(&self.syntax) }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MethodImpl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MethodImpl {
+    #[inline]
+    pub fn guard(&self) -> Option<Guard> { support::child(&self.syntax) }
+    #[inline]
+    pub fn method_signature(&self) -> Option<MethodSignature> { support::child(&self.syntax) }
+    #[inline]
+    pub fn stmt_list_bsv(&self) -> Option<StmtList_bsv> { support::child(&self.syntax) }
+    #[inline]
+    pub fn endmethod_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endmethod])
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2640,7 +2638,7 @@ impl ast::HasDocComments for Item {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ModuleStmt {
-    Method(Method),
+    MethodImpl(MethodImpl),
     ModuleInst(ModuleInst),
     Rule(Rule),
 }
@@ -3953,20 +3951,6 @@ impl AstNode for Meta {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for Method {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == METHOD }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for MethodCallExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == METHOD_CALL_EXPR }
@@ -3984,6 +3968,20 @@ impl AstNode for MethodCallExpr {
 impl AstNode for MethodDecl {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == METHOD_DECL }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for MethodImpl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == METHOD_IMPL }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -5866,9 +5864,9 @@ impl AstNode for Item {
         }
     }
 }
-impl From<Method> for ModuleStmt {
+impl From<MethodImpl> for ModuleStmt {
     #[inline]
-    fn from(node: Method) -> ModuleStmt { ModuleStmt::Method(node) }
+    fn from(node: MethodImpl) -> ModuleStmt { ModuleStmt::MethodImpl(node) }
 }
 impl From<ModuleInst> for ModuleStmt {
     #[inline]
@@ -5880,11 +5878,11 @@ impl From<Rule> for ModuleStmt {
 }
 impl AstNode for ModuleStmt {
     #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, METHOD | MODULE_INST | RULE) }
+    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, METHOD_IMPL | MODULE_INST | RULE) }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
-            METHOD => ModuleStmt::Method(Method { syntax }),
+            METHOD_IMPL => ModuleStmt::MethodImpl(MethodImpl { syntax }),
             MODULE_INST => ModuleStmt::ModuleInst(ModuleInst { syntax }),
             RULE => ModuleStmt::Rule(Rule { syntax }),
             _ => return None,
@@ -5894,7 +5892,7 @@ impl AstNode for ModuleStmt {
     #[inline]
     fn syntax(&self) -> &SyntaxNode {
         match self {
-            ModuleStmt::Method(it) => &it.syntax,
+            ModuleStmt::MethodImpl(it) => &it.syntax,
             ModuleStmt::ModuleInst(it) => &it.syntax,
             ModuleStmt::Rule(it) => &it.syntax,
         }
@@ -7653,17 +7651,17 @@ impl std::fmt::Display for Meta {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for Method {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for MethodCallExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
 impl std::fmt::Display for MethodDecl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for MethodImpl {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

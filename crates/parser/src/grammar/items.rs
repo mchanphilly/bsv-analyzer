@@ -295,6 +295,7 @@ pub(super) fn module_stmt(p: &mut Parser<'_>) {
     let m = p.start();
     match p.current() {
         T![rule] => rule(p),
+        T![method] => method_impl(p),
         _ => expressions::module_inst(p),
     }
     m.complete(p, MODULE_STMT);
@@ -307,6 +308,19 @@ pub(super) fn interface_stmt(p: &mut Parser<'_>) {
         _ => p.bump_any(),  // BSV TODO remove
     }
     m.complete(p, INTERFACE_STMT);
+}
+
+pub(super) fn method_impl(p: &mut Parser<'_>) {
+    let m = p.start();
+    expressions::method_signature(p);
+    if p.at(T![if]) {
+        assert!(opt_guard(p));  // not actually optional
+    }
+    if p.eat(T![;]) {  // TODO BSV: Support shorthand method impls e.g., method Bit#(3) M = 5;
+        expressions::stmt_list_bsv(p, T![endmethod]);
+        p.expect(T![endmethod]);
+    }
+    m.complete(p, METHOD_IMPL);
 }
 
 fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
@@ -525,7 +539,6 @@ fn opt_guard(p: &mut Parser<'_>) -> bool {
 }
 
 fn rule(p: &mut Parser<'_>) {
-    assert!(p.at(T![rule]));
     let m = p.start();
 
     p.bump(T![rule]);
