@@ -91,7 +91,8 @@ pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
     p.expect(T![')']);
     p.expect(T![;]);
 
-    while !(p.at(EOF) || p.at(T![endmodule])) && p.at(IDENT) {
+    // TODO BSV: how do we make sure this doesn't eat file on bad inputs?
+    while !(p.at(EOF) || p.at(T![endmodule])) {
         module_stmt(p);  // TODO BSV open up to different kinds
     }
 

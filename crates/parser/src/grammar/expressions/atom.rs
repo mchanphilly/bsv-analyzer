@@ -187,6 +187,18 @@ pub(super) fn atom_expr(
             stmt_list(p);
             m.complete(p, BLOCK_EXPR)
         }
+        T![begin] => {
+            // test begin_end
+            // method Action x();
+            //     begin
+            //     end
+            // endmethod
+            let m = p.start();
+            p.bump(T![begin]);
+            stmt_list_bsv(p, T![end]);
+            p.expect(T![end]);
+            m.complete(p, STMT_LIST_BSV)
+        }
 
         T![const] | T![static] | T![async] | T![move] | T![|] => closure_expr(p),
         T![for] if la == T![<] => closure_expr(p),
@@ -816,6 +828,14 @@ pub(crate) fn block_expr(p: &mut Parser<'_>) {
     let m = p.start();
     stmt_list(p);
     m.complete(p, BLOCK_EXPR);
+}
+
+// Observe the BSV version doesn't require braces. The caller should be removing
+// the braces.
+pub(crate) fn stmt_list_bsv(p: &mut Parser<'_>, end: SyntaxKind) -> CompletedMarker {
+    let m = p.start();
+    expr_block_contents_bsv(p, end);  // TODO BSV migrate to whatever end brace, don't consume
+    m.complete(p, STMT_LIST_BSV)
 }
 
 fn stmt_list(p: &mut Parser<'_>) -> CompletedMarker {

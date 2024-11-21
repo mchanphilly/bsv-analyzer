@@ -819,6 +819,19 @@ impl GenericParamList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Guard {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Guard {
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn if_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![if]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IdentPat {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1280,15 +1293,6 @@ impl ModuleInst {
     pub fn typed_var(&self) -> Option<TypedVar> { support::child(&self.syntax) }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ModuleStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ModuleStmt {
-    #[inline]
-    pub fn module_inst(&self) -> Option<ModuleInst> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1807,6 +1811,24 @@ impl ReturnTypeSyntax {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Rule {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for Rule {}
+impl Rule {
+    #[inline]
+    pub fn guard(&self) -> Option<Guard> { support::child(&self.syntax) }
+    #[inline]
+    pub fn stmt_list_bsv(&self) -> Option<StmtList_bsv> { support::child(&self.syntax) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn endrule_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![endrule]) }
+    #[inline]
+    pub fn rule_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![rule]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SelfParam {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1900,6 +1922,19 @@ impl StmtList {
     pub fn l_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['{']) }
     #[inline]
     pub fn r_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['}']) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct StmtList_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl StmtList_bsv {
+    #[inline]
+    pub fn statements(&self) -> AstChildren<Stmt> { support::children(&self.syntax) }
+    #[inline]
+    pub fn begin_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![begin]) }
+    #[inline]
+    pub fn end_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![end]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2493,6 +2528,12 @@ pub enum Item {
 }
 impl ast::HasAttrs for Item {}
 impl ast::HasDocComments for Item {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ModuleStmt {
+    ModuleInst(ModuleInst),
+    Rule(Rule),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pat {
@@ -3326,6 +3367,20 @@ impl AstNode for GenericParamList {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Guard {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == GUARD }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for IdentPat {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == IDENT_PAT }
@@ -3805,20 +3860,6 @@ impl AstNode for ModuleCall {
 impl AstNode for ModuleInst {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_INST }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for ModuleStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_STMT }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -4348,6 +4389,20 @@ impl AstNode for ReturnTypeSyntax {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Rule {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == RULE }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for SelfParam {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == SELF_PARAM }
@@ -4421,6 +4476,20 @@ impl AstNode for Static {
 impl AstNode for StmtList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == STMT_LIST }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for StmtList_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == STMT_LIST_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -5589,6 +5658,34 @@ impl AstNode for Item {
         }
     }
 }
+impl From<ModuleInst> for ModuleStmt {
+    #[inline]
+    fn from(node: ModuleInst) -> ModuleStmt { ModuleStmt::ModuleInst(node) }
+}
+impl From<Rule> for ModuleStmt {
+    #[inline]
+    fn from(node: Rule) -> ModuleStmt { ModuleStmt::Rule(node) }
+}
+impl AstNode for ModuleStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, MODULE_INST | RULE) }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            MODULE_INST => ModuleStmt::ModuleInst(ModuleInst { syntax }),
+            RULE => ModuleStmt::Rule(Rule { syntax }),
+            _ => return None,
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ModuleStmt::ModuleInst(it) => &it.syntax,
+            ModuleStmt::Rule(it) => &it.syntax,
+        }
+    }
+}
 impl From<BoxPat> for Pat {
     #[inline]
     fn from(node: BoxPat) -> Pat { Pat::BoxPat(node) }
@@ -6547,6 +6644,7 @@ impl AstNode for AnyHasName {
                 | PACKAGE
                 | RECORD_FIELD
                 | RENAME
+                | RULE
                 | SELF_PARAM
                 | STATIC
                 | STRUCT
@@ -6621,6 +6719,10 @@ impl From<RecordField> for AnyHasName {
 impl From<Rename> for AnyHasName {
     #[inline]
     fn from(node: Rename) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<Rule> for AnyHasName {
+    #[inline]
+    fn from(node: Rule) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<SelfParam> for AnyHasName {
     #[inline]
@@ -6863,6 +6965,11 @@ impl std::fmt::Display for GenericParam {
     }
 }
 impl std::fmt::Display for Item {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for ModuleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -7142,6 +7249,11 @@ impl std::fmt::Display for GenericParamList {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Guard {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for IdentPat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -7313,11 +7425,6 @@ impl std::fmt::Display for ModuleCall {
     }
 }
 impl std::fmt::Display for ModuleInst {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for ModuleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -7507,6 +7614,11 @@ impl std::fmt::Display for ReturnTypeSyntax {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Rule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for SelfParam {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -7533,6 +7645,11 @@ impl std::fmt::Display for Static {
     }
 }
 impl std::fmt::Display for StmtList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for StmtList_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

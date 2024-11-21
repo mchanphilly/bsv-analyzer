@@ -4,7 +4,7 @@ use crate::grammar::attributes::ATTRIBUTE_FIRST;
 
 use super::*;
 
-pub(crate) use atom::{block_expr, match_arm_list};
+pub(crate) use atom::{block_expr, match_arm_list, stmt_list_bsv};
 pub(super) use atom::{literal, LITERAL_FIRST};
 use types::typed_var_bsv;
 
@@ -177,6 +177,14 @@ pub(super) fn module_call_bsv(p: &mut Parser<'_>) {
         arg_list(p);  // TODO BSV: Migrate over to BSV arg_list
     }
     m.complete(p, MODULE_CALL);
+}
+
+pub(super) fn expr_block_contents_bsv(p: &mut Parser<'_>, end: SyntaxKind) {
+    attributes::inner_attrs(p);
+
+    while !p.at(EOF) && !p.at(end) {
+        stmt(p, Semicolon::Required);
+    }
 }
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {

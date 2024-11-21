@@ -43,8 +43,28 @@ Module_bsv =
   'endmodule' (':' Name)?
 
 ModuleStmt =
-  ModuleInst
-// | Rule
+  ModuleInst  // TODO BSV consider merging with generic actionvalue
+| Rule
+
+// TODO BSV: I decided to have StmtList directly instead of with
+// BlockExpr because I think there aren't many keyword modifiers to
+// the StmtList directly, which is why they did it in Rust
+// TODO re, since we have Begin/End blocks too?
+// TODO rere, we have StmtList for Begin/End blocks 
+Rule =
+  'rule' Name Guard? ';'
+  StmtList_bsv
+  'endrule'
+
+// Modeled off MatchGuard
+Guard =
+  'if'? '(' condition:Expr ')'
+
+// Observe this doesn't have delimiters unlike the Rust version.
+StmtList_bsv =
+  statements:Stmt*
+| 'begin' statements:Stmt* 'end'  // Treated similar to whitespace
+
 
 ModuleInst =
   TypedVar op:('<-') ModuleCall ';'

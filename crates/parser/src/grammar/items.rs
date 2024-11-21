@@ -3,6 +3,8 @@ mod consts;
 mod traits;
 mod use_item;
 
+use entry::prefix::expr;
+
 pub(crate) use self::{
     adt::{record_field_list, variant_list},
     expressions::{match_arm_list, record_expr_field_list},
@@ -290,7 +292,10 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
 pub(super) fn module_stmt(p: &mut Parser<'_>) {
     let m = p.start();
-    expressions::module_inst(p);
+    match p.current() {
+        T![rule] => rule(p),
+        _ => expressions::module_inst(p),
+    }
     m.complete(p, MODULE_STMT);
 }
 
@@ -489,6 +494,45 @@ fn macro_call(p: &mut Parser<'_>, m: Marker) {
         }
     }
     m.complete(p, MACRO_CALL);
+}
+
+// test opt_guard
+// rule tick1 if (cond1);
+// rule tick2 (cond2);
+// rule tick2;
+fn opt_guard(p: &mut Parser<'_>) -> bool {
+    let guard = p.start();
+    p.eat(T![if]);
+    if p.at(T!['(']) {
+        expr(p);  // TODO BSV: Check for breaking code calling convention
+        p.expect(T![')']);
+        guard.complete(p, GUARD);
+        true
+    } else {
+        guard.abandon(p);
+        false
+    }
+}
+
+fn rule(p: &mut Parser<'_>) {
+    assert!(p.at(T![rule]));
+    let m = p.start();
+
+    p.bump(T![rule]);
+
+    // TODO BSV check if rules actually require names
+    name(p);
+
+    opt_guard(p);
+
+    if p.eat(T![;]) {
+        expressions::stmt_list_bsv(p, T![endrule]);
+        p.expect(T![endrule]);
+    }
+
+    // TODO BSV check if this is an appropriate way to complete without
+    // a body, or if we should be doing an error or something.
+    m.complete(p, RULE);
 }
 
 pub(super) fn macro_call_after_excl(p: &mut Parser<'_>) -> BlockLike {
