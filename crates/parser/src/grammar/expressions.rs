@@ -6,7 +6,7 @@ use super::*;
 
 pub(crate) use atom::{block_expr, match_arm_list, stmt_list_bsv};
 pub(super) use atom::{literal, LITERAL_FIRST};
-use types::typed_var_bsv;
+use types::{type_bsv, typed_var_bsv};
 
 #[derive(PartialEq, Eq)]
 pub(super) enum Semicolon {
@@ -159,6 +159,20 @@ pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
             p.expect(T![;]);
         }
     }
+}
+
+// test method_signature
+// method Bit#(4) get_count(Bool tag);
+pub(super) fn method_signature(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.bump(T![method]);
+    type_bsv(p);
+    name(p);
+    if p.at(T!['(']) {
+        params::param_list_bsv(p);
+    }
+    p.expect(T![;]);
+    m.complete(p, METHOD_SIGNATURE);
 }
 
 pub(super) fn module_inst(p: &mut Parser<'_>) {

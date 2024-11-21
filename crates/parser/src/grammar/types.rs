@@ -42,11 +42,18 @@ pub(crate) fn typed_var_bsv(p: &mut Parser<'_>) {
 
 pub(crate) fn type_bsv(p: &mut Parser<'_>) {
     let bsv_type = p.start();
-    name_ref(p);
-    if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
-        p.expect(T!['(']);
-        type_bsv(p);
-        p.expect(T![')']);
+
+    // test type_bsv
+    // 4
+    // Bit#(4)
+    // Reg#(Bit#(4))
+    if !p.eat(INT_NUMBER) {
+        name_ref(p);
+        if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
+            p.expect(T!['(']);
+            type_bsv(p);  // Recurse
+            p.expect(T![')']);
+        }
     }
     bsv_type.complete(p, TYPE_BSV);
 }

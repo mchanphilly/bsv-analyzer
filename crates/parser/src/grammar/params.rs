@@ -28,12 +28,17 @@ pub(super) fn param_list_closure(p: &mut Parser<'_>) {
     list_(p, Flavor::Closure);
 }
 
+pub(super) fn param_list_bsv(p: &mut Parser<'_>) {
+    list_(p, Flavor::Bsv);
+}
+
 #[derive(Debug, Clone, Copy)]
 enum Flavor {
     FnDef,   // Includes trait fn params; omitted param idents are not supported
     FnTrait, // Params for `Fn(...)`/`FnMut(...)`/`FnOnce(...)` annotations
     FnPointer,
     Closure,
+    Bsv,
 }
 
 fn list_(p: &mut Parser<'_>, flavor: Flavor) {
@@ -41,7 +46,7 @@ fn list_(p: &mut Parser<'_>, flavor: Flavor) {
 
     let (bra, ket) = match flavor {
         Closure => (T![|], T![|]),
-        FnDef | FnTrait | FnPointer => (T!['('], T![')']),
+        FnDef | FnTrait | FnPointer | Bsv => (T!['('], T![')']),
     };
 
     let list_marker = p.start();
@@ -153,6 +158,11 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
             if p.at(T![:]) && !p.at(T![::]) {
                 types::ascription(p);
             }
+        }
+
+        Flavor::Bsv => {
+            types::type_bsv(p);
+            name(p);
         }
     }
     m.complete(p, PARAM);

@@ -267,6 +267,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
         T![type] => type_alias(p, m),
 
+        T![interface] => traits::interface_(p, m),
         T![module] => traits::module_(p, m),
         // test extern_block
         // unsafe extern "C" {}
@@ -297,6 +298,15 @@ pub(super) fn module_stmt(p: &mut Parser<'_>) {
         _ => expressions::module_inst(p),
     }
     m.complete(p, MODULE_STMT);
+}
+
+pub(super) fn interface_stmt(p: &mut Parser<'_>) {
+    let m = p.start();
+    match p.current() {
+        T![method] => expressions::method_signature(p),
+        _ => p.bump_any(),  // BSV TODO remove
+    }
+    m.complete(p, INTERFACE_STMT);
 }
 
 fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {

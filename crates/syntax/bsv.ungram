@@ -35,6 +35,24 @@ Attr_bsv =
 AttrMeta_bsv =
   key:NameRef ('=' value:Literal)?
 
+Interface_bsv =
+  'interface' Name ';'
+  InterfaceStmt*
+  'endinterface' (':' Name)?
+
+InterfaceStmt =
+  MethodSignature
+// | // TODO BSV: Add subinterfaces
+
+MethodSignature =
+  'method' Type_bsv Name ParamList_bsv? ';'
+
+ParamList_bsv =
+  '(' params:(Param (',' Param)*) ')'
+
+Param_bsv =
+  Type_bsv Name
+
 // TODO BSV: can a module support more than one interface?
 // TODO BSV: Add ModuleParams?
 Module_bsv =
@@ -82,7 +100,7 @@ ModuleCall =
 // '(' args:(Expr_bsv (',' Expr_bsv)* ','?)? ')'
 
 Type_bsv =
-  NameRef  // TODO BSV, not sophisticated enough?
+  NameRef ('#' '(' Type_bsv ')')  // TODO BSV, not sophisticated enough?
 
 //   ArrayType
 // | DynTraitType
@@ -262,6 +280,7 @@ Item =
 | ExternCrate
 | Fn
 | Impl
+// | Module_bsv  // Needs HasAttrs to put into Item
 | MacroCall
 | MacroRules
 | MacroDef
@@ -341,6 +360,7 @@ Param =
     Pat (':' Type)?
   | Type
   | '...'
+  | Type_bsv Name  // TODO BSV: Less sophisticated pattern matching than Rust
   )
 
 RetType =

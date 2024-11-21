@@ -76,6 +76,31 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
 // test module_item
 // module mkTop (Empty);
 // endmodule : mkTop
+pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
+    std::env::set_var("RUST_BACKTRACE", "1");
+
+    // TODO BSV: Consider consuming the signature separately
+    p.bump(T![interface]);
+
+    // Interface name
+    name_r(p, ITEM_RECOVERY_SET);
+    p.expect(T![;]);
+
+    // TODO BSV: how do we make sure this doesn't eat file on bad inputs?
+    while !(p.at(EOF) || p.at(T![endinterface])) {
+        interface_stmt(p);  // TODO BSV open up to different kinds
+    }
+
+    p.expect(T![endinterface]);
+    if p.eat(T![:]) {  // optional end tag
+        name(p);
+    }
+    m.complete(p, INTERFACE_BSV);
+}
+
+// test module_item
+// module mkTop (Empty);
+// endmodule : mkTop
 pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
     // TODO BSV: Consider consuming the signature separately
     p.bump(T![module]);
