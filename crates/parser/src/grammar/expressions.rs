@@ -161,6 +161,15 @@ pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
     }
 }
 
+// test method_decl
+// method Bit#(4) get_count(Bool tag);
+pub(super) fn method_decl(p: &mut Parser<'_>) {
+    let m = p.start();
+    method_signature(p);
+    p.expect(T![;]);
+    m.complete(p, METHOD_DECL);
+}
+
 // test method_signature
 // method Bit#(4) get_count(Bool tag);
 pub(super) fn method_signature(p: &mut Parser<'_>) {
@@ -171,7 +180,6 @@ pub(super) fn method_signature(p: &mut Parser<'_>) {
     if p.at(T!['(']) {
         params::param_list_bsv(p);
     }
-    p.expect(T![;]);
     m.complete(p, METHOD_SIGNATURE);
 }
 

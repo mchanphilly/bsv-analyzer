@@ -41,11 +41,15 @@ Interface_bsv =
   'endinterface' (':' Name)?
 
 InterfaceStmt =
-  MethodSignature
+  MethodDecl
 // | // TODO BSV: Add subinterfaces
 
+MethodDecl =
+  MethodSignature ';'
+
 MethodSignature =
-  'method' Type_bsv Name ParamList_bsv? ';'
+  'method' Type_bsv Name ParamList_bsv?
+
 
 ParamList_bsv =
   '(' params:(Param (',' Param)*) ')'
@@ -63,6 +67,12 @@ Module_bsv =
 ModuleStmt =
   ModuleInst  // TODO BSV consider merging with generic actionvalue
 | Rule
+| Method
+
+Method =
+  MethodSignature ('if' Guard)?  // Notice 'if' is mandatory here, but not rule
+  StmtList_bsv
+  'endmethod'
 
 // TODO BSV: I decided to have StmtList directly instead of with
 // BlockExpr because I think there aren't many keyword modifiers to

@@ -303,7 +303,7 @@ pub(super) fn module_stmt(p: &mut Parser<'_>) {
 pub(super) fn interface_stmt(p: &mut Parser<'_>) {
     let m = p.start();
     match p.current() {
-        T![method] => expressions::method_signature(p),
+        T![method] => expressions::method_decl(p),
         _ => p.bump_any(),  // BSV TODO remove
     }
     m.complete(p, INTERFACE_STMT);
