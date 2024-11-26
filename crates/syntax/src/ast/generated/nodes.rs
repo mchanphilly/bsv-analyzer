@@ -2318,6 +2318,20 @@ impl TypeParam {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TypeSynonym {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for TypeSynonym {}
+impl TypeSynonym {
+    #[inline]
+    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Type_bsv {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2325,7 +2339,7 @@ impl Type_bsv {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
     #[inline]
-    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
+    pub fn types(&self) -> AstChildren<Type_bsv> { support::children(&self.syntax) }
     #[inline]
     pub fn pound_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![#]) }
     #[inline]
@@ -2350,6 +2364,15 @@ impl TypedVar {
     pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
     #[inline]
     pub fn let_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![let]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Typedef_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Typedef_bsv {
+    #[inline]
+    pub fn type_synonym(&self) -> Option<TypeSynonym> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -4999,6 +5022,20 @@ impl AstNode for TypeParam {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for TypeSynonym {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPE_SYNONYM }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for Type_bsv {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == TYPE_BSV }
@@ -5016,6 +5053,20 @@ impl AstNode for Type_bsv {
 impl AstNode for TypedVar {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == TYPED_VAR }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Typedef_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPEDEF_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6945,6 +6996,7 @@ impl AstNode for AnyHasName {
                 | TRAIT_ALIAS
                 | TYPE_ALIAS
                 | TYPE_PARAM
+                | TYPE_SYNONYM
                 | TYPED_VAR
                 | UNION
                 | VARIANT
@@ -7064,6 +7116,10 @@ impl From<TypeAlias> for AnyHasName {
 impl From<TypeParam> for AnyHasName {
     #[inline]
     fn from(node: TypeParam) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<TypeSynonym> for AnyHasName {
+    #[inline]
+    fn from(node: TypeSynonym) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<TypedVar> for AnyHasName {
     #[inline]
@@ -8092,12 +8148,22 @@ impl std::fmt::Display for TypeParam {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for TypeSynonym {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for Type_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
 impl std::fmt::Display for TypedVar {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Typedef_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

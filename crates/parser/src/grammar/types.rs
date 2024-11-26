@@ -56,6 +56,9 @@ pub(crate) fn type_bsv(p: &mut Parser<'_>) {
         if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
             p.expect(T!['(']);
             type_bsv(p);  // Recurse
+            while (p.eat(T![,])) {
+                type_bsv(p);
+            }
             p.expect(T![')']);
         }
     }

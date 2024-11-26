@@ -347,6 +347,7 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
         T![import] => use_item::import_(p, m),
         T![package] => package_item(p, m),
 
+        T![typedef] => typedef_(p, m),
         T![type] => type_alias(p, m),
         T![struct] => adt::strukt(p, m),
         T![enum] => adt::enum_(p, m),
@@ -398,6 +399,28 @@ pub(crate) fn package_item(p: &mut Parser<'_>, m: Marker) {
     name(p);
     p.expect(T![;]);
     m.complete(p, PACKAGE);
+}
+
+pub(crate) fn typedef_(p: &mut Parser<'_>, m: Marker) {
+    p.bump(T![typedef]);
+
+    match p.current() {
+        _ => type_synonym_bsv(p),
+    }
+
+    m.complete(p, TYPEDEF_BSV);
+}
+
+// test type_synonym
+// typedef BRAM1Port#(Bit#(8), Bit#(32)) CacheBRAM;
+fn type_synonym_bsv(p: &mut Parser<'_>) {
+    let m = p.start();
+
+    types::type_bsv(p);
+    name(p);
+
+    p.expect(T![;]);
+    m.complete(p, TYPE_SYNONYM);
 }
 
 // test type_alias

@@ -35,6 +35,25 @@ Attr_bsv =
 AttrMeta_bsv =
   key:NameRef ('=' value:Literal)?
 
+// TODO BSV Marry all top level items
+
+Typedef_bsv =
+  TypeSynonym
+// | EnumDecl
+
+TypeSynonym =
+  'typedef' Type_bsv Name ';'
+
+// EnumDecl =
+//   'typedef' 'enum'
+//   '(' enums:(Name (',' Name)*) ')'
+//   Name
+//   Deriving? ';'
+
+// Deriving =
+//   'deriving'
+//   '(' typeclasses:(NameRef (',' NameRef)*) ')'
+
 Interface_bsv =
   'interface' Name ';'
   InterfaceStmt*
@@ -117,8 +136,10 @@ ModuleCall =
 // ArgList_bsv =
 // '(' args:(Expr_bsv (',' Expr_bsv)* ','?)? ')'
 
+// TODO BSV check if this recursive structure works
 Type_bsv =
-  (NameRef | 'ActionValue') ('#' '(' Type_bsv ')')  // TODO BSV, not sophisticated enough?
+  (NameRef | 'ActionValue')
+  ('#' '(' types:(Type_bsv (',' Type_bsv)*) ')')  // TODO BSV, not sophisticated enough?
 | 'Action'
 
 //   ArrayType
