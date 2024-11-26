@@ -565,6 +565,23 @@ impl ContinueExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Deriving {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Deriving {
+    #[inline]
+    pub fn typeclasses(&self) -> AstChildren<NameRef> { support::children(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn deriving_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![deriving])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DynTraitType {
     pub(crate) syntax: SyntaxNode,
 }
@@ -589,6 +606,37 @@ impl Enum {
     pub fn variant_list(&self) -> Option<VariantList> { support::child(&self.syntax) }
     #[inline]
     pub fn enum_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![enum]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EnumDecl {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for EnumDecl {}
+impl EnumDecl {
+    #[inline]
+    pub fn deriving(&self) -> Option<Deriving> { support::child(&self.syntax) }
+    #[inline]
+    pub fn enum_list(&self) -> Option<EnumList> { support::child(&self.syntax) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn enum_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![enum]) }
+    #[inline]
+    pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct EnumList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl EnumList {
+    #[inline]
+    pub fn enums(&self) -> AstChildren<Name> { support::children(&self.syntax) }
+    #[inline]
+    pub fn l_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['{']) }
+    #[inline]
+    pub fn r_curly_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['}']) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3314,6 +3362,20 @@ impl AstNode for ContinueExpr {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Deriving {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == DERIVING }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for DynTraitType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == DYN_TRAIT_TYPE }
@@ -3331,6 +3393,34 @@ impl AstNode for DynTraitType {
 impl AstNode for Enum {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == ENUM }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for EnumDecl {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ENUM_DECL }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for EnumList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == ENUM_LIST }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6973,6 +7063,7 @@ impl AstNode for AnyHasName {
                 | CONST
                 | CONST_PARAM
                 | ENUM
+                | ENUM_DECL
                 | FN
                 | FORMAT_ARGS_ARG
                 | FUNCTION_SIGNATURE
@@ -7024,6 +7115,10 @@ impl From<ConstParam> for AnyHasName {
 impl From<Enum> for AnyHasName {
     #[inline]
     fn from(node: Enum) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<EnumDecl> for AnyHasName {
+    #[inline]
+    fn from(node: EnumDecl) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<Fn> for AnyHasName {
     #[inline]
@@ -7538,12 +7633,27 @@ impl std::fmt::Display for ContinueExpr {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Deriving {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for DynTraitType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
 impl std::fmt::Display for Enum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for EnumDecl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for EnumList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

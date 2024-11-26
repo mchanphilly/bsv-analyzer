@@ -405,6 +405,7 @@ pub(crate) fn typedef_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![typedef]);
 
     match p.current() {
+        T![enum] => enum_decl(p),
         _ => type_synonym_bsv(p),
     }
 
@@ -421,6 +422,48 @@ fn type_synonym_bsv(p: &mut Parser<'_>) {
 
     p.expect(T![;]);
     m.complete(p, TYPE_SYNONYM);
+}
+
+// test enum_decl
+// typedef BRAM1Port#(Bit#(8), Bit#(32)) CacheBRAM;
+fn enum_decl(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.bump(T![enum]);
+
+    enum_list(p);
+    name(p);
+    opt_deriving(p);
+
+    p.expect(T![;]);
+    m.complete(p, ENUM_DECL);
+}
+
+fn enum_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(T!['{']);
+    name(p);
+    while p.eat(T![,]) {
+        name(p);
+    }
+    p.expect(T!['}']);
+    m.complete(p, ENUM_LIST);
+}
+
+fn opt_deriving(p: &mut Parser<'_>) {
+    let m = p.start();
+
+    if !p.eat(T![deriving]) {
+        m.abandon(p);
+        return;
+    }
+
+    p.expect(T!['(']);
+    name_ref(p);
+    while p.eat(T![,]) {
+        name_ref(p);
+    }
+    p.expect(T![')']);
+    m.complete(p, DERIVING);
 }
 
 // test type_alias

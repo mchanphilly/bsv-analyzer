@@ -44,15 +44,18 @@ Typedef_bsv =
 TypeSynonym =
   'typedef' Type_bsv Name ';'
 
-// EnumDecl =
-//   'typedef' 'enum'
-//   '(' enums:(Name (',' Name)*) ')'
-//   Name
-//   Deriving? ';'
+EnumDecl =
+  'typedef' 'enum'
+  EnumList
+  Name
+  Deriving? ';'
 
-// Deriving =
-//   'deriving'
-//   '(' typeclasses:(NameRef (',' NameRef)*) ')'
+EnumList =
+  '{' enums:(Name (',' Name)*) '}'
+
+Deriving =
+  'deriving'
+  '(' typeclasses:(NameRef (',' NameRef)*) ')'
 
 Interface_bsv =
   'interface' Name ';'
