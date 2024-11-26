@@ -183,6 +183,19 @@ pub(super) fn method_signature(p: &mut Parser<'_>) {
     m.complete(p, METHOD_SIGNATURE);
 }
 
+// test function_signature
+// function Bit#(4) get_count(Bool tag);
+pub(super) fn function_signature(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.bump(T![function]);
+    type_bsv(p);
+    name(p);
+    if p.at(T!['(']) {
+        params::param_list_bsv(p);
+    }
+    m.complete(p, FUNCTION_SIGNATURE);
+}
+
 pub(super) fn module_inst(p: &mut Parser<'_>) {
     let m = p.start();
     typed_var_bsv(p);

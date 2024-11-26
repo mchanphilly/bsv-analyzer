@@ -47,8 +47,12 @@ pub(crate) fn type_bsv(p: &mut Parser<'_>) {
     // 4
     // Bit#(4)
     // Reg#(Bit#(4))
-    if !p.eat(INT_NUMBER) {
-        name_ref(p);
+    // Action
+    // ActionValue#(Bit#(4))
+    if !p.eat(INT_NUMBER) && !p.eat(T![Action]){
+        if !p.eat(T![ActionValue]) {
+            name_ref(p);
+        }
         if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
             p.expect(T!['(']);
             type_bsv(p);  // Recurse

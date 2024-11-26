@@ -269,6 +269,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
         T![interface] => traits::interface_(p, m),
         T![module] => traits::module_(p, m),
+        T![function] => function(p),
         // test extern_block
         // unsafe extern "C" {}
         // extern {}
@@ -293,9 +294,12 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
 pub(super) fn module_stmt(p: &mut Parser<'_>) {
     let m = p.start();
+    attributes::outer_attrs_bsv(p);
+
     match p.current() {
         T![rule] => rule(p),
         T![method] => method_impl(p),
+        T![function] => function(p),  // TODO BSV add to outside of module
         _ => expressions::module_inst(p),
     }
     m.complete(p, MODULE_STMT);
@@ -321,6 +325,19 @@ pub(super) fn method_impl(p: &mut Parser<'_>) {
         p.expect(T![endmethod]);
     }
     m.complete(p, METHOD_IMPL);
+}
+
+pub(super) fn function(p: &mut Parser<'_>) {  // TODO BSV add support for non-module-associated functions
+    let m = p.start();
+    expressions::function_signature(p);
+    if p.at(T![if]) {
+        assert!(opt_guard(p));  // not actually optional
+    }
+    if p.eat(T![;]) {  // TODO BSV: Support shorthand function impls e.g., method Bit#(3) M = 5;
+        expressions::stmt_list_bsv(p, T![endfunction]);
+        p.expect(T![endfunction]);
+    }
+    m.complete(p, FUNCTION);
 }
 
 fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {

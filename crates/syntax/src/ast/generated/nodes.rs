@@ -791,6 +791,39 @@ impl FormatArgsExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Function {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Function {
+    #[inline]
+    pub fn function_signature(&self) -> Option<FunctionSignature> { support::child(&self.syntax) }
+    #[inline]
+    pub fn guard(&self) -> Option<Guard> { support::child(&self.syntax) }
+    #[inline]
+    pub fn stmt_list_bsv(&self) -> Option<StmtList_bsv> { support::child(&self.syntax) }
+    #[inline]
+    pub fn endfunction_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endfunction])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FunctionSignature {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasName for FunctionSignature {}
+impl FunctionSignature {
+    #[inline]
+    pub fn param_list_bsv(&self) -> Option<ParamList_bsv> { support::child(&self.syntax) }
+    #[inline]
+    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
+    #[inline]
+    pub fn function_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![function])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GenericArgList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2299,6 +2332,12 @@ impl Type_bsv {
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn Action_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![Action]) }
+    #[inline]
+    pub fn ActionValue_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![ActionValue])
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2638,6 +2677,7 @@ impl ast::HasDocComments for Item {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ModuleStmt {
+    Function(Function),
     MethodImpl(MethodImpl),
     ModuleInst(ModuleInst),
     Rule(Rule),
@@ -3436,6 +3476,34 @@ impl AstNode for FormatArgsArg {
 impl AstNode for FormatArgsExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == FORMAT_ARGS_EXPR }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Function {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == FUNCTION }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for FunctionSignature {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == FUNCTION_SIGNATURE }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -5864,6 +5932,10 @@ impl AstNode for Item {
         }
     }
 }
+impl From<Function> for ModuleStmt {
+    #[inline]
+    fn from(node: Function) -> ModuleStmt { ModuleStmt::Function(node) }
+}
 impl From<MethodImpl> for ModuleStmt {
     #[inline]
     fn from(node: MethodImpl) -> ModuleStmt { ModuleStmt::MethodImpl(node) }
@@ -5878,10 +5950,13 @@ impl From<Rule> for ModuleStmt {
 }
 impl AstNode for ModuleStmt {
     #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, METHOD_IMPL | MODULE_INST | RULE) }
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, FUNCTION | METHOD_IMPL | MODULE_INST | RULE)
+    }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
+            FUNCTION => ModuleStmt::Function(Function { syntax }),
             METHOD_IMPL => ModuleStmt::MethodImpl(MethodImpl { syntax }),
             MODULE_INST => ModuleStmt::ModuleInst(ModuleInst { syntax }),
             RULE => ModuleStmt::Rule(Rule { syntax }),
@@ -5892,6 +5967,7 @@ impl AstNode for ModuleStmt {
     #[inline]
     fn syntax(&self) -> &SyntaxNode {
         match self {
+            ModuleStmt::Function(it) => &it.syntax,
             ModuleStmt::MethodImpl(it) => &it.syntax,
             ModuleStmt::ModuleInst(it) => &it.syntax,
             ModuleStmt::Rule(it) => &it.syntax,
@@ -6848,6 +6924,7 @@ impl AstNode for AnyHasName {
                 | ENUM
                 | FN
                 | FORMAT_ARGS_ARG
+                | FUNCTION_SIGNATURE
                 | IDENT_PAT
                 | INTERFACE_BSV
                 | MACRO_DEF
@@ -6903,6 +6980,10 @@ impl From<Fn> for AnyHasName {
 impl From<FormatArgsArg> for AnyHasName {
     #[inline]
     fn from(node: FormatArgsArg) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<FunctionSignature> for AnyHasName {
+    #[inline]
+    fn from(node: FunctionSignature) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<IdentPat> for AnyHasName {
     #[inline]
@@ -7467,6 +7548,16 @@ impl std::fmt::Display for FormatArgsArg {
     }
 }
 impl std::fmt::Display for FormatArgsExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Function {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for FunctionSignature {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

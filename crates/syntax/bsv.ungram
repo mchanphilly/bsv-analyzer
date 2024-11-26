@@ -50,6 +50,8 @@ MethodDecl =
 MethodSignature =
   'method' Type_bsv Name ParamList_bsv?
 
+FunctionSignature =
+  'function' Type_bsv Name ParamList_bsv?
 
 ParamList_bsv =
   '(' params:(Param (',' Param)*) ')'
@@ -68,6 +70,7 @@ ModuleStmt =
   ModuleInst  // TODO BSV consider merging with generic actionvalue
 | Rule
 | MethodImpl
+| Function
 
 MethodImpl =
   MethodSignature Guard?  // Note 'if' is mandatory in this Guard, but not rule
@@ -83,6 +86,11 @@ Rule =
   'rule' Name Guard? ';'
   StmtList_bsv
   'endrule'
+
+Function =
+  FunctionSignature Guard?
+  StmtList_bsv
+  'endfunction'
 
 // Modeled off MatchGuard
 Guard =
@@ -110,7 +118,8 @@ ModuleCall =
 // '(' args:(Expr_bsv (',' Expr_bsv)* ','?)? ')'
 
 Type_bsv =
-  NameRef ('#' '(' Type_bsv ')')  // TODO BSV, not sophisticated enough?
+  (NameRef | 'ActionValue') ('#' '(' Type_bsv ')')  // TODO BSV, not sophisticated enough?
+| 'Action'
 
 //   ArrayType
 // | DynTraitType

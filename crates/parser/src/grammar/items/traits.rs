@@ -77,7 +77,7 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
 // module mkTop (Empty);
 // endmodule : mkTop
 pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
-    std::env::set_var("RUST_BACKTRACE", "1");
+    // std::env::set_var("RUST_BACKTRACE", "1");
 
     // TODO BSV: Consider consuming the signature separately
     p.bump(T![interface]);
