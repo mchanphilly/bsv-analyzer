@@ -64,20 +64,29 @@ export function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export type BsvDocument = vscode.TextDocument & { languageId: "bluespec" };
-export type BsvEditor = vscode.TextEditor & { document: BsvDocument };
+export type SupportedLanguageId = "bluespec" | "minispec";
+export type LanguageDocument<T extends SupportedLanguageId> = vscode.TextDocument & { languageId: T };
+export type SupportedLanguageDocument = LanguageDocument<SupportedLanguageId>;
+export type LanguageEditor<T extends SupportedLanguageId> = vscode.TextEditor & { document: LanguageDocument<T> };
+export type SupportedLanguageEditor = LanguageEditor<SupportedLanguageId>;
 
-export function isBsvDocument(document: vscode.TextDocument): document is BsvDocument {
+export function isSupportedLanguageDocument(document: vscode.TextDocument): document is SupportedLanguageDocument {
     // Prevent corrupted text (particularly via inlay hints) in diff views
     // by allowing only `file` schemes
     // unfortunately extensions that use diff views not always set this
     // to something different than 'file' (see ongoing bug: #4608)
-    return document.languageId === "bluespec" && document.uri.scheme === "file";
+    return (document.languageId === "bluespec" || document.languageId === "minispec") 
+           && document.uri.scheme === "file";
 }
 
-export function isCargoTomlDocument(document: vscode.TextDocument): document is BsvDocument {
+export function isSupportedEditor(editor: vscode.TextEditor): editor is SupportedLanguageEditor {
+    return isSupportedLanguageDocument(editor.document);
+}
+
+export function isCargoTomlDocument(document: vscode.TextDocument): document is SupportedLanguageDocument {
     // ideally `document.languageId` should be 'toml' but user maybe not have toml extension installed
-    return document.uri.scheme === "file" && document.fileName.endsWith("Cargo.toml");
+    // return document.uri.scheme === "file" && document.fileName.endsWith("Cargo.toml");
+    return false;
 }
 
 export function isCargoRunnableArgs(
@@ -86,11 +95,7 @@ export function isCargoRunnableArgs(
     return (args as CargoRunnableArgs).executableArgs !== undefined;
 }
 
-export function isBsvEditor(editor: vscode.TextEditor): editor is BsvEditor {
-    return isBsvDocument(editor.document);
-}
-
-export function isDocumentInWorkspace(document: BsvDocument): boolean {
+export function isDocumentInWorkspace(document: SupportedLanguageDocument): boolean {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders) {
         return false;

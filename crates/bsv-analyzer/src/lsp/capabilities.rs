@@ -110,6 +110,14 @@ pub fn server_capabilities(config: &Config) -> ServerCapabilities {
                         FileOperationFilter {
                             scheme: Some(String::from("file")),
                             pattern: FileOperationPattern {
+                                glob: String::from("**/*.ms"),
+                                matches: Some(FileOperationPatternKind::File),
+                                options: None,
+                            },
+                        },
+                        FileOperationFilter {
+                            scheme: Some(String::from("file")),
+                            pattern: FileOperationPattern {
                                 glob: String::from("**"),
                                 matches: Some(FileOperationPatternKind::Folder),
                                 options: None,

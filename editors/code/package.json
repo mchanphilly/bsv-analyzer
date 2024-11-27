@@ -74,7 +74,9 @@
     },
     "activationEvents": [
         "workspaceContains:*.bsv",
-        "onLanguage:bluespec"
+        "workspaceContains:*.ms",
+        "onLanguage:bluespec",
+        "onLanguage:minispec"
     ],
     "main": "./out/main",
     "contributes": {

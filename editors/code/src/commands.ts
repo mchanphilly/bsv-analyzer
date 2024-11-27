@@ -17,13 +17,13 @@ import {
 } from "./run";
 import { AstInspector } from "./ast_inspector";
 import {
-    isBsvDocument,
+    isSupportedLanguageDocument,
     isCargoRunnableArgs,
     isCargoTomlDocument,
     sleep,
-    isBsvEditor,
+    isSupportedEditor,
     type BsvEditor,
-    type BsvDocument,
+    type SupportedLanguageDocument,
     unwrapUndefinable,
 } from "./util";
 import { startDebugSession, makeDebugConfig } from "./debug";
@@ -232,7 +232,7 @@ export function parentModule(ctx: CtxInit): Cmd {
     return async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
-        if (!(isBsvDocument(editor.document) || isCargoTomlDocument(editor.document))) return;
+        if (!(isSupportedLanguageDocument(editor.document) || isCargoTomlDocument(editor.document))) return;
 
         const client = ctx.client;
 
@@ -328,7 +328,7 @@ export function revealDependency(ctx: CtxInit): Cmd {
  * &emsp;|- ...\
  * std
  */
-async function revealParentChain(document: BsvDocument, ctx: CtxInit) {
+async function revealParentChain(document: SupportedLanguageDocument, ctx: CtxInit) {
     let documentPath = document.uri.fsPath;
     const maxDepth = documentPath.split(path.sep).length - 1;
     const parentChain: DependencyId[] = [{ id: documentPath.toLowerCase() }];
@@ -447,14 +447,14 @@ export function syntaxTree(ctx: CtxInit): Cmd {
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isBsvDocument(event.document)) {
+            if (isSupportedLanguageDocument(event.document)) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isBsvEditor(editor)) {
+            if (editor && isSupportedEditor(editor)) {
                 this.eventEmitter.fire(this.uri);
             }
         }
@@ -541,14 +541,14 @@ function viewFileUsingTextDocumentContentProvider(
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isBsvDocument(event.document) && shouldUpdate) {
+            if (isSupportedLanguageDocument(event.document) && shouldUpdate) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isBsvEditor(editor) && shouldUpdate) {
+            if (editor && isSupportedEditor(editor) && shouldUpdate) {
                 this.eventEmitter.fire(this.uri);
             }
         }
@@ -633,14 +633,14 @@ export function viewFileText(ctx: CtxInit): Cmd {
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isBsvDocument(event.document)) {
+            if (isSupportedLanguageDocument(event.document)) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isBsvEditor(editor)) {
+            if (editor && isSupportedEditor(editor)) {
                 this.eventEmitter.fire(this.uri);
             }
         }
@@ -696,14 +696,14 @@ export function viewItemTree(ctx: CtxInit): Cmd {
         }
 
         private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
-            if (isBsvDocument(event.document)) {
+            if (isSupportedLanguageDocument(event.document)) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
                 void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
-            if (editor && isBsvEditor(editor)) {
+            if (editor && isSupportedEditor(editor)) {
                 this.eventEmitter.fire(this.uri);
             }
         }

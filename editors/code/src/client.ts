@@ -19,7 +19,10 @@ export async function createClient(
     unlinkedFiles: vscode.Uri[],
 ): Promise<lc.LanguageClient> {
     const clientOptions: lc.LanguageClientOptions = {
-        documentSelector: [{ scheme: "file", language: "bluespec" }],
+        documentSelector: [
+            { scheme: "file", language: "bluespec" },
+            { scheme: "file", language: "minispec" }
+        ],
         initializationOptions,
         diagnosticCollectionName: "rustc",
         traceOutputChannel,

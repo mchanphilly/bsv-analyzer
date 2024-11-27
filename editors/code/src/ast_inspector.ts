@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import type { Ctx, Disposable } from "./ctx";
-import { type BsvEditor, isBsvEditor, unwrapUndefinable } from "./util";
+import { type BsvEditor, isSupportedEditor, unwrapUndefinable } from "./util";
 
 // FIXME: consider implementing this via the Tree View API?
 // https://code.visualstudio.com/api/extension-guides/tree-view
@@ -79,7 +79,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
             this.setBsvEditor(undefined);
             return;
         }
-        this.setBsvEditor(editors.find(isBsvEditor));
+        this.setBsvEditor(editors.find(isSupportedEditor));
     }
 
     private findAstTextEditor(): undefined | vscode.TextEditor {

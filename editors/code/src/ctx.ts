@@ -6,8 +6,8 @@ import { Config, prepareVSCodeConfig } from "./config";
 import { createClient } from "./client";
 import {
     isDocumentInWorkspace,
-    isBsvDocument,
-    isBsvEditor,
+    isSupportedLanguageDocument,
+    isSupportedEditor,
     LazyOutputChannel,
     log,
     type BsvEditor,
@@ -46,7 +46,7 @@ export function fetchWorkspace(): Workspace {
         (folder) => folder.uri.scheme === "file",
     );
     const rustDocuments = vscode.workspace.textDocuments.filter((document) =>
-        isBsvDocument(document),
+        isSupportedLanguageDocument(document),
     );
 
     return folders.length === 0
@@ -314,7 +314,7 @@ export class Ctx implements BsvAnalyzerExtensionApi {
     private shouldRevealDependency(e: vscode.TextEditor | undefined): e is BsvEditor {
         return (
             e !== undefined &&
-            isBsvEditor(e) &&
+            isSupportedEditor(e) &&
             !isDocumentInWorkspace(e.document) &&
             (this.treeView?.visible || false)
         );
@@ -354,7 +354,7 @@ export class Ctx implements BsvAnalyzerExtensionApi {
 
     get activeBsvEditor(): BsvEditor | undefined {
         const editor = vscode.window.activeTextEditor;
-        return editor && isBsvEditor(editor) ? editor : undefined;
+        return editor && isSupportedEditor(editor) ? editor : undefined;
     }
 
     get extensionPath(): string {

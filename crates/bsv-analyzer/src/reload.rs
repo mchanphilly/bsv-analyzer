@@ -533,7 +533,8 @@ impl GlobalState {
                         .flat_map(|include| {
                             include.into_iter().flat_map(|base| {
                                 [
-                                    (base, "**/*.bsv"),
+                                    (base.clone(), "**/*.bsv"),
+                                    (base, "**/*.ms"),
                                     // (base.clone(), "**/Cargo.{lock,toml}"),
                                     // (base, "**/bsv-analyzer.toml"),
                                 ]
@@ -558,6 +559,7 @@ impl GlobalState {
                             include.into_iter().flat_map(|base| {
                                 [
                                     format!("{base}/**/*.bsv"),
+                                    format!("{base}/**/*.ms"),
                                     // format!("{base}/**/Cargo.{{toml,lock}}"),
                                     // format!("{base}/**/bsv-analyzer.toml"),
                                 ]

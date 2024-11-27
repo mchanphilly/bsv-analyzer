@@ -217,6 +217,11 @@ impl GlobalState {
                 scheme: None,
                 pattern: Some("**/*.bsv".into()),
             },
+            lsp_types::DocumentFilter {
+                language: None,
+                scheme: None,
+                pattern: Some("**/*.ms".into()),
+            },
             // lsp_types::DocumentFilter {
             //     language: None,
             //     scheme: None,
