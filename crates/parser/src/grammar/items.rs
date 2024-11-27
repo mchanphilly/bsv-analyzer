@@ -4,7 +4,6 @@ mod traits;
 mod use_item;
 
 use entry::prefix::expr;
-use expressions::instantiation;
 
 pub(crate) use self::{
     adt::{record_field_list, variant_list},
@@ -307,7 +306,8 @@ pub(super) fn module_stmt(p: &mut Parser<'_>) {
         T![rule] => rule(p),
         T![method] => method_impl(p),
         T![function] => function(p),  // TODO BSV add to outside of module
-        _ => instantiation(p),  // i.e., assignment stuff
+        T![let] => expressions::let_stmt(p, expressions::Semicolon::Required),
+        _ => expressions::instantiation(p),  // i.e., assignment stuff
         // everything else, e.g., for loops TODO BSV
     }
     m.complete(p, MODULE_STMT);

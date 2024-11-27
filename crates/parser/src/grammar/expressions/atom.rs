@@ -44,6 +44,8 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T!['('],
         T!['{'],
         T!['['],
+        T![begin],
+        T![end],
         T![|],
         T![async],
         T![box],

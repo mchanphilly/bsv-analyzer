@@ -125,7 +125,7 @@ pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
     }
 
     let mut expr_after_eq: Option<CompletedMarker> = None;
-    if p.eat(T![=]) {
+    if p.eat(T![=]) || p.eat(T![<-]) {
         // test let_stmt_init
         // fn f() { let x = 92; }
         expr_after_eq = expressions::expr(p);
