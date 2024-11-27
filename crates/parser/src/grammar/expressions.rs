@@ -393,7 +393,7 @@ fn expr_bp(
 }
 
 const LHS_FIRST: TokenSet =
-    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![_]]));
+    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![~], T![_]]));
 
 fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLike)> {
     let m;
@@ -426,7 +426,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLik
         //     !!true;
         //     --1;
         // }
-        T![*] | T![!] | T![-] => {
+        T![*] | T![!] | T![-] | T![~] => {
             m = p.start();
             p.bump_any();
             PREFIX_EXPR

@@ -650,7 +650,7 @@ BlockExpr =
   Attr* Label? ('try' | 'unsafe' | ('async' 'move'?) | ('gen' 'move'?) | 'const') StmtList
 
 PrefixExpr =
-  Attr* op:('-' | '!' | '*') Expr
+  Attr* op:('-' | '!' | '*' | '~') Expr
 
 BinExpr =
   Attr*
