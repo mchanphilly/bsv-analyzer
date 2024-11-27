@@ -942,6 +942,17 @@ impl IfExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IfExpr_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IfExpr_bsv {
+    #[inline]
+    pub fn else_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![else]) }
+    #[inline]
+    pub fn if_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![if]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Impl {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3687,6 +3698,20 @@ impl AstNode for IdentPat {
 impl AstNode for IfExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == IF_EXPR }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for IfExpr_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == IF_EXPR_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -7749,6 +7774,11 @@ impl std::fmt::Display for IdentPat {
     }
 }
 impl std::fmt::Display for IfExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for IfExpr_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

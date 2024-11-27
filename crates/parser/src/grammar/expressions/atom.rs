@@ -196,6 +196,7 @@ pub(super) fn atom_expr(
             //     end
             // endmethod
             let m = p.start();
+            // Could replace with the stmt_list_or_expr, but we'd only ever use the stmt_list branch.
             p.bump(T![begin]);
             stmt_list_bsv(p, T![end]);
             p.expect(T![end]);
@@ -599,15 +600,27 @@ fn if_expr(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(T![if]);
     expr_no_struct(p);
-    block_expr(p);
+
+    stmt_list_or_expr_bsv(p, T![begin], T![end]);
+
     if p.eat(T![else]) {
         if p.at(T![if]) {
             if_expr(p);
         } else {
-            block_expr(p);
+            stmt_list_or_expr_bsv(p, T![begin], T![end]);
         }
     }
-    m.complete(p, IF_EXPR)
+    m.complete(p, IF_EXPR_BSV)
+}
+
+// Shorthand for when we may have a sole expression OR a begin/end or action/endaction or other pair.
+fn stmt_list_or_expr_bsv(p: &mut Parser<'_>, start: SyntaxKind, end: SyntaxKind) {
+    if p.eat(start) {
+        stmt_list_bsv(p, end);
+        p.expect(end);
+    } else {
+        expr(p);  // expect a sole expression
+    }
 }
 
 // test label

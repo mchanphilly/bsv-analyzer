@@ -244,6 +244,7 @@ pub enum SyntaxKind {
     GUARD,
     IDENT_PAT,
     IF_EXPR,
+    IF_EXPR_BSV,
     IMPL,
     IMPL_TRAIT_TYPE,
     IMPORT,

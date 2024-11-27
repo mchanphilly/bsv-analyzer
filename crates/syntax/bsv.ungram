@@ -122,7 +122,7 @@ Guard =
 StmtList_bsv =
   statements:Stmt*
 | 'begin' statements:Stmt* 'end'  // Treated similar to whitespace
-
+// | 'action' statements:Stmt* 'endaction'
 
 Instantiation =
   TypedVar op:('<-' | '<=' | '=') Expr ';'
@@ -716,6 +716,10 @@ ClosureBinder =
 IfExpr =
   Attr* 'if' condition:Expr then_branch:BlockExpr
   ('else' else_branch:(IfExpr | BlockExpr))?
+
+IfExpr_bsv =
+  'if' condition:Expr then_branch:StmtList_bsv
+  ('else' else_branch:(IfExpr | StmtList_bsv))?
 
 LoopExpr =
   Attr* Label? 'loop'
