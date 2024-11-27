@@ -306,8 +306,9 @@ fn name(p: &mut Parser<'_>) {
 }
 
 fn name_ref(p: &mut Parser<'_>) {
-    if p.at(IDENT) {
+    if p.at(IDENT) || p.at(T![$]) {
         let m = p.start();
+        p.eat(T![$]);
         p.bump(IDENT);
         m.complete(p, NAME_REF);
     } else {

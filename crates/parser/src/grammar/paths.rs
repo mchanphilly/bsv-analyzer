@@ -1,7 +1,7 @@
 use super::*;
 
 pub(super) const PATH_FIRST: TokenSet =
-    TokenSet::new(&[IDENT, T![self], T![super], T![crate], T![Self], T![:], T![<]]);
+    TokenSet::new(&[IDENT, T![$]]);
 
 pub(super) fn is_path_start(p: &Parser<'_>) -> bool {
     is_use_path_start(p) || p.at(T![<]) || p.at(T![Self])
@@ -9,7 +9,8 @@ pub(super) fn is_path_start(p: &Parser<'_>) -> bool {
 
 pub(super) fn is_use_path_start(p: &Parser<'_>) -> bool {
     match p.current() {
-        IDENT | T![self] | T![super] | T![crate] => true,
+        // TODO BSV check if $ captures too much
+        IDENT | T![self] | T![super] | T![crate] | T![$] => true,
         T![:] if p.at(T![::]) => true,
         _ => false,
     }
@@ -100,7 +101,7 @@ fn path_segment(p: &mut Parser<'_>, mode: Mode, first: bool) {
             true
         };
         match p.current() {
-            IDENT => {
+            IDENT | T![$] => {
                 name_ref(p);
                 opt_path_type_args(p, mode);
             }

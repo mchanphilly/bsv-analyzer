@@ -1016,6 +1016,19 @@ impl InferType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Instantiation {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Instantiation {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    #[inline]
+    pub fn typed_var(&self) -> Option<TypedVar> { support::child(&self.syntax) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct InterfaceStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1434,19 +1447,6 @@ impl ast::HasArgList for ModuleCall {}
 impl ModuleCall {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ModuleInst {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ModuleInst {
-    #[inline]
-    pub fn module_call(&self) -> Option<ModuleCall> { support::child(&self.syntax) }
-    #[inline]
-    pub fn typed_var(&self) -> Option<TypedVar> { support::child(&self.syntax) }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2749,8 +2749,8 @@ impl ast::HasDocComments for Item {}
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ModuleStmt {
     Function(Function),
+    Instantiation(Instantiation),
     MethodImpl(MethodImpl),
-    ModuleInst(ModuleInst),
     Rule(Rule),
 }
 
@@ -3768,6 +3768,20 @@ impl AstNode for InferType {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for Instantiation {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == INSTANTIATION }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for InterfaceStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == INTERFACE_STMT }
@@ -4205,20 +4219,6 @@ impl AstNode for Module {
 impl AstNode for ModuleCall {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_CALL }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for ModuleInst {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE_INST }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6077,13 +6077,13 @@ impl From<Function> for ModuleStmt {
     #[inline]
     fn from(node: Function) -> ModuleStmt { ModuleStmt::Function(node) }
 }
+impl From<Instantiation> for ModuleStmt {
+    #[inline]
+    fn from(node: Instantiation) -> ModuleStmt { ModuleStmt::Instantiation(node) }
+}
 impl From<MethodImpl> for ModuleStmt {
     #[inline]
     fn from(node: MethodImpl) -> ModuleStmt { ModuleStmt::MethodImpl(node) }
-}
-impl From<ModuleInst> for ModuleStmt {
-    #[inline]
-    fn from(node: ModuleInst) -> ModuleStmt { ModuleStmt::ModuleInst(node) }
 }
 impl From<Rule> for ModuleStmt {
     #[inline]
@@ -6092,14 +6092,14 @@ impl From<Rule> for ModuleStmt {
 impl AstNode for ModuleStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, FUNCTION | METHOD_IMPL | MODULE_INST | RULE)
+        matches!(kind, FUNCTION | INSTANTIATION | METHOD_IMPL | RULE)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             FUNCTION => ModuleStmt::Function(Function { syntax }),
+            INSTANTIATION => ModuleStmt::Instantiation(Instantiation { syntax }),
             METHOD_IMPL => ModuleStmt::MethodImpl(MethodImpl { syntax }),
-            MODULE_INST => ModuleStmt::ModuleInst(ModuleInst { syntax }),
             RULE => ModuleStmt::Rule(Rule { syntax }),
             _ => return None,
         };
@@ -6109,8 +6109,8 @@ impl AstNode for ModuleStmt {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             ModuleStmt::Function(it) => &it.syntax,
+            ModuleStmt::Instantiation(it) => &it.syntax,
             ModuleStmt::MethodImpl(it) => &it.syntax,
-            ModuleStmt::ModuleInst(it) => &it.syntax,
             ModuleStmt::Rule(it) => &it.syntax,
         }
     }
@@ -7778,6 +7778,11 @@ impl std::fmt::Display for InferType {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Instantiation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for InterfaceStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -7934,11 +7939,6 @@ impl std::fmt::Display for Module {
     }
 }
 impl std::fmt::Display for ModuleCall {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for ModuleInst {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

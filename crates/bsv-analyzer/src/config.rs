@@ -1903,27 +1903,6 @@ impl Config {
     pub(crate) fn completion_snippets_default() -> FxHashMap<String, SnippetDef> {
         serde_json::from_str(
             r#"{
-            "Arc::new": {
-                "postfix": "arc",
-                "body": "Arc::new(${receiver})",
-                "requires": "std::sync::Arc",
-                "description": "Put the expression into an `Arc`",
-                "scope": "expr"
-            },
-            "Rc::new": {
-                "postfix": "rc",
-                "body": "Rc::new(${receiver})",
-                "requires": "std::rc::Rc",
-                "description": "Put the expression into an `Rc`",
-                "scope": "expr"
-            },
-            "Box::pin": {
-                "postfix": "pinbox",
-                "body": "Box::pin(${receiver})",
-                "requires": "std::boxed::Box",
-                "description": "Put the expression into a pinned `Box`",
-                "scope": "expr"
-            },
             "Ok": {
                 "postfix": "ok",
                 "body": "Ok(${receiver})",

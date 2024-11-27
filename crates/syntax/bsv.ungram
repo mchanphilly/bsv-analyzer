@@ -89,7 +89,7 @@ Module_bsv =
   'endmodule' (':' Name)?
 
 ModuleStmt =
-  ModuleInst  // TODO BSV consider merging with generic actionvalue
+  Instantiation  // TODO BSV consider merging with generic actionvalue
 | Rule
 | MethodImpl
 | Function
@@ -124,8 +124,8 @@ StmtList_bsv =
 | 'begin' statements:Stmt* 'end'  // Treated similar to whitespace
 
 
-ModuleInst =
-  TypedVar op:('<-') ModuleCall ';'
+Instantiation =
+  TypedVar op:('<-' | '<=' | '=') Expr ';'
 
 // TODO BSV add polymorphism
 // TODO BSV check whether `let` permitted in ModuleInst

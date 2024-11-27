@@ -196,16 +196,19 @@ pub(super) fn function_signature(p: &mut Parser<'_>) {
     m.complete(p, FUNCTION_SIGNATURE);
 }
 
-pub(super) fn module_inst(p: &mut Parser<'_>) {
+pub(super) fn instantiation(p: &mut Parser<'_>) {
     let m = p.start();
     typed_var_bsv(p);
 
     if !(p.eat(T![<-]) || p.eat(T![=])) {
-        p.err_and_bump("Expected a `<=` or `=` operator");
+        p.err_and_bump("Expected a `<-` or `=` operator");
     }
-    module_call_bsv(p);
+    // test literal_in_module_inst
+    // String out_file = "output.log";
+    expr(p);
+
     p.expect(T![;]);
-    m.complete(p, MODULE_INST);
+    m.complete(p, INSTANTIATION);
 }
 
 pub(super) fn module_call_bsv(p: &mut Parser<'_>) {
@@ -281,6 +284,7 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
         T![<] if p.at(T![<=])  => (5,  T![<=],  Left),
         T![<] if p.at(T![<<=]) => (1,  T![<<=], Right),
         T![<] if p.at(T![<<])  => (9,  T![<<],  Left),
+        T![<] if p.at(T![<-])  => (1,  T![<-],  Left),
         T![<]                  => (5,  T![<],   Left),
         T![+] if p.at(T![+=])  => (1,  T![+=],  Right),
         T![+]                  => (10, T![+],   Left),
