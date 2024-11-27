@@ -31,10 +31,7 @@ pub(super) const TYPE_RECOVERY_SET: TokenSet = TokenSet::new(&[
 pub(crate) fn typed_var_bsv(p: &mut Parser<'_>) {
     let typed_var = p.start();
 
-    match p.current() {  // the type
-        T![let] => p.bump(T![let]),
-        _ => type_bsv(p),
-    }
+    type_bsv(p);
     name(p);  // the variable
 
     typed_var.complete(p, TYPED_VAR);
@@ -56,7 +53,7 @@ pub(crate) fn type_bsv(p: &mut Parser<'_>) {
         if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
             p.expect(T!['(']);
             type_bsv(p);  // Recurse
-            while (p.eat(T![,])) {
+            while p.eat(T![,]) {
                 type_bsv(p);
             }
             p.expect(T![')']);
