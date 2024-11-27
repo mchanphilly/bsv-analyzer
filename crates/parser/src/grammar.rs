@@ -93,7 +93,13 @@ pub(crate) mod entry {
 
         pub(crate) fn source_file(p: &mut Parser<'_>) {
             let m = p.start();
-            items::package_contents_bsv(p, None);
+
+            // In the rare case we have multiple packages.
+            // Note that this will yield incorrect results if there are
+            // additional statements following the first package, or
+            while !p.at(EOF) {
+                items::package_contents_bsv(p);
+            }
             m.complete(p, SOURCE_FILE);
         }
 

@@ -17,10 +17,24 @@ use super::*;
 // package Top;
 // import FIFOF::*;
 // import BRAM   ::   *;
-pub(super) fn package_contents_bsv(p: &mut Parser<'_>, end: Option<SyntaxKind>) {
-    while !(p.at(EOF)) {
-        item_or_stmt_bsv(p, end);
+pub(super) fn package_contents_bsv(p: &mut Parser<'_>) {
+    let m = p.start();
+
+    let expect_end = p.eat(T![package]);
+    if expect_end {
+        name(p);
+        p.expect(T![;]);
     }
+
+    while !(p.at(EOF) || (expect_end && p.eat(T![endpackage]))) {
+        item_or_stmt_bsv(p, None);
+    }
+
+    if !p.at(EOF) && !p.at(T![package]) {
+        p.error("Package ended but is followed by a non-package statement.");
+    }
+
+    m.complete(p, PACKAGE);
 }
 
 // test mod_contents

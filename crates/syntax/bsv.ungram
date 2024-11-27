@@ -26,7 +26,8 @@ Import =
   'import' NameRef '::' '*' ';'
 
 Package =
-  'package' Name ';'
+  Item_bsv*
+| 'package' Name ';' Item_bsv* 'endpackage'
 
 // TODO Extract out the cyclops symbols. Need to fiddle with macros to get it to work.
 Attr_bsv =
@@ -36,6 +37,14 @@ AttrMeta_bsv =
   key:NameRef ('=' value:Literal)?
 
 // TODO BSV Marry all top level items
+SourceFile_bsv =
+  Package*  // Usually there's only one.
+
+Item_bsv =  // Item_bsv invisible in syntax tree; access members directly
+  Typedef_bsv
+| EnumDecl
+| Interface_bsv
+| Module_bsv
 
 Typedef_bsv =
   TypeSynonym

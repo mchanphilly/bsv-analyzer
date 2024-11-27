@@ -1569,7 +1569,13 @@ pub struct Package {
 impl ast::HasName for Package {}
 impl Package {
     #[inline]
+    pub fn item_bsvs(&self) -> AstChildren<Item_bsv> { support::children(&self.syntax) }
+    #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn endpackage_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endpackage])
+    }
     #[inline]
     pub fn package_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![package]) }
 }
@@ -2074,6 +2080,15 @@ impl ast::HasModuleItem for SourceFile {}
 impl SourceFile {
     #[inline]
     pub fn shebang_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![shebang]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SourceFile_bsv {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SourceFile_bsv {
+    #[inline]
+    pub fn packages(&self) -> AstChildren<Package> { support::children(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2756,6 +2771,14 @@ pub enum Item {
 }
 impl ast::HasAttrs for Item {}
 impl ast::HasDocComments for Item {}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Item_bsv {
+    EnumDecl(EnumDecl),
+    Interface_bsv(Interface_bsv),
+    Module_bsv(Module_bsv),
+    Typedef_bsv(Typedef_bsv),
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ModuleStmt {
@@ -4871,6 +4894,20 @@ impl AstNode for SourceFile {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
+impl AstNode for SourceFile_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == SOURCE_FILE_BSV }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
 impl AstNode for Static {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == STATIC }
@@ -6095,6 +6132,48 @@ impl AstNode for Item {
             Item::TypeAlias(it) => &it.syntax,
             Item::Union(it) => &it.syntax,
             Item::Use(it) => &it.syntax,
+        }
+    }
+}
+impl From<EnumDecl> for Item_bsv {
+    #[inline]
+    fn from(node: EnumDecl) -> Item_bsv { Item_bsv::EnumDecl(node) }
+}
+impl From<Interface_bsv> for Item_bsv {
+    #[inline]
+    fn from(node: Interface_bsv) -> Item_bsv { Item_bsv::Interface_bsv(node) }
+}
+impl From<Module_bsv> for Item_bsv {
+    #[inline]
+    fn from(node: Module_bsv) -> Item_bsv { Item_bsv::Module_bsv(node) }
+}
+impl From<Typedef_bsv> for Item_bsv {
+    #[inline]
+    fn from(node: Typedef_bsv) -> Item_bsv { Item_bsv::Typedef_bsv(node) }
+}
+impl AstNode for Item_bsv {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, ENUM_DECL | INTERFACE_BSV | MODULE_BSV | TYPEDEF_BSV)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            ENUM_DECL => Item_bsv::EnumDecl(EnumDecl { syntax }),
+            INTERFACE_BSV => Item_bsv::Interface_bsv(Interface_bsv { syntax }),
+            MODULE_BSV => Item_bsv::Module_bsv(Module_bsv { syntax }),
+            TYPEDEF_BSV => Item_bsv::Typedef_bsv(Typedef_bsv { syntax }),
+            _ => return None,
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Item_bsv::EnumDecl(it) => &it.syntax,
+            Item_bsv::Interface_bsv(it) => &it.syntax,
+            Item_bsv::Module_bsv(it) => &it.syntax,
+            Item_bsv::Typedef_bsv(it) => &it.syntax,
         }
     }
 }
@@ -7458,6 +7537,11 @@ impl std::fmt::Display for Item {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
+impl std::fmt::Display for Item_bsv {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
 impl std::fmt::Display for ModuleStmt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -8189,6 +8273,11 @@ impl std::fmt::Display for SliceType {
     }
 }
 impl std::fmt::Display for SourceFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for SourceFile_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
