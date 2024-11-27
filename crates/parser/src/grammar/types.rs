@@ -46,8 +46,10 @@ pub(crate) fn type_bsv(p: &mut Parser<'_>) {
     // Reg#(Bit#(4))
     // Action
     // ActionValue#(Bit#(4))
+    // FloatingPoint::RoundMode
     if !p.eat(INT_NUMBER) && !p.eat(T![Action]){
         if !p.eat(T![ActionValue]) {
+            // TODO BSV: Fold into paths or otherwise support qualified expressions.
             name_ref(p);
         }
         if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
