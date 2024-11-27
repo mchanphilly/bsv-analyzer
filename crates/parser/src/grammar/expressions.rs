@@ -199,7 +199,10 @@ pub(super) fn function_signature(p: &mut Parser<'_>) {
 pub(super) fn module_inst(p: &mut Parser<'_>) {
     let m = p.start();
     typed_var_bsv(p);
-    p.expect(T![<-]);
+
+    if !(p.eat(T![<-]) || p.eat(T![=])) {
+        p.err_and_bump("Expected a `<=` or `=` operator");
+    }
     module_call_bsv(p);
     p.expect(T![;]);
     m.complete(p, MODULE_INST);

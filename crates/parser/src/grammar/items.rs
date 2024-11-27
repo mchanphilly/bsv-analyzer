@@ -49,6 +49,11 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![pub],
     T![crate],
     T![import],
+    T![module],
+    T![interface],
+    T![rule],
+    T![function],
+    T![typedef],
     T![macro],
     T![;],
 ]);
@@ -296,6 +301,7 @@ pub(super) fn module_stmt(p: &mut Parser<'_>) {
     let m = p.start();
     attributes::outer_attrs_bsv(p);
 
+    // TODO BSV: Consider folding in the other cases as expressions, or eliminating this altogether.
     match p.current() {
         T![rule] => rule(p),
         T![method] => method_impl(p),
