@@ -2,7 +2,7 @@
 //! metadata` or `rust-project.json`) into representation stored in the salsa
 //! database -- `CrateGraph`.
 
-use std::{collections::VecDeque, fmt, fs, iter, sync};
+use std::{collections::{HashMap, VecDeque}, fmt, fs, iter, sync};
 
 use anyhow::Context;
 use base_db::{
@@ -222,7 +222,7 @@ impl ProjectWorkspace {
                 ProjectWorkspace::load_detached_file(rust_file, config)?
             }
             ProjectManifest::BluespecFile(file) => {
-                ProjectWorkspace::load_detached_file(file, config)?
+                ProjectWorkspace::load_detached_bsv(file, config)?
             }
             ProjectManifest::CargoToml(cargo_toml) => {
                 let sysroot = match (&config.sysroot, &config.sysroot_src) {
@@ -388,6 +388,53 @@ impl ProjectWorkspace {
             target_layout: data_layout.map(Arc::from).map_err(|it| Arc::from(it.to_string())),
             cfg_overrides: cfg_overrides.clone(),
         }
+    }
+
+    pub fn load_detached_bsv(
+        detached_file: &ManifestPath,
+        config: &CargoConfig,
+    ) -> anyhow::Result<ProjectWorkspace> {
+        let sysroot = Sysroot::empty();
+
+        // let sysroot = match &config.sysroot {
+        //     Some(RustLibSource::Path(path)) => Sysroot::discover_sysroot_src_dir(path.clone()),
+        //     Some(RustLibSource::Discover) => Sysroot::discover(dir, &config.extra_env),
+        //     None => Sysroot::empty(),
+        // };
+
+        let toolchain = None;
+        // TODO BSV special casing
+        // let toolchain =
+        //     match get_toolchain_version(dir, &sysroot, Tool::Rustc, &config.extra_env, "rustc ") {
+        //         Ok(it) => it,
+        //         Err(e) => {
+        //             tracing::error!("{e}");
+        //             None
+        //         }
+        //     };
+
+        let rustc_cfg = vec!();
+
+        // let rustc_cfg = rustc_cfg::get(None, &config.extra_env, RustcCfgConfig::Rustc(&sysroot));
+        let data_layout = target_data_layout::get(
+            RustcDataLayoutConfig::Rustc(&sysroot),
+            None,
+            &config.extra_env,
+        );
+
+        Ok(ProjectWorkspace {
+            kind: ProjectWorkspaceKind::DetachedFile {
+                file: detached_file.to_owned(),
+                cargo: None,
+                cargo_config_extra_env: HashMap::default(),
+                set_test: false,
+            },
+            sysroot,
+            rustc_cfg,
+            toolchain,
+            target_layout: data_layout.map(Arc::from).map_err(|it| Arc::from(it.to_string())),
+            cfg_overrides: config.cfg_overrides.clone(),
+        })
     }
 
     pub fn load_detached_file(
