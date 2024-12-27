@@ -291,7 +291,7 @@ impl GlobalState {
         let mut modified_ratoml_files: FxHashMap<FileId, (ChangeKind, vfs::VfsPath)> =
             FxHashMap::default();
 
-        let (change, modified_rust_files, workspace_structure_change) = {
+        let (change, modified_bsv_files, workspace_structure_change) = {
             let mut change = ChangeWithProcMacros::new();
             let mut guard = self.vfs.write();
             let changed_files = guard.0.take_changes();
@@ -307,7 +307,7 @@ impl GlobalState {
             // A file was added or deleted
             let mut has_structure_changes = false;
             let mut bytes = vec![];
-            let mut modified_rust_files = vec![];
+            let mut modified_bsv_files = vec![];
             for file in changed_files.into_values() {
                 let vfs_path = vfs.file_path(file.file_id);
                 if let Some(("bsv_analyzer", Some("toml"))) = vfs_path.name_and_extension() {
@@ -318,8 +318,9 @@ impl GlobalState {
                 if let Some(path) = vfs_path.as_path() {
                     has_structure_changes |= file.is_created_or_deleted();
 
-                    if file.is_modified() && path.extension() == Some("rs") {
-                        modified_rust_files.push(file.file_id);
+                    let correct_exts = path.extension() == Some("bsv") || path.extension() == Some("ms");
+                    if file.is_modified() && correct_exts {
+                        modified_bsv_files.push(file.file_id);
                     }
 
                     let additional_files = self
@@ -379,7 +380,7 @@ impl GlobalState {
                 let roots = self.source_root_config.partition(vfs);
                 change.set_roots(roots);
             }
-            (change, modified_rust_files, workspace_structure_change)
+            (change, modified_bsv_files, workspace_structure_change)
         };
 
         let _p = span!(Level::INFO, "GlobalState::process_changes/apply_change").entered();
@@ -477,7 +478,7 @@ impl GlobalState {
                 _ = self
                     .deferred_task_queue
                     .sender
-                    .send(crate::main_loop::QueuedTask::CheckProcMacroSources(modified_rust_files));
+                    .send(crate::main_loop::QueuedTask::CheckProcMacroSources(modified_bsv_files));
             }
             // FIXME: ideally we should only trigger a workspace fetch for non-library changes
             // but something's going wrong with the source root business when we add a new local
