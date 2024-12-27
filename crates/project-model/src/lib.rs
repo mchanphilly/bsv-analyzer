@@ -66,25 +66,24 @@ pub enum ProjectManifest {
     ProjectJson(ManifestPath),
     CargoToml(ManifestPath),
     CargoScript(ManifestPath),
+    BluespecFile(ManifestPath),
 }
 
 impl ProjectManifest {
     pub fn from_manifest_file(path: AbsPathBuf) -> anyhow::Result<ProjectManifest> {
         let path = ManifestPath::try_from(path)
             .map_err(|path| format_err!("bad manifest path: {path}"))?;
-        if path.file_name().unwrap_or_default() == "rust-project.json" {
-            return Ok(ProjectManifest::ProjectJson(path));
+
+        // if path.file_name().unwrap_or_default() == ".rust-project.json" {
+        //     return Ok(ProjectManifest::ProjectJson(path));
+        // }
+
+        // TODO BSV, we may instead seek a config file (e.g., a toml or json) to describe projects later
+        if path.extension().unwrap_or_default() == "bsv" ||
+            path.extension().unwrap_or_default() == "ms" {
+            return Ok(ProjectManifest::BluespecFile(path));
         }
-        if path.file_name().unwrap_or_default() == ".rust-project.json" {
-            return Ok(ProjectManifest::ProjectJson(path));
-        }
-        if path.file_name().unwrap_or_default() == "Cargo.toml" {
-            return Ok(ProjectManifest::CargoToml(path));
-        }
-        if path.extension().unwrap_or_default() == "rs" {
-            return Ok(ProjectManifest::CargoScript(path));
-        }
-        bail!("project root must point to a Cargo.toml, rust-project.json or <script>.rs file: {path}");
+        bail!("project root must point to a .bsv or .ms file: {path}");
     }
 
     pub fn discover_single(path: &AbsPath) -> anyhow::Result<ProjectManifest> {
@@ -101,50 +100,67 @@ impl ProjectManifest {
     }
 
     pub fn discover(path: &AbsPath) -> io::Result<Vec<ProjectManifest>> {
-        if let Some(project_json) = find_in_parent_dirs(path, "rust-project.json") {
-            return Ok(vec![ProjectManifest::ProjectJson(project_json)]);
+        // TODO BSV add in a way to connect things together.
+        // if let Some(project_json) = find_in_parent_dirs(path, "rust-project.json") {
+        //     return Ok(vec![ProjectManifest::ProjectJson(project_json)]);
+        // }
+        let target_exts = &["bsv", "ms"];
+        if let Some(bluespec_file) = find_exts_in_parent_dirs(path, target_exts) {
+            return Ok(vec![ProjectManifest::BluespecFile(bluespec_file)]);
         }
-        if let Some(project_json) = find_in_parent_dirs(path, ".rust-project.json") {
-            return Ok(vec![ProjectManifest::ProjectJson(project_json)]);
-        }
-        return find_cargo_toml(path)
-            .map(|paths| paths.into_iter().map(ProjectManifest::CargoToml).collect());
 
-        fn find_cargo_toml(path: &AbsPath) -> io::Result<Vec<ManifestPath>> {
-            match find_in_parent_dirs(path, "Cargo.toml") {
+        // // Performs a traversal of the file system from the workspace root provided by LS client on launch
+        // // or maybe other times too, e.g., if we add a dependency.
+        return find_exts(path, target_exts)
+            .map(|paths| paths.into_iter().map(ProjectManifest::BluespecFile).collect());
+        // return find_cargo_toml(path)
+        //     .map(|paths| paths.into_iter().map(ProjectManifest::CargoToml).collect());
+
+        fn find_exts(path: &AbsPath, target_exts: &[&str]) -> io::Result<Vec<ManifestPath>> {
+            match find_exts_in_parent_dirs(path, target_exts) {
                 Some(it) => Ok(vec![it]),
-                None => Ok(find_cargo_toml_in_child_dir(read_dir(path)?)),
+                None => Ok(find_exts_in_child_dir(read_dir(path)?, target_exts)),
             }
         }
 
-        fn find_in_parent_dirs(path: &AbsPath, target_file_name: &str) -> Option<ManifestPath> {
-            if path.file_name().unwrap_or_default() == target_file_name {
-                if let Ok(manifest) = ManifestPath::try_from(path.to_path_buf()) {
-                    return Some(manifest);
-                }
-            }
+        // Note that this will latch onto the first BSV file discovered, so removed until we figure a
+        // project file format. TODO BSV
+        fn find_exts_in_parent_dirs(path: &AbsPath, target_exts: &[&str]) -> Option<ManifestPath> {
+            // let ext = path.extension().unwrap_or_default();
 
-            let mut curr = Some(path);
+            // // The path itself
+            // if target_exts.contains(&ext) {
+            //     if let Ok(manifest) = ManifestPath::try_from(path.to_path_buf()) {
+            //         return Some(manifest);
+            //     }
+            // }
 
-            while let Some(path) = curr {
-                let candidate = path.join(target_file_name);
-                if fs::metadata(&candidate).is_ok() {
-                    if let Ok(manifest) = ManifestPath::try_from(candidate) {
-                        return Some(manifest);
-                    }
-                }
-                curr = path.parent();
-            }
+            // let mut curr = Some(path);
+            // // If the path is to a directory
+            // while let Some(path) = curr {
+            //     let candidate = path.join(target_file_name);
+            //     if fs::metadata(&candidate).is_ok() {
+            //         if let Ok(manifest) = ManifestPath::try_from(candidate) {
+            //             return Some(manifest);
+            //         }
+            //     }
+            //     curr = path.parent();
+            // }
 
             None
         }
 
-        fn find_cargo_toml_in_child_dir(entities: ReadDir) -> Vec<ManifestPath> {
+        fn find_exts_in_child_dir(entities: ReadDir, target_exts: &[&str]) -> Vec<ManifestPath> {
             // Only one level down to avoid cycles the easy way and stop a runaway scan with large projects
             entities
                 .filter_map(Result::ok)
-                .map(|it| it.path().join("Cargo.toml"))
-                .filter(|it| it.exists())
+                .map(|it| it.path())
+                .filter(|path| {
+                    path.extension()
+                        .and_then(|ext| ext.to_str())
+                        .map(|ext| target_exts.contains(&ext))
+                        .unwrap_or(false)
+                })
                 .map(Utf8PathBuf::from_path_buf)
                 .filter_map(Result::ok)
                 .map(AbsPathBuf::try_from)
@@ -170,7 +186,8 @@ impl ProjectManifest {
         match self {
             ProjectManifest::ProjectJson(it)
             | ProjectManifest::CargoToml(it)
-            | ProjectManifest::CargoScript(it) => it,
+            | ProjectManifest::CargoScript(it)
+            | ProjectManifest::BluespecFile(it) => it,
         }
     }
 }

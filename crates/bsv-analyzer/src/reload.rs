@@ -283,21 +283,22 @@ impl GlobalState {
 
                 sender.send(Task::FetchWorkspace(ProjectWorkspaceProgress::Begin)).unwrap();
 
-                if let (Some(_command), Some(path)) = (&discover_command, &path) {
-                    let build = linked_projects.iter().find_map(|project| match project {
-                        LinkedProject::InlineJsonProject(it) => it.crate_by_buildfile(path),
-                        _ => None,
-                    });
+                // We don't typically have inline json projects, so we can ignore this body.
+                // if let (Some(_command), Some(path)) = (&discover_command, &path) {
+                //     let build = linked_projects.iter().find_map(|project| match project {
+                //         LinkedProject::InlineJsonProject(it) => it.crate_by_buildfile(path),
+                //         _ => None,
+                //     });
 
-                    if let Some(build) = build {
-                        if is_quiescent {
-                            let path = AbsPathBuf::try_from(build.build_file)
-                                .expect("Unable to convert to an AbsPath");
-                            let arg = DiscoverProjectParam::Buildfile(path);
-                            sender.send(Task::DiscoverLinkedProjects(arg)).unwrap();
-                        }
-                    }
-                }
+                //     if let Some(build) = build {
+                //         if is_quiescent {
+                //             let path = AbsPathBuf::try_from(build.build_file)
+                //                 .expect("Unable to convert to an AbsPath");
+                //             let arg = DiscoverProjectParam::Buildfile(path);
+                //             sender.send(Task::DiscoverLinkedProjects(arg)).unwrap();
+                //         }
+                //     }
+                // }
 
                 let mut workspaces = linked_projects
                     .iter()
@@ -744,30 +745,29 @@ impl GlobalState {
 
     // TODO BSV
     pub(super) fn fetch_workspace_error(&self) -> Result<(), String> {
-        // let mut buf = String::new();
+        let mut buf = String::new();
 
-        // let Some(FetchWorkspaceResponse { workspaces, .. }) =
-        //     self.fetch_workspaces_queue.last_op_result()
-        // else {
-        //     return Ok(());
-        // };
+        let Some(FetchWorkspaceResponse { workspaces, .. }) =
+            self.fetch_workspaces_queue.last_op_result()
+        else {
+            return Ok(());
+        };
 
-        return Ok(());
-        // if workspaces.is_empty() && self.config.discover_workspace_config().is_none() {
-        //     stdx::format_to!(buf, "bsv-analyzer failed to fetch workspace");
-        // } else {
-        //     for ws in workspaces {
-        //         if let Err(err) = ws {
-        //             stdx::format_to!(buf, "bsv-analyzer failed to load workspace: {:#}\n", err);
-        //         }
-        //     }
-        // }
+        if workspaces.is_empty() && self.config.discover_workspace_config().is_none() {
+            stdx::format_to!(buf, "bsv-analyzer failed to fetch workspace");
+        } else {
+            for ws in workspaces {
+                if let Err(err) = ws {
+                    stdx::format_to!(buf, "bsv-analyzer failed to load workspace: {:#}\n", err);
+                }
+            }
+        }
 
-        // if buf.is_empty() {
-        //     return Ok(());
-        // }
+        if buf.is_empty() {
+            return Ok(());
+        }
 
-        // Err(buf)
+        Err(buf)
     }
 
     pub(super) fn fetch_build_data_error(&self) -> Result<(), String> {

@@ -221,6 +221,9 @@ impl ProjectWorkspace {
             ProjectManifest::CargoScript(rust_file) => {
                 ProjectWorkspace::load_detached_file(rust_file, config)?
             }
+            ProjectManifest::BluespecFile(file) => {
+                ProjectWorkspace::load_detached_file(file, config)?
+            }
             ProjectManifest::CargoToml(cargo_toml) => {
                 let sysroot = match (&config.sysroot, &config.sysroot_src) {
                     (Some(RustLibSource::Discover), None) => {
@@ -398,6 +401,7 @@ impl ProjectWorkspace {
             None => Sysroot::empty(),
         };
 
+        // TODO BSV special casing
         let toolchain =
             match get_toolchain_version(dir, &sysroot, Tool::Rustc, &config.extra_env, "rustc ") {
                 Ok(it) => it,

@@ -388,15 +388,16 @@ impl GlobalState {
                 // self.handle_cargo_test_msg(message);
                 // // Coalesce many test result event into a single loop turn
                 // while let Ok(message) = self.test_run_receiver.try_recv() {
-                //     self.handle_cargo_test_msg(message);
-                // }
-            }
+                    //     self.handle_cargo_test_msg(message);
+                    // }
+                }
             Event::DiscoverProject(message) => {
-                // self.handle_discover_msg(message);
-                // // Coalesce many project discovery events into a single loop turn.
-                // while let Ok(message) = self.discover_receiver.try_recv() {
-                //     self.handle_discover_msg(message);
-                // }
+                let _p = tracing::info_span!("GlobalState::handle_event/handle_discover_msg").entered();
+                self.handle_discover_msg(message);
+                // Coalesce many project discovery events into a single loop turn.
+                while let Ok(message) = self.discover_receiver.try_recv() {
+                    self.handle_discover_msg(message);
+                }
             }
         }
         let event_handling_duration = loop_start.elapsed();
@@ -463,23 +464,23 @@ impl GlobalState {
         //     }
         // }
 
-        // if self.config.cargo_autoreload_config(None)
-        //     || self.config.discover_workspace_config().is_some()
-        // {
-        //     if let Some((cause, FetchWorkspaceRequest { path, force_crate_graph_reload })) =
-        //         self.fetch_workspaces_queue.should_start_op()
-        //     {
-        //         self.fetch_workspaces(cause, path, force_crate_graph_reload);
-        //     }
-        // }
+        if self.config.cargo_autoreload_config(None)
+            || self.config.discover_workspace_config().is_some()
+        {
+            if let Some((cause, FetchWorkspaceRequest { path, force_crate_graph_reload })) =
+                self.fetch_workspaces_queue.should_start_op()
+            {
+                self.fetch_workspaces(cause, path, force_crate_graph_reload);
+            }
+        }
 
-        // if !self.fetch_workspaces_queue.op_in_progress() {
-        //     if let Some((cause, ())) = self.fetch_build_data_queue.should_start_op() {
-        //         self.fetch_build_data(cause);
-        //     } else if let Some((cause, paths)) = self.fetch_proc_macros_queue.should_start_op() {
-        //         self.fetch_proc_macros(cause, paths);
-        //     }
-        // }
+        if !self.fetch_workspaces_queue.op_in_progress() {
+            if let Some((cause, ())) = self.fetch_build_data_queue.should_start_op() {
+                self.fetch_build_data(cause);
+            } else if let Some((cause, paths)) = self.fetch_proc_macros_queue.should_start_op() {
+                self.fetch_proc_macros(cause, paths);
+            }
+        }
 
         if let Some((cause, ())) = self.prime_caches_queue.should_start_op() {
             self.prime_caches(cause);
@@ -889,34 +890,34 @@ impl GlobalState {
         }
     }
 
-    // fn handle_discover_msg(&mut self, message: DiscoverProjectMessage) {
-    //     let title = self
-    //         .config
-    //         .discover_workspace_config()
-    //         .map(|cfg| cfg.progress_label.clone())
-    //         .expect("No title could be found; this is a bug");
-    //     match message {
-    //         DiscoverProjectMessage::Finished { project, buildfile } => {
-    //             self.discover_handle = None;
-    //             self.report_progress(&title, Progress::End, None, None, None);
-    //             self.discover_workspace_queue.op_completed(());
+    fn handle_discover_msg(&mut self, message: DiscoverProjectMessage) {
+        let title = self
+            .config
+            .discover_workspace_config()
+            .map(|cfg| cfg.progress_label.clone())
+            .expect("No title could be found; this is a bug");
+        match message {
+            DiscoverProjectMessage::Finished { project, buildfile } => {
+                self.discover_handle = None;
+                self.report_progress(&title, Progress::End, None, None, None);
+                self.discover_workspace_queue.op_completed(());
 
-    //             let mut config = Config::clone(&*self.config);
-    //             config.add_discovered_project_from_command(project, buildfile);
-    //             self.update_configuration(config);
-    //         }
-    //         DiscoverProjectMessage::Progress { message } => {
-    //             self.report_progress(&title, Progress::Report, Some(message), None, None)
-    //         }
-    //         DiscoverProjectMessage::Error { error, source } => {
-    //             self.discover_handle = None;
-    //             let message = format!("Project discovery failed: {error}");
-    //             self.discover_workspace_queue.op_completed(());
-    //             self.show_and_log_error(message.clone(), source);
-    //             self.report_progress(&title, Progress::End, Some(message), None, None)
-    //         }
-    //     }
-    // }
+                let mut config = Config::clone(&*self.config);
+                config.add_discovered_project_from_command(project, buildfile);
+                self.update_configuration(config);
+            }
+            DiscoverProjectMessage::Progress { message } => {
+                self.report_progress(&title, Progress::Report, Some(message), None, None)
+            }
+            DiscoverProjectMessage::Error { error, source } => {
+                self.discover_handle = None;
+                let message = format!("Project discovery failed: {error}");
+                self.discover_workspace_queue.op_completed(());
+                self.show_and_log_error(message.clone(), source);
+                self.report_progress(&title, Progress::End, Some(message), None, None)
+            }
+        }
+    }
 
     // fn handle_cargo_test_msg(&mut self, message: CargoTestMessage) {
     //     match message {

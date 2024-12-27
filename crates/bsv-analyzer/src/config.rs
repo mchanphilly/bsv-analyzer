@@ -1692,39 +1692,39 @@ impl Config {
     }
 
     // TODO BSV
-    // fn discovered_projects(&self) -> Vec<ManifestOrProjectJson> {
-    //     let exclude_dirs: Vec<_> =
-    //         self.files_excludeDirs().iter().map(|p| self.root_path.join(p)).collect();
+    fn discovered_projects(&self) -> Vec<ManifestOrProjectJson> {
+        let exclude_dirs: Vec<_> =
+            self.files_excludeDirs().iter().map(|p| self.root_path.join(p)).collect();
 
-    //     let mut projects = vec![];
-    //     for fs_proj in &self.discovered_projects_from_filesystem {
-    //         let manifest_path = fs_proj.manifest_path();
-    //         if exclude_dirs.iter().any(|p| manifest_path.starts_with(p)) {
-    //             continue;
-    //         }
+        let mut projects = vec![];
+        for fs_proj in &self.discovered_projects_from_filesystem {
+            let manifest_path = fs_proj.manifest_path();
+            if exclude_dirs.iter().any(|p| manifest_path.starts_with(p)) {
+                continue;
+            }
 
-    //         let buf: Utf8PathBuf = manifest_path.to_path_buf().into();
-    //         projects.push(ManifestOrProjectJson::Manifest(buf));
-    //     }
+            let buf: Utf8PathBuf = manifest_path.to_path_buf().into();
+            projects.push(ManifestOrProjectJson::Manifest(buf));
+        }
 
-    //     for dis_proj in &self.discovered_projects_from_command {
-    //         projects.push(ManifestOrProjectJson::DiscoveredProjectJson {
-    //             data: dis_proj.data.clone(),
-    //             buildfile: dis_proj.buildfile.clone(),
-    //         });
-    //     }
+        for dis_proj in &self.discovered_projects_from_command {
+            projects.push(ManifestOrProjectJson::DiscoveredProjectJson {
+                data: dis_proj.data.clone(),
+                buildfile: dis_proj.buildfile.clone(),
+            });
+        }
 
-    //     projects
-    // }
+        projects
+    }
 
     pub fn linked_or_discovered_projects(&self) -> Vec<LinkedProject> {
-        // let linked_projects = self.linkedProjects();
-        // let projects = if linked_projects.is_empty() {
-        //     self.discovered_projects()
-        // } else {
-        //     linked_projects.clone()
-        // };
-        let projects = vec![];
+        // General case is no linked projects, and we must discover them.
+        let linked_projects = self.linkedProjects();
+        let projects = if linked_projects.is_empty() {
+            self.discovered_projects()
+        } else {
+            linked_projects.clone()
+        };
 
         projects
             .iter()
