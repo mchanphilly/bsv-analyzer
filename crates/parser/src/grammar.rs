@@ -297,6 +297,16 @@ fn opt_ret_type(p: &mut Parser<'_>) -> bool {
     }
 }
 
+fn name_ref_r(p: &mut Parser<'_>, recovery: TokenSet) {
+    if p.at(IDENT) {
+        let m = p.start();
+        p.bump(IDENT);
+        m.complete(p, NAME_REF);
+    } else {
+        p.err_recover("expected a name ref", recovery);
+    }
+}
+
 fn name_r(p: &mut Parser<'_>, recovery: TokenSet) {
     if p.at(IDENT) {
         let m = p.start();

@@ -894,6 +894,12 @@ impl GenericParamList {
     #[inline]
     pub fn generic_params(&self) -> AstChildren<GenericParam> { support::children(&self.syntax) }
     #[inline]
+    pub fn pound_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![#]) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
     pub fn l_angle_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![<]) }
     #[inline]
     pub fn r_angle_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![>]) }
@@ -1037,6 +1043,33 @@ impl Instantiation {
     pub fn typed_var(&self) -> Option<TypedVar> { support::child(&self.syntax) }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Interface {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasAttrs for Interface {}
+impl ast::HasGenericParams for Interface {}
+impl ast::HasName for Interface {}
+impl ast::HasVisibility for Interface {}
+impl Interface {
+    #[inline]
+    pub fn assoc_item_list(&self) -> Option<AssocItemList> { support::child(&self.syntax) }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn endinterface_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endinterface])
+    }
+    #[inline]
+    pub fn interface_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![interface])
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2389,6 +2422,10 @@ impl TypeParam {
     pub fn default_type(&self) -> Option<Type> { support::child(&self.syntax) }
     #[inline]
     pub fn eq_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![=]) }
+    #[inline]
+    pub fn numeric_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![numeric]) }
+    #[inline]
+    pub fn type_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![type]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2757,6 +2794,7 @@ pub enum Item {
     ExternCrate(ExternCrate),
     Fn(Fn),
     Impl(Impl),
+    Interface(Interface),
     MacroCall(MacroCall),
     MacroDef(MacroDef),
     MacroRules(MacroRules),
@@ -2770,7 +2808,6 @@ pub enum Item {
     Use(Use),
 }
 impl ast::HasAttrs for Item {}
-impl ast::HasDocComments for Item {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item_bsv {
@@ -3819,6 +3856,20 @@ impl AstNode for InferType {
 impl AstNode for Instantiation {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == INSTANTIATION }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Interface {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == INTERFACE }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6020,6 +6071,10 @@ impl From<Impl> for Item {
     #[inline]
     fn from(node: Impl) -> Item { Item::Impl(node) }
 }
+impl From<Interface> for Item {
+    #[inline]
+    fn from(node: Interface) -> Item { Item::Interface(node) }
+}
 impl From<MacroCall> for Item {
     #[inline]
     fn from(node: MacroCall) -> Item { Item::MacroCall(node) }
@@ -6075,6 +6130,7 @@ impl AstNode for Item {
                 | EXTERN_CRATE
                 | FN
                 | IMPL
+                | INTERFACE
                 | MACRO_CALL
                 | MACRO_DEF
                 | MACRO_RULES
@@ -6097,6 +6153,7 @@ impl AstNode for Item {
             EXTERN_CRATE => Item::ExternCrate(ExternCrate { syntax }),
             FN => Item::Fn(Fn { syntax }),
             IMPL => Item::Impl(Impl { syntax }),
+            INTERFACE => Item::Interface(Interface { syntax }),
             MACRO_CALL => Item::MacroCall(MacroCall { syntax }),
             MACRO_DEF => Item::MacroDef(MacroDef { syntax }),
             MACRO_RULES => Item::MacroRules(MacroRules { syntax }),
@@ -6121,6 +6178,7 @@ impl AstNode for Item {
             Item::ExternCrate(it) => &it.syntax,
             Item::Fn(it) => &it.syntax,
             Item::Impl(it) => &it.syntax,
+            Item::Interface(it) => &it.syntax,
             Item::MacroCall(it) => &it.syntax,
             Item::MacroDef(it) => &it.syntax,
             Item::MacroRules(it) => &it.syntax,
@@ -6548,6 +6606,7 @@ impl AstNode for AnyHasAttrs {
                 | IF_EXPR
                 | IMPL
                 | INDEX_EXPR
+                | INTERFACE
                 | ITEM_LIST
                 | LET_EXPR
                 | LET_STMT
@@ -6706,6 +6765,10 @@ impl From<Impl> for AnyHasAttrs {
 impl From<IndexExpr> for AnyHasAttrs {
     #[inline]
     fn from(node: IndexExpr) -> AnyHasAttrs { AnyHasAttrs { syntax: node.syntax } }
+}
+impl From<Interface> for AnyHasAttrs {
+    #[inline]
+    fn from(node: Interface) -> AnyHasAttrs { AnyHasAttrs { syntax: node.syntax } }
 }
 impl From<ItemList> for AnyHasAttrs {
     #[inline]
@@ -7055,7 +7118,10 @@ impl AnyHasGenericParams {
 impl AstNode for AnyHasGenericParams {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, ENUM | FN | IMPL | STRUCT | TRAIT | TRAIT_ALIAS | TYPE_ALIAS | UNION)
+        matches!(
+            kind,
+            ENUM | FN | IMPL | INTERFACE | STRUCT | TRAIT | TRAIT_ALIAS | TYPE_ALIAS | UNION
+        )
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -7075,6 +7141,10 @@ impl From<Fn> for AnyHasGenericParams {
 impl From<Impl> for AnyHasGenericParams {
     #[inline]
     fn from(node: Impl) -> AnyHasGenericParams { AnyHasGenericParams { syntax: node.syntax } }
+}
+impl From<Interface> for AnyHasGenericParams {
+    #[inline]
+    fn from(node: Interface) -> AnyHasGenericParams { AnyHasGenericParams { syntax: node.syntax } }
 }
 impl From<Struct> for AnyHasGenericParams {
     #[inline]
@@ -7172,6 +7242,7 @@ impl AstNode for AnyHasName {
                 | FORMAT_ARGS_ARG
                 | FUNCTION_SIGNATURE
                 | IDENT_PAT
+                | INTERFACE
                 | INTERFACE_BSV
                 | MACRO_DEF
                 | MACRO_RULES
@@ -7239,6 +7310,10 @@ impl From<FunctionSignature> for AnyHasName {
 impl From<IdentPat> for AnyHasName {
     #[inline]
     fn from(node: IdentPat) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<Interface> for AnyHasName {
+    #[inline]
+    fn from(node: Interface) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<Interface_bsv> for AnyHasName {
     #[inline]
@@ -7393,6 +7468,7 @@ impl AstNode for AnyHasVisibility {
                 | EXTERN_CRATE
                 | FN
                 | IMPL
+                | INTERFACE
                 | MACRO_DEF
                 | MACRO_RULES
                 | MODULE
@@ -7434,6 +7510,10 @@ impl From<Fn> for AnyHasVisibility {
 impl From<Impl> for AnyHasVisibility {
     #[inline]
     fn from(node: Impl) -> AnyHasVisibility { AnyHasVisibility { syntax: node.syntax } }
+}
+impl From<Interface> for AnyHasVisibility {
+    #[inline]
+    fn from(node: Interface) -> AnyHasVisibility { AnyHasVisibility { syntax: node.syntax } }
 }
 impl From<MacroDef> for AnyHasVisibility {
     #[inline]
@@ -7893,6 +7973,11 @@ impl std::fmt::Display for InferType {
     }
 }
 impl std::fmt::Display for Instantiation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Interface {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

@@ -6,6 +6,9 @@ pub(super) fn opt_generic_param_list(p: &mut Parser<'_>) {
     if p.at(T![<]) {
         generic_param_list(p);
     }
+    if p.at(T![#]) {
+        generic_param_list_bsv(p);
+    }
 }
 
 // test generic_param_list
@@ -35,10 +38,37 @@ fn generic_param_list(p: &mut Parser<'_>) {
     m.complete(p, GENERIC_PARAM_LIST);
 }
 
-const GENERIC_PARAM_FIRST: TokenSet = TokenSet::new(&[IDENT, LIFETIME_IDENT, T![const]]);
+// test_err generic_param_list_recover_bsv
+// interface Ifc#(type U,,type V)
+fn generic_param_list_bsv(p: &mut Parser<'_>) {
+    assert!(p.at(T![#]));
+    let m = p.start();
+    p.bump(T![#]);
+    delimited(
+        p,
+        T!['('],
+        T![')'],
+        T![,],
+        || "expected generic parameter".into(),
+        GENERIC_PARAM_FIRST.union(ATTRIBUTE_FIRST),
+        |p| {
+            // // test generic_param_attribute
+            // // fn foo<#[lt_attr] 'a, #[t_attr] T>() {}
+            let m = p.start();
+            generic_param(p, m)
+        },
+    );
+
+    m.complete(p, GENERIC_PARAM_LIST);
+}
+
+const GENERIC_PARAM_FIRST: TokenSet = TokenSet::new(&[
+    IDENT, LIFETIME_IDENT, T![const], T![numeric], T![type]
+]);
 
 fn generic_param(p: &mut Parser<'_>, m: Marker) -> bool {
     match p.current() {
+        T![numeric] | T![type] => type_param_bsv(p, m),
         LIFETIME_IDENT => lifetime_param(p, m),
         IDENT => type_param(p, m),
         T![const] => const_param(p, m),
@@ -60,6 +90,16 @@ fn lifetime_param(p: &mut Parser<'_>, m: Marker) {
         lifetime_bounds(p);
     }
     m.complete(p, LIFETIME_PARAM);
+}
+
+// test type_param_bsv
+// interface Ifc#(numeric type n, type t); endinterface
+fn type_param_bsv(p: &mut Parser<'_>, m: Marker) {
+    p.eat(T![numeric]);  // TODO do something with numeric
+    p.expect(T![type]);
+    name(p);
+
+    m.complete(p, TYPE_PARAM);
 }
 
 // test type_param

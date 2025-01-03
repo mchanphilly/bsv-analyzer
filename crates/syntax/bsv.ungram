@@ -267,6 +267,7 @@ ConstArg =
 
 GenericParamList =
   '<' (GenericParam (',' GenericParam)* ','?)? '>'
+| '#' '(' ( GenericParam (',' GenericParam)*)? ')'  // Sort of. It's polymorphism.
 
 GenericParam =
   ConstParam
@@ -276,6 +277,7 @@ GenericParam =
 TypeParam =
   Attr* Name (':' TypeBoundList?)?
   ('=' default_type:Type)?
+| 'numeric'? 'type' Name  // BSV
 
 ConstParam =
   Attr* 'const' Name ':' Type
@@ -333,6 +335,7 @@ Item =
 | ExternCrate
 | Fn
 | Impl
+| Interface
 // | Module_bsv  // Needs HasAttrs to put into Item
 | MacroCall
 | MacroRules
@@ -486,6 +489,13 @@ Static =
   'static' 'mut'? Name ':' Type
   ('=' body:Expr)? ';'
 
+// TODO_BSV clean (items require Attr, Vis, (Where, Generic))
+Interface =
+  Attr* Visibility? WhereClause?
+  'interface' Name GenericParamList? ';'
+  AssocItemList
+  'endinterface' (':' NameRef)?
+
 Trait =
   Attr* Visibility?
   'unsafe'? 'auto'?
@@ -498,6 +508,7 @@ TraitAlias =
 
 AssocItemList =
   '{' Attr* AssocItem* '}'
+| Attr* AssocItem*  // BSV: bounds in higher level.
 
 AssocItem =
   Const

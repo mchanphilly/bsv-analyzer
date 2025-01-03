@@ -115,6 +115,7 @@ register_ast_id_node! {
         ExternBlock,
         ExternCrate,
         Impl,
+        Interface,
         Macro,
             MacroDef,
             MacroRules,

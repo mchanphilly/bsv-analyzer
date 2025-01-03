@@ -1,5 +1,31 @@
 use super::*;
 
+// test interface_item
+// interface Ifc; endinterface : Ifc
+pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
+    p.bump(T![interface]);
+
+    // Interface name
+    name_r(p, ITEM_RECOVERY_SET);
+
+    // test interface_item_generic_params
+    // interface Ifc#(numeric type N, type T); endinterface;
+    generic_params::opt_generic_param_list(p);
+
+    if p.eat(T![;]) {
+        borderless_assoc_item_list(p, T![endinterface]);
+    } else {
+        p.error("expected `;`");
+    }
+
+    p.expect(T![endinterface]);
+    if p.eat(T![:]) {  // optional end tag
+        name_ref_r(p, ITEM_RECOVERY_SET);
+    }
+
+    m.complete(p, INTERFACE_BSV);
+}
+
 // test trait_item
 // trait T { fn new() -> Self; }
 pub(super) fn trait_(p: &mut Parser<'_>, m: Marker) {
@@ -76,31 +102,6 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
 // test module_item
 // module mkTop (Empty);
 // endmodule : mkTop
-pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
-    // std::env::set_var("RUST_BACKTRACE", "1");
-
-    // TODO BSV: Consider consuming the signature separately
-    p.bump(T![interface]);
-
-    // Interface name
-    name_r(p, ITEM_RECOVERY_SET);
-    p.expect(T![;]);
-
-    // TODO BSV: how do we make sure this doesn't eat file on bad inputs?
-    while !(p.at(EOF) || p.at(T![endinterface])) {
-        interface_stmt(p);  // TODO BSV open up to different kinds
-    }
-
-    p.expect(T![endinterface]);
-    if p.eat(T![:]) {  // optional end tag
-        name(p);
-    }
-    m.complete(p, INTERFACE_BSV);
-}
-
-// test module_item
-// module mkTop (Empty);
-// endmodule : mkTop
 pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
     // TODO BSV: Consider consuming the signature separately
     p.bump(T![module]);
@@ -126,6 +127,27 @@ pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
         name(p);
     }
     m.complete(p, MODULE_BSV);
+}
+
+// test borderless_assoc_item_list
+// interface F {
+//     method Action foo();
+// endinterface
+pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind) {
+    let m = p.start();
+
+    // // test borderless_assoc_item_list_inner_attrs
+    // // impl S { #![attr] }
+    // attributes::inner_attrs(p);
+
+    while !p.at(EOF) && !p.at(end) {
+        // if p.at(T!['{']) {  // TODO_BSV error resilience
+        //     error_block(p, "expected an item");
+        //     continue;
+        // }
+        item_or_macro(p, true);
+    }
+    m.complete(p, ASSOC_ITEM_LIST);
 }
 
 // test assoc_item_list
