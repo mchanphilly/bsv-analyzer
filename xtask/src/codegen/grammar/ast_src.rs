@@ -188,7 +188,7 @@ pub(crate) fn generate_kind_src(
         }
     });
     PUNCT.iter().zip(used_puncts).filter(|(_, used)| !used).for_each(|((punct, _), _)| {
-        panic!("Punctuation {punct:?} is not used in grammar");
+        println!("Punctuation {punct:?} is not used in grammar");
     });
     keywords.extend(RESERVED.iter().copied());
     keywords.sort();

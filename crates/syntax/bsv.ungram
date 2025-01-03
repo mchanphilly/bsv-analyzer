@@ -45,6 +45,7 @@ Item_bsv =  // Item_bsv invisible in syntax tree; access members directly
 | EnumDecl
 | Interface_bsv
 | Module_bsv
+// TODO expand into ordinary statements too
 
 Typedef_bsv =
   TypeSynonym
@@ -93,11 +94,11 @@ Param_bsv =
 // TODO BSV: can a module support more than one interface?
 // TODO BSV: Add ModuleParams?
 Module_bsv =
-  'module' Name '(' NameRef ')' ';'
+  'module' Name '(' interface:Path ')' ';'
   ModuleStmt*
   'endmodule' (':' Name)?
 
-ModuleStmt =
+ModuleStmt =  // Similar to Item
   Instantiation  // TODO BSV consider merging with generic actionvalue
 | Rule
 | MethodImpl

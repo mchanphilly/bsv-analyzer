@@ -1467,9 +1467,9 @@ pub struct Module_bsv {
 impl ast::HasName for Module_bsv {}
 impl Module_bsv {
     #[inline]
-    pub fn module_stmts(&self) -> AstChildren<ModuleStmt> { support::children(&self.syntax) }
+    pub fn interface(&self) -> Option<Path> { support::child(&self.syntax) }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    pub fn module_stmts(&self) -> AstChildren<ModuleStmt> { support::children(&self.syntax) }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     #[inline]
