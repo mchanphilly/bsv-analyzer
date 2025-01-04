@@ -74,9 +74,9 @@ impl ProjectManifest {
         let path = ManifestPath::try_from(path)
             .map_err(|path| format_err!("bad manifest path: {path}"))?;
 
-        // if path.file_name().unwrap_or_default() == ".rust-project.json" {
-        //     return Ok(ProjectManifest::ProjectJson(path));
-        // }
+        if path.file_name().unwrap_or_default() == ".rust-project.json" {
+            return Ok(ProjectManifest::ProjectJson(path));
+        }
 
         // TODO BSV, we may instead seek a config file (e.g., a toml or json) to describe projects later
         if path.extension().unwrap_or_default() == "bsv" ||

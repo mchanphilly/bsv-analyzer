@@ -202,16 +202,16 @@ impl Sysroot {
                     SysrootMode::Stitched(stitched) => stitched.by_name("core").is_some(),
                     SysrootMode::Empty => true,
                 };
-                if !has_core {
-                    let var_note = if env::var_os("RUST_SRC_PATH").is_some() {
-                        " (env var `RUST_SRC_PATH` is set and may be incorrect, try unsetting it)"
-                    } else {
-                        ", try running `rustup component add rust-src` to possibly fix this"
-                    };
-                    sysroot.error = Some(format!(
-                        "sysroot at `{src_root}` is missing a `core` library{var_note}",
-                    ));
-                }
+                // if !has_core {  // Not important for BSV
+                //     let var_note = if env::var_os("RUST_SRC_PATH").is_some() {
+                //         " (env var `RUST_SRC_PATH` is set and may be incorrect, try unsetting it)"
+                //     } else {
+                //         ", try running `rustup component add rust-src` to possibly fix this"
+                //     };
+                //     sysroot.error = Some(format!(
+                //         "sysroot at `{src_root}` is missing a `core` library{var_note}",
+                //     ));
+                // }
             }
         }
         sysroot
