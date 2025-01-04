@@ -38,7 +38,7 @@ pub fn server_capabilities(config: &Config) -> ServerCapabilities {
             will_save_wait_until: None,
             save: Some(SaveOptions::default().into()),
         })),
-        hover_provider: Some(HoverProviderCapability::Simple(false)),
+        hover_provider: Some(HoverProviderCapability::Simple(true)),
         completion_provider: Some(CompletionOptions {
             resolve_provider: config.caps().completions_resolve_provider(),
             trigger_characters: Some(vec![
@@ -56,10 +56,10 @@ pub fn server_capabilities(config: &Config) -> ServerCapabilities {
             retrigger_characters: None,
             work_done_progress_options: WorkDoneProgressOptions { work_done_progress: None },
         }),
-        declaration_provider: Some(DeclarationCapability::Simple(false)),
-        definition_provider: Some(OneOf::Left(false)),
-        type_definition_provider: Some(TypeDefinitionProviderCapability::Simple(false)),
-        implementation_provider: Some(ImplementationProviderCapability::Simple(false)),
+        declaration_provider: Some(DeclarationCapability::Simple(true)),
+        definition_provider: Some(OneOf::Left(true)),
+        type_definition_provider: Some(TypeDefinitionProviderCapability::Simple(true)),
+        implementation_provider: Some(ImplementationProviderCapability::Simple(true)),
         references_provider: Some(OneOf::Left(false)),
         document_highlight_provider: Some(OneOf::Left(false)),
         document_symbol_provider: Some(OneOf::Left(false)),

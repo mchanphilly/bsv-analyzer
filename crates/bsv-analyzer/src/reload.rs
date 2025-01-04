@@ -283,23 +283,22 @@ impl GlobalState {
 
                 sender.send(Task::FetchWorkspace(ProjectWorkspaceProgress::Begin)).unwrap();
 
-                // We don't typically have inline json projects, so we can ignore this body.
-                // if let (Some(_command), Some(path)) = (&discover_command, &path) {
-                //     let build = linked_projects.iter().find_map(|project| match project {
-                //         LinkedProject::InlineJsonProject(it) => it.crate_by_buildfile(path),
-                //         _ => None,
-                //     });
+                // Currently we do use na InlineJsonProject to take in our projects.
+                if let (Some(_command), Some(path)) = (&discover_command, &path) {
+                    let build = linked_projects.iter().find_map(|project| match project {
+                        LinkedProject::InlineJsonProject(it) => it.crate_by_buildfile(path),
+                        _ => None,
+                    });
 
-                //     if let Some(build) = build {
-                //         if is_quiescent {
-                //             let path = AbsPathBuf::try_from(build.build_file)
-                //                 .expect("Unable to convert to an AbsPath");
-                //             let arg = DiscoverProjectParam::Buildfile(path);
-                //             sender.send(Task::DiscoverLinkedProjects(arg)).unwrap();
-                //         }
-                //     }
-                // }
-
+                    if let Some(build) = build {
+                        if is_quiescent {
+                            let path = AbsPathBuf::try_from(build.build_file)
+                                .expect("Unable to convert to an AbsPath");
+                            let arg = DiscoverProjectParam::Buildfile(path);
+                            sender.send(Task::DiscoverLinkedProjects(arg)).unwrap();
+                        }
+                    }
+                }
                 let mut workspaces = linked_projects
                     .iter()
                     .map(|project| match project {

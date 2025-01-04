@@ -1089,10 +1089,10 @@ impl GlobalState {
             // .on::<RETRY, lsp_request::FoldingRangeRequest>(handlers::handle_folding_range)
             // .on::<NO_RETRY, lsp_request::SignatureHelpRequest>(handlers::handle_signature_help)
             // .on::<RETRY, lsp_request::WillRenameFiles>(handlers::handle_will_rename_files)
-            // .on::<NO_RETRY, lsp_request::GotoDefinition>(handlers::handle_goto_definition)  // TODO BSV
-            // .on::<NO_RETRY, lsp_request::GotoDeclaration>(handlers::handle_goto_declaration)
+            .on::<NO_RETRY, lsp_request::GotoDefinition>(handlers::handle_goto_definition)  // TODO BSV
+            .on::<NO_RETRY, lsp_request::GotoDeclaration>(handlers::handle_goto_declaration)
             // .on::<NO_RETRY, lsp_request::GotoImplementation>(handlers::handle_goto_implementation)
-            // .on::<NO_RETRY, lsp_request::GotoTypeDefinition>(handlers::handle_goto_type_definition)
+            .on::<NO_RETRY, lsp_request::GotoTypeDefinition>(handlers::handle_goto_type_definition)
             // .on::<NO_RETRY, lsp_request::InlayHintRequest>(handlers::handle_inlay_hints)
             // .on_identity::<NO_RETRY, lsp_request::InlayHintResolveRequest, _>(handlers::handle_inlay_hints_resolve)
             // .on::<NO_RETRY, lsp_request::CodeLensRequest>(handlers::handle_code_lens)
@@ -1124,7 +1124,7 @@ impl GlobalState {
             // .on::<NO_RETRY, lsp_ext::RelatedTests>(handlers::handle_related_tests)
             // .on::<NO_RETRY, lsp_ext::CodeActionRequest>(handlers::handle_code_action)
             // .on_identity::<RETRY, lsp_ext::CodeActionResolveRequest, _>(handlers::handle_code_action_resolve)
-            // .on::<NO_RETRY, lsp_ext::HoverRequest>(handlers::handle_hover)
+            .on::<NO_RETRY, lsp_ext::HoverRequest>(handlers::handle_hover)
             // .on::<NO_RETRY, lsp_ext::ExternalDocs>(handlers::handle_open_docs)
             // .on::<NO_RETRY, lsp_ext::OpenCargoToml>(handlers::handle_open_cargo_toml)
             // .on::<NO_RETRY, lsp_ext::MoveItem>(handlers::handle_move_item)

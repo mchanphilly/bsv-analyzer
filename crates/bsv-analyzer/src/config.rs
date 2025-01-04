@@ -101,16 +101,16 @@ config_data! {
         /// `#rust-analyzer.hover.actions.enable#` is set.
         hover_actions_debug_enable: bool           = false,
         /// Whether to show HoverActions in Rust files.
-        hover_actions_enable: bool          = false,
+        hover_actions_enable: bool          = true,
         /// Whether to show `Go to Type Definition` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
-        hover_actions_gotoTypeDef_enable: bool     = false,
+        hover_actions_gotoTypeDef_enable: bool     = true,
         /// Whether to show `Implementations` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
-        hover_actions_implementations_enable: bool = false,
+        hover_actions_implementations_enable: bool = true,
         /// Whether to show `References` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
-        hover_actions_references_enable: bool      = false,
+        hover_actions_references_enable: bool      = true,
         /// Whether to show `Run` action. Only applies when
         /// `#rust-analyzer.hover.actions.enable#` is set.
         hover_actions_run_enable: bool             = false,
@@ -497,7 +497,7 @@ config_data! {
         cargo_allTargets: bool           = false,
         /// Automatically refresh project info via `cargo metadata` on
         /// `Cargo.toml` or `.cargo/config.toml` changes.
-        cargo_autoreload: bool           = false,
+        cargo_autoreload: bool           = true,
         /// Run build scripts (`build.rs`) for more precise code analysis.
         cargo_buildScripts_enable: bool  = false,
         /// Specifies the invocation strategy to use when running the build scripts command.
@@ -1726,7 +1726,7 @@ impl Config {
             linked_projects.clone()
         };
 
-        projects
+        let res = projects
             .iter()
             .filter_map(|linked_project| match linked_project {
                 ManifestOrProjectJson::Manifest(it) => {
@@ -1745,7 +1745,9 @@ impl Config {
                     Some(ProjectJson::new(None, &self.root_path, it.clone()).into())
                 }
             })
-            .collect()
+            .collect();
+        // dbg!(&res);
+        res
     }
 
     pub fn prefill_caches(&self) -> bool {
