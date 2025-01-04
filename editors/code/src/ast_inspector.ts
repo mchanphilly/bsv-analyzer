@@ -38,7 +38,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
         ctx.pushExtCleanup(
             vscode.languages.registerHoverProvider({ scheme: "bsv-analyzer" }, this),
         );
-        ctx.pushExtCleanup(vscode.languages.registerDefinitionProvider({ language: "rust" }, this));
+        ctx.pushExtCleanup(vscode.languages.registerDefinitionProvider({ language: "bluespec" }, this));
         vscode.workspace.onDidCloseTextDocument(
             this.onDidCloseTextDocument,
             this,
@@ -146,7 +146,7 @@ export class AstInspector implements vscode.HoverProvider, vscode.DefinitionProv
         const rustSourceCode = this.BsvEditor.document.getText(rustFileRange);
         const astFileRange = this.findAstNodeRange(astFileLine);
 
-        return new vscode.Hover(["```rust\n" + rustSourceCode + "\n```"], astFileRange);
+        return new vscode.Hover(["```bluespec\n" + rustSourceCode + "\n```"], astFileRange);
     }
 
     private findAstNodeRange(astLine: vscode.TextLine): vscode.Range {
