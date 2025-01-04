@@ -23,7 +23,7 @@ pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
         name_ref_r(p, ITEM_RECOVERY_SET);
     }
 
-    m.complete(p, INTERFACE_BSV);
+    m.complete(p, TRAIT);
 }
 
 // test trait_item

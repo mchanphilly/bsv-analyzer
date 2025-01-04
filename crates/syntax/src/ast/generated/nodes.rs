@@ -2794,7 +2794,6 @@ pub enum Item {
     ExternCrate(ExternCrate),
     Fn(Fn),
     Impl(Impl),
-    Interface(Interface),
     MacroCall(MacroCall),
     MacroDef(MacroDef),
     MacroRules(MacroRules),
@@ -2808,6 +2807,7 @@ pub enum Item {
     Use(Use),
 }
 impl ast::HasAttrs for Item {}
+impl ast::HasDocComments for Item {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item_bsv {
@@ -6071,10 +6071,6 @@ impl From<Impl> for Item {
     #[inline]
     fn from(node: Impl) -> Item { Item::Impl(node) }
 }
-impl From<Interface> for Item {
-    #[inline]
-    fn from(node: Interface) -> Item { Item::Interface(node) }
-}
 impl From<MacroCall> for Item {
     #[inline]
     fn from(node: MacroCall) -> Item { Item::MacroCall(node) }
@@ -6130,7 +6126,6 @@ impl AstNode for Item {
                 | EXTERN_CRATE
                 | FN
                 | IMPL
-                | INTERFACE
                 | MACRO_CALL
                 | MACRO_DEF
                 | MACRO_RULES
@@ -6153,7 +6148,6 @@ impl AstNode for Item {
             EXTERN_CRATE => Item::ExternCrate(ExternCrate { syntax }),
             FN => Item::Fn(Fn { syntax }),
             IMPL => Item::Impl(Impl { syntax }),
-            INTERFACE => Item::Interface(Interface { syntax }),
             MACRO_CALL => Item::MacroCall(MacroCall { syntax }),
             MACRO_DEF => Item::MacroDef(MacroDef { syntax }),
             MACRO_RULES => Item::MacroRules(MacroRules { syntax }),
@@ -6178,7 +6172,6 @@ impl AstNode for Item {
             Item::ExternCrate(it) => &it.syntax,
             Item::Fn(it) => &it.syntax,
             Item::Impl(it) => &it.syntax,
-            Item::Interface(it) => &it.syntax,
             Item::MacroCall(it) => &it.syntax,
             Item::MacroDef(it) => &it.syntax,
             Item::MacroRules(it) => &it.syntax,

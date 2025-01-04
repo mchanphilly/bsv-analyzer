@@ -18,7 +18,7 @@ use super::*;
 // import FIFOF::*;
 // import BRAM   ::   *;
 pub(super) fn package_contents_bsv(p: &mut Parser<'_>) {
-    let m = p.start();
+    // let m = p.start();
 
     let expect_end = p.eat(T![package]);
     if expect_end {
@@ -34,7 +34,7 @@ pub(super) fn package_contents_bsv(p: &mut Parser<'_>) {
         p.error("Package ended but is followed by a non-package statement.");
     }
 
-    m.complete(p, PACKAGE);
+    // m.complete(p, PACKAGE);
 }
 
 // test mod_contents

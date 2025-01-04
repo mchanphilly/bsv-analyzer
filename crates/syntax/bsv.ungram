@@ -335,7 +335,7 @@ Item =
 | ExternCrate
 | Fn
 | Impl
-| Interface
+// | Interface
 // | Module_bsv  // Needs HasAttrs to put into Item
 | MacroCall
 | MacroRules
