@@ -144,7 +144,6 @@ impl<'a> Ctx<'a> {
             ast::Item::Module(ast) => self.lower_module(ast)?.into(),
             ast::Item::Trait(ast) => self.lower_trait(ast)?.into(),
             ast::Item::TraitAlias(ast) => self.lower_trait_alias(ast)?.into(),
-            ast::Item::Interface(ast) => self.lower_interface(ast)?.into(),
             ast::Item::Impl(ast) => self.lower_impl(ast)?.into(),
             ast::Item::Use(ast) => self.lower_use(ast)?.into(),
             ast::Item::ExternCrate(ast) => self.lower_extern_crate(ast)?.into(),
@@ -518,33 +517,6 @@ impl<'a> Ctx<'a> {
         let ast_id = self.source_ast_id_map.ast_id(module);
         let res = Mod { name, visibility, kind, ast_id };
         Some(id(self.data().mods.alloc(res)))
-    }
-
-    // TODO_BSV: Currently we're placing it in as a *trait*
-    fn lower_interface(&mut self, interface_def: &ast::Interface) -> Option<FileItemTreeId<Trait>> {
-        let trait_wrap = ast::Trait{syntax: interface_def.syntax().clone()};
-
-        let name = interface_def.name()?.as_name();
-        let visibility = self.lower_visibility(interface_def);
-        let ast_id = self.source_ast_id_map.ast_id(interface_def);
-        let is_auto = false;
-        let is_unsafe = false;
-
-        let items = interface_def
-            .assoc_item_list()
-            .into_iter()
-            .flat_map(|list| list.assoc_items())
-            .filter_map(|item_node| self.lower_assoc_item(&item_node))
-            .collect();
-
-        let generic_params =
-            self.lower_generic_params(HasImplicitSelf::Yes(None), interface_def);
-
-        // This is the peculiar part: We store it into the system as a trait.
-        let def = Trait { name, visibility, generic_params, is_auto, is_unsafe, items, ast_id };
-        let id = id(self.data().traits.alloc(def));
-        self.write_generic_params_attributes(id.into());
-        Some(id)
     }
 
     fn lower_trait(&mut self, trait_def: &ast::Trait) -> Option<FileItemTreeId<Trait>> {

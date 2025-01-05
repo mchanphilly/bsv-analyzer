@@ -349,8 +349,8 @@ impl DefMap {
             module_data,
             None,
         );
-        // let def_map =
-        //     collector::collect_defs(db, def_map, TreeId::new(krate.root_file_id().into(), None));
+        let def_map =
+            collector::collect_defs(db, def_map, TreeId::new(krate.root_file_id().into(), None));
 
         Arc::new(def_map)
     }
