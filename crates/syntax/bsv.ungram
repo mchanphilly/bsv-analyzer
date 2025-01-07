@@ -424,10 +424,16 @@ RetType =
   '->' Type
 
 TypeAlias =
+(
   Attr* Visibility?
   'default'?
   'type' Name GenericParamList? (':' TypeBoundList?)? WhereClause?
   ('=' Type)? ';'
+)
+| (
+  Attr* Visibility?
+  'typedef' Type Name GenericParamList? (':' TypeBoundList?)? WhereClause? ';'
+)
 
 Struct =
   Attr* Visibility?

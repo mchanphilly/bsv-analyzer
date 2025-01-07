@@ -285,6 +285,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         T![impl] => traits::impl_(p, m),
 
         T![type] => type_alias(p, m),
+        T![typedef] => typedef_(p, m),  // handles synonyms, structs, enums
 
         T![interface] => traits::interface_(p, m),
         T![module] => traits::module_(p, m),
@@ -426,24 +427,26 @@ pub(crate) fn package_item(p: &mut Parser<'_>, m: Marker) {
 pub(crate) fn typedef_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![typedef]);
 
+    // m should really be consumed inside here
     match p.current() {
-        T![enum] => enum_decl(p),
-        _ => type_synonym_bsv(p),
+        // T![enum] => enum_decl(p),  // TODO
+        _ => type_synonym_bsv(p, m),
     }
 
-    m.complete(p, TYPEDEF_BSV);
+    p.expect(T![;]);
 }
 
 // test type_synonym
 // typedef BRAM1Port#(Bit#(8), Bit#(32)) CacheBRAM;
-fn type_synonym_bsv(p: &mut Parser<'_>) {
-    let m = p.start();
+fn type_synonym_bsv(p: &mut Parser<'_>, m: Marker) {
 
-    types::type_bsv(p);
-    name(p);
+    types::type_(p);
+    // types::type_bsv(p);  // We'll use this for now.
 
-    p.expect(T![;]);
-    m.complete(p, TYPE_SYNONYM);
+    // Needs to recover because we often have other items coming up.
+    name_r(p, ITEM_RECOVERY_SET);
+
+    m.complete(p, TYPE_ALIAS);
 }
 
 // test enum_decl

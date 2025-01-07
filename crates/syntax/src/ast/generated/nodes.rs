@@ -2367,6 +2367,8 @@ impl TypeAlias {
     pub fn default_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![default]) }
     #[inline]
     pub fn type_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![type]) }
+    #[inline]
+    pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
