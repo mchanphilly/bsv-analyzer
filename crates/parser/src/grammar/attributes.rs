@@ -60,6 +60,14 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
     attr.complete(p, ATTR);
 }
 
+pub(super) fn deriving_attr(p: &mut Parser<'_>) {
+    let attr = p.start();
+
+    meta(p);
+
+    attr.complete(p, ATTR);
+}
+
 // test meta_bsv
 // (* synthesize *)
 // (* fire_when_enabled, no_implicit_conditions *)

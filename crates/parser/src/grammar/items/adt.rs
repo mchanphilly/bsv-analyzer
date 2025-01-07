@@ -19,7 +19,11 @@ pub(super) fn strukt_bsv(p: &mut Parser<'_>, m: Marker) {
 
     name_r(p, ITEM_RECOVERY_SET);
 
-    // TODO add in optional deriving tag
+    // This may be overkill for `deriving` since it's a hardset
+    // "macro" name. But it's sort of like Rust's derives attr
+    if p.at(IDENT) {
+        attributes::deriving_attr(p);
+    }
 
     p.expect(T![;]);
     m.complete(p, STRUCT);

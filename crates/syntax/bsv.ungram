@@ -58,14 +58,9 @@ EnumDecl =
   'typedef' 'enum'
   EnumList
   Name
-  Deriving? ';'
 
 EnumList =
   '{' enums:(Name (',' Name)*) '}'
-
-Deriving =
-  'deriving'
-  '(' typeclasses:(NameRef (',' NameRef)*) ')'
 
 Interface_bsv =
   'interface' Name ';'
@@ -314,7 +309,11 @@ MacroStmts =
   Expr?
 
 Attr =
+(  // Rust
   '#' '!'? '[' Meta ']'
+) | (  // Bluespec
+  Meta  // only if containing `deriving`
+)
 
 Meta =
   'unsafe' '(' Path ('=' Expr | TokenTree)? ')'
@@ -447,9 +446,11 @@ Struct =
   // Removed WhereClause
   // Removed struct declaration without definition
   // Simplified grouping
-  Attr* Visibility?
+  Visibility?
   'typedef' 'struct' Name
-  RecordFieldList ';'
+  // We moved the Attr to deriving, but we'll need to figure a solution
+  // if we actually must deal with more than one Attr type (e.g., head and tail)
+  RecordFieldList Attr*';'
 )
 
 RecordFieldList =

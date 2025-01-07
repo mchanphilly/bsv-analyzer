@@ -565,23 +565,6 @@ impl ContinueExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Deriving {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Deriving {
-    #[inline]
-    pub fn typeclasses(&self) -> AstChildren<NameRef> { support::children(&self.syntax) }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
-    #[inline]
-    pub fn deriving_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![deriving])
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DynTraitType {
     pub(crate) syntax: SyntaxNode,
 }
@@ -615,11 +598,7 @@ pub struct EnumDecl {
 impl ast::HasName for EnumDecl {}
 impl EnumDecl {
     #[inline]
-    pub fn deriving(&self) -> Option<Deriving> { support::child(&self.syntax) }
-    #[inline]
     pub fn enum_list(&self) -> Option<EnumList> { support::child(&self.syntax) }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     #[inline]
     pub fn enum_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![enum]) }
     #[inline]
@@ -3427,20 +3406,6 @@ impl AstNode for ConstParam {
 impl AstNode for ContinueExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == CONTINUE_EXPR }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for Deriving {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == DERIVING }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -7810,11 +7775,6 @@ impl std::fmt::Display for ConstParam {
     }
 }
 impl std::fmt::Display for ContinueExpr {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Deriving {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

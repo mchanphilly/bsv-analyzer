@@ -459,7 +459,6 @@ fn enum_decl(p: &mut Parser<'_>) {
 
     enum_list(p);
     name(p);
-    opt_deriving(p);
 
     p.expect(T![;]);
     m.complete(p, ENUM_DECL);
@@ -474,23 +473,6 @@ fn enum_list(p: &mut Parser<'_>) {
     }
     p.expect(T!['}']);
     m.complete(p, ENUM_LIST);
-}
-
-fn opt_deriving(p: &mut Parser<'_>) {
-    let m = p.start();
-
-    if !p.eat(T![deriving]) {
-        m.abandon(p);
-        return;
-    }
-
-    p.expect(T!['(']);
-    name_ref(p);
-    while p.eat(T![,]) {
-        name_ref(p);
-    }
-    p.expect(T![')']);
-    m.complete(p, DERIVING);
 }
 
 // test type_alias
