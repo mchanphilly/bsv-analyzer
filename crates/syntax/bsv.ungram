@@ -145,11 +145,11 @@ ModuleCall =
 // ArgList_bsv =
 // '(' args:(Expr_bsv (',' Expr_bsv)* ','?)? ')'
 
+// TODO deprecate. Action and ActionValue demoted from keywords.
 // TODO BSV check if this recursive structure works
 Type_bsv =
   (NameRef | 'ActionValue')
   ('#' '(' types:(Type_bsv (',' Type_bsv)*) ')')  // TODO BSV, not sophisticated enough?
-| 'Action'
 
 //   ArrayType
 // | DynTraitType
@@ -390,10 +390,18 @@ UseTreeList =
   '{' (UseTree (',' UseTree)* ','?)? '}'
 
 Fn =
+(  // Rust
  Attr* Visibility?
  'default'? 'const'? 'async'? 'gen'? 'unsafe'? Abi?
  'fn' Name GenericParamList? ParamList RetType? WhereClause?
  (body:BlockExpr | ';')
+) | (  // Bluespec
+  // Attr* Visibility?
+  // param list optional in Bluespec
+  ('method' | 'function') RetType Name ParamList?
+  (body:BlockExpr | ';')
+  ('endmethod' | 'endfunction')
+)
 
 Abi =
   'extern' '@string'?
@@ -419,8 +427,8 @@ Param =
   | Type_bsv Name  // TODO BSV: Less sophisticated pattern matching than Rust
   )
 
-RetType =
-  '->' Type
+RetType =  // ? for Bluespec
+  '->'? Type
 
 TypeAlias =
 (  // Rust
@@ -691,12 +699,13 @@ Literal =
 PathExpr =
   Attr* Path
 
+// ? for Bluespec. No tail_expr for Bluespec
 StmtList =
-  '{'
+  '{'?
     Attr*
     statements:Stmt*
     tail_expr:Expr?
-  '}'
+  '}'?
 
 RefExpr =
   Attr* '&' (('raw' 'const'?)| ('raw'? 'mut') ) Expr

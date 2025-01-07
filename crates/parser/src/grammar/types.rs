@@ -27,42 +27,42 @@ pub(super) const TYPE_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![pub],
 ]);
 
-// TODO BSV: Support polymorphic # types
-pub(crate) fn typed_var_bsv(p: &mut Parser<'_>) {
-    let typed_var = p.start();
+// // TODO BSV: Support polymorphic # types
+// pub(crate) fn typed_var_bsv(p: &mut Parser<'_>) {
+//     let typed_var = p.start();
 
-    type_bsv(p);
-    name(p);  // the variable
+//     type_bsv(p);
+//     name(p);  // the variable
 
-    typed_var.complete(p, TYPED_VAR);
-}
+//     typed_var.complete(p, TYPED_VAR);
+// }
 
-pub(crate) fn type_bsv(p: &mut Parser<'_>) {
-    let bsv_type = p.start();
+// pub(crate) fn type_bsv(p: &mut Parser<'_>) {
+//     let bsv_type = p.start();
 
-    // test type_bsv
-    // 4
-    // Bit#(4)
-    // Reg#(Bit#(4))
-    // Action
-    // ActionValue#(Bit#(4))
-    // FloatingPoint::RoundMode
-    if !p.eat(INT_NUMBER) && !p.eat(T![Action]){
-        if !p.eat(T![ActionValue]) {
-            // TODO BSV: Fold into paths or otherwise support qualified expressions.
-            name_ref(p);
-        }
-        if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
-            p.expect(T!['(']);
-            type_bsv(p);  // Recurse
-            while p.eat(T![,]) {
-                type_bsv(p);
-            }
-            p.expect(T![')']);
-        }
-    }
-    bsv_type.complete(p, TYPE_BSV);
-}
+//     // test type_bsv
+//     // 4
+//     // Bit#(4)
+//     // Reg#(Bit#(4))
+//     // Action
+//     // ActionValue#(Bit#(4))
+//     // FloatingPoint::RoundMode
+//     if !p.eat(INT_NUMBER) && !p.eat(T![Action]){
+//         if !p.eat(T![ActionValue]) {
+//             // TODO BSV: Fold into paths or otherwise support qualified expressions.
+//             name_ref(p);
+//         }
+//         if p.eat(T![#]) {  // TODO BSV add support for multiple parametric args
+//             p.expect(T!['(']);
+//             type_bsv(p);  // Recurse
+//             while p.eat(T![,]) {
+//                 type_bsv(p);
+//             }
+//             p.expect(T![')']);
+//         }
+//     }
+//     bsv_type.complete(p, TYPE_BSV);
+// }
 
 pub(crate) fn type_(p: &mut Parser<'_>) {
     type_with_bounds_cond(p, true);

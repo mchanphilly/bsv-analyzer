@@ -726,9 +726,23 @@ impl Fn {
     #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![default]) }
     #[inline]
+    pub fn endfunction_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endfunction])
+    }
+    #[inline]
+    pub fn endmethod_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endmethod])
+    }
+    #[inline]
     pub fn fn_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![fn]) }
     #[inline]
+    pub fn function_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![function])
+    }
+    #[inline]
     pub fn gen_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![gen]) }
+    #[inline]
+    pub fn method_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![method]) }
     #[inline]
     pub fn unsafe_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![unsafe]) }
 }
@@ -2442,8 +2456,6 @@ impl Type_bsv {
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
-    #[inline]
-    pub fn Action_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![Action]) }
     #[inline]
     pub fn ActionValue_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![ActionValue])

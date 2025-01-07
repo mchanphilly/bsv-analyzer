@@ -161,7 +161,7 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
         }
 
         Flavor::Bsv => {
-            types::type_bsv(p);
+            types::type_(p);
             name(p);
         }
     }

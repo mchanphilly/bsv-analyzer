@@ -99,35 +99,36 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, IMPL);
 }
 
-// test module_item
-// module mkTop (Empty);
-// endmodule : mkTop
-pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
-    // TODO BSV: Consider consuming the signature separately
-    p.bump(T![module]);
+// TODO_BSV
+// // test module_item
+// // module mkTop (Empty);
+// // endmodule : mkTop
+// pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
+//     // TODO BSV: Consider consuming the signature separately
+//     p.bump(T![module]);
 
-    name_r(p, ITEM_RECOVERY_SET);
+//     name_r(p, ITEM_RECOVERY_SET);
 
-    // Interface name
-    if p.eat(T!['(']) {
-        name_ref(p);
-    } else {
-        p.error("expected `{`");
-    }
-    p.expect(T![')']);
-    p.expect(T![;]);
+//     // Interface name
+//     if p.eat(T!['(']) {
+//         name_ref(p);
+//     } else {
+//         p.error("expected `{`");
+//     }
+//     p.expect(T![')']);
+//     p.expect(T![;]);
 
-    // TODO BSV: how do we make sure this doesn't eat file on bad inputs?
-    while !(p.at(EOF) || p.at(T![endmodule])) {
-        module_stmt(p);  // TODO BSV open up to different kinds
-    }
+//     // TODO BSV: how do we make sure this doesn't eat file on bad inputs?
+//     while !(p.at(EOF) || p.at(T![endmodule])) {
+//         module_stmt(p);  // TODO BSV open up to different kinds
+//     }
 
-    p.expect(T![endmodule]);
-    if p.eat(T![:]) {  // optional end tag
-        name(p);
-    }
-    m.complete(p, MODULE_BSV);
-}
+//     p.expect(T![endmodule]);
+//     if p.eat(T![:]) {  // optional end tag
+//         name(p);
+//     }
+//     m.complete(p, MODULE_BSV);
+// }
 
 // test borderless_assoc_item_list
 // interface F {

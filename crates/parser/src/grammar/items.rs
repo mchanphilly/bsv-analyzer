@@ -287,9 +287,9 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         T![type] => type_alias(p, m),
         T![typedef] => typedef_(p, m),  // handles synonyms, structs, enums
 
+        T![function] | T![method] => function_or_method_(p, m),
         T![interface] => traits::interface_(p, m),
-        T![module] => traits::module_(p, m),
-        T![function] => function(p),
+        // T![module] => traits::module_(p, m),  // TODO_BSV
         // test extern_block
         // unsafe extern "C" {}
         // extern {}
@@ -312,56 +312,56 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     Ok(())
 }
 
-pub(super) fn module_stmt(p: &mut Parser<'_>) {
-    let m = p.start();
-    attributes::outer_attrs_bsv(p);
+// pub(super) fn module_stmt(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     attributes::outer_attrs_bsv(p);
 
-    // TODO BSV: Consider folding in the other cases as expressions, or eliminating this altogether.
-    match p.current() {
-        T![rule] => rule(p),
-        T![method] => method_impl(p),
-        T![function] => function(p),  // TODO BSV add to outside of module
-        T![let] => expressions::let_stmt(p, expressions::Semicolon::Required),
-        _ => expressions::instantiation(p),  // i.e., assignment stuff
-        // everything else, e.g., for loops TODO BSV
-    }
-    m.complete(p, MODULE_STMT);
-}
+//     // TODO BSV: Consider folding in the other cases as expressions, or eliminating this altogether.
+//     match p.current() {
+//         T![rule] => rule(p),
+//         T![method] => method_impl(p),
+//         T![function] => function(p),  // TODO BSV add to outside of module
+//         T![let] => expressions::let_stmt(p, expressions::Semicolon::Required),
+//         _ => expressions::instantiation(p),  // i.e., assignment stuff
+//         // everything else, e.g., for loops TODO BSV
+//     }
+//     m.complete(p, MODULE_STMT);
+// }
 
-pub(super) fn interface_stmt(p: &mut Parser<'_>) {
-    let m = p.start();
-    match p.current() {
-        T![method] => expressions::method_decl(p),
-        _ => p.bump_any(),  // BSV TODO remove
-    }
-    m.complete(p, INTERFACE_STMT);
-}
+// pub(super) fn interface_stmt(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     match p.current() {
+//         T![method] => expressions::method_decl(p),
+//         _ => p.bump_any(),  // BSV TODO remove
+//     }
+//     m.complete(p, INTERFACE_STMT);
+// }
 
-pub(super) fn method_impl(p: &mut Parser<'_>) {
-    let m = p.start();
-    expressions::method_signature(p);
-    if p.at(T![if]) {
-        assert!(opt_guard(p));  // not actually optional
-    }
-    if p.eat(T![;]) {  // TODO BSV: Support shorthand method impls e.g., method Bit#(3) M = 5;
-        expressions::stmt_list_bsv(p, T![endmethod]);
-        p.expect(T![endmethod]);
-    }
-    m.complete(p, METHOD_IMPL);
-}
+// pub(super) fn method_impl(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     expressions::method_signature(p);
+//     if p.at(T![if]) {
+//         assert!(opt_guard(p));  // not actually optional
+//     }
+//     if p.eat(T![;]) {  // TODO BSV: Support shorthand method impls e.g., method Bit#(3) M = 5;
+//         expressions::stmt_list_bsv(p, T![endmethod]);
+//         p.expect(T![endmethod]);
+//     }
+//     m.complete(p, METHOD_IMPL);
+// }
 
-pub(super) fn function(p: &mut Parser<'_>) {  // TODO BSV add support for non-module-associated functions
-    let m = p.start();
-    expressions::function_signature(p);
-    if p.at(T![if]) {
-        assert!(opt_guard(p));  // not actually optional
-    }
-    if p.eat(T![;]) {  // TODO BSV: Support shorthand function impls e.g., method Bit#(3) M = 5;
-        expressions::stmt_list_bsv(p, T![endfunction]);
-        p.expect(T![endfunction]);
-    }
-    m.complete(p, FUNCTION);
-}
+// pub(super) fn function(p: &mut Parser<'_>) {  // TODO BSV add support for non-module-associated functions
+//     let m = p.start();
+//     expressions::function_signature(p);
+//     if p.at(T![if]) {
+//         assert!(opt_guard(p));  // not actually optional
+//     }
+//     if p.eat(T![;]) {  // TODO BSV: Support shorthand function impls e.g., method Bit#(3) M = 5;
+//         expressions::stmt_list_bsv(p, T![endfunction]);
+//         p.expect(T![endfunction]);
+//     }
+//     m.complete(p, FUNCTION);
+// }
 
 fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     let la = p.nth(1);
@@ -566,6 +566,67 @@ fn macro_def(p: &mut Parser<'_>, m: Marker) {
     }
 
     m.complete(p, MACRO_DEF);
+}
+
+// // test fn_
+// // fn foo() {}
+fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
+    let is_function;
+    match p.current() {
+        T![function] => {
+            is_function = true;
+            p.bump(T![function]);
+        },
+        T![method] => {
+            is_function = false;
+            p.bump(T![method]);
+        },
+        _ => {
+            unreachable!("should only be reachable on `function` or `method`");
+        }
+    }
+
+    // TODO_BSV: We may need to modify visibility according to function or method. We'll see
+
+    // Going to assume we *always* have a return type
+    // even if Action. Actual language may be more permissive
+    let ret_m = p.start();
+    types::type_(p);  // Not sure the difference. It used to be below.
+    // types::type_no_bounds(p);
+    ret_m.complete(p, RET_TYPE);
+
+    name_r(p, ITEM_RECOVERY_SET);
+
+    if p.at(T!['(']) {
+        params::param_list_bsv(p);
+    }  else {
+        // Arguments optional in Bluespec, unfortunately.
+        // We replace with empty param list so we're sure to interpret
+        // as "no parameters" and not "missing parameters"
+        let param_list_m = p.start();
+        param_list_m.complete(p, PARAM_LIST);
+    }
+
+    // // test function_where_clause
+    // // fn foo<T>() where T: Copy {}
+    // generic_params::opt_where_clause(p);
+
+    // // test fn_decl
+    // // trait T { fn foo(); }
+    if !p.eat(T![;]) {
+        // TODO_BSV add body: also need to be resilient to nesting.
+        expressions::block_expr(p);
+
+        if is_function {
+            p.expect(T![endfunction]);
+        } else {
+            p.expect(T![endmethod]);
+        }
+    } else if is_function {
+        p.error("function should have a body");
+    }
+
+    m.complete(p, FN);
 }
 
 // test fn_

@@ -6,7 +6,6 @@ use super::*;
 
 pub(crate) use atom::{block_expr, match_arm_list, stmt_list_bsv};
 pub(super) use atom::{literal, LITERAL_FIRST};
-use types::{type_bsv, typed_var_bsv};
 
 #[derive(PartialEq, Eq)]
 pub(super) enum Semicolon {
@@ -161,55 +160,55 @@ pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
     }
 }
 
-// test method_decl
-// method Bit#(4) get_count(Bool tag);
-pub(super) fn method_decl(p: &mut Parser<'_>) {
-    let m = p.start();
-    method_signature(p);
-    p.expect(T![;]);
-    m.complete(p, METHOD_DECL);
-}
+// // test method_decl
+// // method Bit#(4) get_count(Bool tag);
+// pub(super) fn method_decl(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     method_signature(p);
+//     p.expect(T![;]);
+//     m.complete(p, METHOD_DECL);
+// }
 
-// test method_signature
-// method Bit#(4) get_count(Bool tag);
-pub(super) fn method_signature(p: &mut Parser<'_>) {
-    let m = p.start();
-    p.bump(T![method]);
-    type_bsv(p);
-    name(p);
-    if p.at(T!['(']) {
-        params::param_list_bsv(p);
-    }
-    m.complete(p, METHOD_SIGNATURE);
-}
+// // test method_signature
+// // method Bit#(4) get_count(Bool tag);
+// pub(super) fn method_signature(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     p.bump(T![method]);
+//     type_bsv(p);
+//     name(p);
+//     if p.at(T!['(']) {
+//         params::param_list_bsv(p);
+//     }
+//     m.complete(p, METHOD_SIGNATURE);
+// }
 
-// test function_signature
-// function Bit#(4) get_count(Bool tag);
-pub(super) fn function_signature(p: &mut Parser<'_>) {
-    let m = p.start();
-    p.bump(T![function]);
-    type_bsv(p);
-    name(p);
-    if p.at(T!['(']) {
-        params::param_list_bsv(p);
-    }
-    m.complete(p, FUNCTION_SIGNATURE);
-}
+// // test function_signature
+// // function Bit#(4) get_count(Bool tag);
+// pub(super) fn function_signature(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     p.bump(T![function]);
+//     type_bsv(p);
+//     name(p);
+//     if p.at(T!['(']) {
+//         params::param_list_bsv(p);
+//     }
+//     m.complete(p, FUNCTION_SIGNATURE);
+// }
 
-pub(super) fn instantiation(p: &mut Parser<'_>) {
-    let m = p.start();
-    typed_var_bsv(p);
+// pub(super) fn instantiation(p: &mut Parser<'_>) {
+//     let m = p.start();
+//     typed_var_bsv(p);
 
-    if !(p.eat(T![<-]) || p.eat(T![=])) {
-        p.err_and_bump("Expected a `<-` or `=` operator");
-    }
-    // test literal_in_module_inst
-    // String out_file = "output.log";
-    expr(p);
+//     if !(p.eat(T![<-]) || p.eat(T![=])) {
+//         p.err_and_bump("Expected a `<-` or `=` operator");
+//     }
+//     // test literal_in_module_inst
+//     // String out_file = "output.log";
+//     expr(p);
 
-    p.expect(T![;]);
-    m.complete(p, INSTANTIATION);
-}
+//     p.expect(T![;]);
+//     m.complete(p, INSTANTIATION);
+// }
 
 pub(super) fn module_call_bsv(p: &mut Parser<'_>) {
     let m = p.start();
