@@ -592,20 +592,6 @@ impl Enum {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct EnumDecl {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for EnumDecl {}
-impl EnumDecl {
-    #[inline]
-    pub fn enum_list(&self) -> Option<EnumList> { support::child(&self.syntax) }
-    #[inline]
-    pub fn enum_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![enum]) }
-    #[inline]
-    pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnumList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -832,39 +818,6 @@ impl FormatArgsExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Function {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Function {
-    #[inline]
-    pub fn function_signature(&self) -> Option<FunctionSignature> { support::child(&self.syntax) }
-    #[inline]
-    pub fn guard(&self) -> Option<Guard> { support::child(&self.syntax) }
-    #[inline]
-    pub fn stmt_list_bsv(&self) -> Option<StmtList_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn endfunction_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![endfunction])
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct FunctionSignature {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for FunctionSignature {}
-impl FunctionSignature {
-    #[inline]
-    pub fn param_list_bsv(&self) -> Option<ParamList_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn function_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![function])
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GenericArgList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1026,19 +979,6 @@ impl InferType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Instantiation {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Instantiation {
-    #[inline]
-    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
-    #[inline]
-    pub fn typed_var(&self) -> Option<TypedVar> { support::child(&self.syntax) }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Interface {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1051,37 +991,6 @@ impl Interface {
     pub fn assoc_item_list(&self) -> Option<AssocItemList> { support::child(&self.syntax) }
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
-    #[inline]
-    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-    #[inline]
-    pub fn endinterface_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![endinterface])
-    }
-    #[inline]
-    pub fn interface_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![interface])
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct InterfaceStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl InterfaceStmt {
-    #[inline]
-    pub fn method_decl(&self) -> Option<MethodDecl> { support::child(&self.syntax) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Interface_bsv {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for Interface_bsv {}
-impl Interface_bsv {
-    #[inline]
-    pub fn interface_stmts(&self) -> AstChildren<InterfaceStmt> { support::children(&self.syntax) }
     #[inline]
     pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     #[inline]
@@ -1418,48 +1327,6 @@ impl MethodCallExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MethodDecl {
-    pub(crate) syntax: SyntaxNode,
-}
-impl MethodDecl {
-    #[inline]
-    pub fn method_signature(&self) -> Option<MethodSignature> { support::child(&self.syntax) }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MethodImpl {
-    pub(crate) syntax: SyntaxNode,
-}
-impl MethodImpl {
-    #[inline]
-    pub fn guard(&self) -> Option<Guard> { support::child(&self.syntax) }
-    #[inline]
-    pub fn method_signature(&self) -> Option<MethodSignature> { support::child(&self.syntax) }
-    #[inline]
-    pub fn stmt_list_bsv(&self) -> Option<StmtList_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn endmethod_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![endmethod])
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MethodSignature {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for MethodSignature {}
-impl MethodSignature {
-    #[inline]
-    pub fn param_list_bsv(&self) -> Option<ParamList_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn method_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![method]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Module {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1493,9 +1360,9 @@ pub struct Module_bsv {
 impl ast::HasName for Module_bsv {}
 impl Module_bsv {
     #[inline]
-    pub fn interface(&self) -> Option<Path> { support::child(&self.syntax) }
+    pub fn assoc_items(&self) -> AstChildren<AssocItem> { support::children(&self.syntax) }
     #[inline]
-    pub fn module_stmts(&self) -> AstChildren<ModuleStmt> { support::children(&self.syntax) }
+    pub fn interface(&self) -> Option<Path> { support::child(&self.syntax) }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     #[inline]
@@ -1592,16 +1459,11 @@ impl OrPat {
 pub struct Package {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasAttrs for Package {}
 impl ast::HasName for Package {}
 impl Package {
     #[inline]
-    pub fn item_bsvs(&self) -> AstChildren<Item_bsv> { support::children(&self.syntax) }
-    #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-    #[inline]
-    pub fn endpackage_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![endpackage])
-    }
     #[inline]
     pub fn package_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![package]) }
 }
@@ -1617,8 +1479,6 @@ impl Param {
     pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
     #[inline]
     pub fn ty(&self) -> Option<Type> { support::child(&self.syntax) }
-    #[inline]
-    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
     #[inline]
     pub fn dotdotdot_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![...]) }
     #[inline]
@@ -1642,29 +1502,6 @@ impl ParamList {
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
     #[inline]
     pub fn pipe_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![|]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ParamList_bsv {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ParamList_bsv {
-    #[inline]
-    pub fn params(&self) -> AstChildren<Param> { support::children(&self.syntax) }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Param_bsv {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for Param_bsv {}
-impl Param_bsv {
-    #[inline]
-    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2107,16 +1944,17 @@ impl ast::HasDocComments for SourceFile {}
 impl ast::HasModuleItem for SourceFile {}
 impl SourceFile {
     #[inline]
-    pub fn shebang_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![shebang]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SourceFile_bsv {
-    pub(crate) syntax: SyntaxNode,
-}
-impl SourceFile_bsv {
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
     #[inline]
-    pub fn packages(&self) -> AstChildren<Package> { support::children(&self.syntax) }
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
+    #[inline]
+    pub fn endpackage_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endpackage])
+    }
+    #[inline]
+    pub fn package_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![package]) }
+    #[inline]
+    pub fn shebang_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![shebang]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2425,62 +2263,6 @@ impl TypeParam {
     pub fn numeric_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![numeric]) }
     #[inline]
     pub fn type_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![type]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TypeSynonym {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for TypeSynonym {}
-impl TypeSynonym {
-    #[inline]
-    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-    #[inline]
-    pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Type_bsv {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Type_bsv {
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
-    #[inline]
-    pub fn types(&self) -> AstChildren<Type_bsv> { support::children(&self.syntax) }
-    #[inline]
-    pub fn pound_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![#]) }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
-    #[inline]
-    pub fn ActionValue_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![ActionValue])
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TypedVar {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasName for TypedVar {}
-impl TypedVar {
-    #[inline]
-    pub fn type_bsv(&self) -> Option<Type_bsv> { support::child(&self.syntax) }
-    #[inline]
-    pub fn let_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![let]) }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Typedef_bsv {
-    pub(crate) syntax: SyntaxNode,
-}
-impl Typedef_bsv {
-    #[inline]
-    pub fn type_synonym(&self) -> Option<TypeSynonym> { support::child(&self.syntax) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2805,21 +2587,6 @@ pub enum Item {
 }
 impl ast::HasAttrs for Item {}
 impl ast::HasDocComments for Item {}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Item_bsv {
-    EnumDecl(EnumDecl),
-    Interface_bsv(Interface_bsv),
-    Typedef_bsv(Typedef_bsv),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ModuleStmt {
-    Function(Function),
-    Instantiation(Instantiation),
-    MethodImpl(MethodImpl),
-    Rule(Rule),
-}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Pat {
@@ -3457,20 +3224,6 @@ impl AstNode for Enum {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for EnumDecl {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == ENUM_DECL }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for EnumList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == ENUM_LIST }
@@ -3653,34 +3406,6 @@ impl AstNode for FormatArgsExpr {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for Function {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == FUNCTION }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for FunctionSignature {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == FUNCTION_SIGNATURE }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for GenericArgList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == GENERIC_ARG_LIST }
@@ -3835,51 +3560,9 @@ impl AstNode for InferType {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for Instantiation {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == INSTANTIATION }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for Interface {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == INTERFACE }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for InterfaceStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == INTERFACE_STMT }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for Interface_bsv {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == INTERFACE_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -4241,48 +3924,6 @@ impl AstNode for MethodCallExpr {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for MethodDecl {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == METHOD_DECL }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for MethodImpl {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == METHOD_IMPL }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for MethodSignature {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == METHOD_SIGNATURE }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for Module {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == MODULE }
@@ -4426,34 +4067,6 @@ impl AstNode for Param {
 impl AstNode for ParamList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == PARAM_LIST }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for ParamList_bsv {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == PARAM_LIST_BSV }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for Param_bsv {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == PARAM_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -4927,20 +4540,6 @@ impl AstNode for SourceFile {
     #[inline]
     fn syntax(&self) -> &SyntaxNode { &self.syntax }
 }
-impl AstNode for SourceFile_bsv {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == SOURCE_FILE_BSV }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
 impl AstNode for Static {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == STATIC }
@@ -5196,62 +4795,6 @@ impl AstNode for TypeBoundList {
 impl AstNode for TypeParam {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == TYPE_PARAM }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for TypeSynonym {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPE_SYNONYM }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for Type_bsv {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPE_BSV }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for TypedVar {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPED_VAR }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for Typedef_bsv {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == TYPEDEF_BSV }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6168,84 +5711,6 @@ impl AstNode for Item {
         }
     }
 }
-impl From<EnumDecl> for Item_bsv {
-    #[inline]
-    fn from(node: EnumDecl) -> Item_bsv { Item_bsv::EnumDecl(node) }
-}
-impl From<Interface_bsv> for Item_bsv {
-    #[inline]
-    fn from(node: Interface_bsv) -> Item_bsv { Item_bsv::Interface_bsv(node) }
-}
-impl From<Typedef_bsv> for Item_bsv {
-    #[inline]
-    fn from(node: Typedef_bsv) -> Item_bsv { Item_bsv::Typedef_bsv(node) }
-}
-impl AstNode for Item_bsv {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, ENUM_DECL | INTERFACE_BSV | TYPEDEF_BSV)
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        let res = match syntax.kind() {
-            ENUM_DECL => Item_bsv::EnumDecl(EnumDecl { syntax }),
-            INTERFACE_BSV => Item_bsv::Interface_bsv(Interface_bsv { syntax }),
-            TYPEDEF_BSV => Item_bsv::Typedef_bsv(Typedef_bsv { syntax }),
-            _ => return None,
-        };
-        Some(res)
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            Item_bsv::EnumDecl(it) => &it.syntax,
-            Item_bsv::Interface_bsv(it) => &it.syntax,
-            Item_bsv::Typedef_bsv(it) => &it.syntax,
-        }
-    }
-}
-impl From<Function> for ModuleStmt {
-    #[inline]
-    fn from(node: Function) -> ModuleStmt { ModuleStmt::Function(node) }
-}
-impl From<Instantiation> for ModuleStmt {
-    #[inline]
-    fn from(node: Instantiation) -> ModuleStmt { ModuleStmt::Instantiation(node) }
-}
-impl From<MethodImpl> for ModuleStmt {
-    #[inline]
-    fn from(node: MethodImpl) -> ModuleStmt { ModuleStmt::MethodImpl(node) }
-}
-impl From<Rule> for ModuleStmt {
-    #[inline]
-    fn from(node: Rule) -> ModuleStmt { ModuleStmt::Rule(node) }
-}
-impl AstNode for ModuleStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, FUNCTION | INSTANTIATION | METHOD_IMPL | RULE)
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        let res = match syntax.kind() {
-            FUNCTION => ModuleStmt::Function(Function { syntax }),
-            INSTANTIATION => ModuleStmt::Instantiation(Instantiation { syntax }),
-            METHOD_IMPL => ModuleStmt::MethodImpl(MethodImpl { syntax }),
-            RULE => ModuleStmt::Rule(Rule { syntax }),
-            _ => return None,
-        };
-        Some(res)
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        match self {
-            ModuleStmt::Function(it) => &it.syntax,
-            ModuleStmt::Instantiation(it) => &it.syntax,
-            ModuleStmt::MethodImpl(it) => &it.syntax,
-            ModuleStmt::Rule(it) => &it.syntax,
-        }
-    }
-}
 impl From<BoxPat> for Pat {
     #[inline]
     fn from(node: BoxPat) -> Pat { Pat::BoxPat(node) }
@@ -6591,6 +6056,7 @@ impl AstNode for AnyHasAttrs {
                 | METHOD_CALL_EXPR
                 | MODULE
                 | OFFSET_OF_EXPR
+                | PACKAGE
                 | PARAM
                 | PAREN_EXPR
                 | PATH_EXPR
@@ -6798,6 +6264,10 @@ impl From<Module> for AnyHasAttrs {
 impl From<OffsetOfExpr> for AnyHasAttrs {
     #[inline]
     fn from(node: OffsetOfExpr) -> AnyHasAttrs { AnyHasAttrs { syntax: node.syntax } }
+}
+impl From<Package> for AnyHasAttrs {
+    #[inline]
+    fn from(node: Package) -> AnyHasAttrs { AnyHasAttrs { syntax: node.syntax } }
 }
 impl From<Param> for AnyHasAttrs {
     #[inline]
@@ -7206,21 +6676,16 @@ impl AstNode for AnyHasName {
                 | CONST
                 | CONST_PARAM
                 | ENUM
-                | ENUM_DECL
                 | FN
                 | FORMAT_ARGS_ARG
-                | FUNCTION_SIGNATURE
                 | IDENT_PAT
                 | INTERFACE
-                | INTERFACE_BSV
                 | MACRO_DEF
                 | MACRO_RULES
-                | METHOD_SIGNATURE
                 | MODULE
                 | MODULE_BSV
                 | PACKAGE
                 | PARAM
-                | PARAM_BSV
                 | RECORD_FIELD
                 | RENAME
                 | RULE
@@ -7231,8 +6696,6 @@ impl AstNode for AnyHasName {
                 | TRAIT_ALIAS
                 | TYPE_ALIAS
                 | TYPE_PARAM
-                | TYPE_SYNONYM
-                | TYPED_VAR
                 | UNION
                 | VARIANT
         )
@@ -7260,10 +6723,6 @@ impl From<Enum> for AnyHasName {
     #[inline]
     fn from(node: Enum) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
-impl From<EnumDecl> for AnyHasName {
-    #[inline]
-    fn from(node: EnumDecl) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
 impl From<Fn> for AnyHasName {
     #[inline]
     fn from(node: Fn) -> AnyHasName { AnyHasName { syntax: node.syntax } }
@@ -7271,10 +6730,6 @@ impl From<Fn> for AnyHasName {
 impl From<FormatArgsArg> for AnyHasName {
     #[inline]
     fn from(node: FormatArgsArg) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
-impl From<FunctionSignature> for AnyHasName {
-    #[inline]
-    fn from(node: FunctionSignature) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<IdentPat> for AnyHasName {
     #[inline]
@@ -7284,10 +6739,6 @@ impl From<Interface> for AnyHasName {
     #[inline]
     fn from(node: Interface) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
-impl From<Interface_bsv> for AnyHasName {
-    #[inline]
-    fn from(node: Interface_bsv) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
 impl From<MacroDef> for AnyHasName {
     #[inline]
     fn from(node: MacroDef) -> AnyHasName { AnyHasName { syntax: node.syntax } }
@@ -7295,10 +6746,6 @@ impl From<MacroDef> for AnyHasName {
 impl From<MacroRules> for AnyHasName {
     #[inline]
     fn from(node: MacroRules) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
-impl From<MethodSignature> for AnyHasName {
-    #[inline]
-    fn from(node: MethodSignature) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<Module> for AnyHasName {
     #[inline]
@@ -7315,10 +6762,6 @@ impl From<Package> for AnyHasName {
 impl From<Param> for AnyHasName {
     #[inline]
     fn from(node: Param) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
-impl From<Param_bsv> for AnyHasName {
-    #[inline]
-    fn from(node: Param_bsv) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<RecordField> for AnyHasName {
     #[inline]
@@ -7359,14 +6802,6 @@ impl From<TypeAlias> for AnyHasName {
 impl From<TypeParam> for AnyHasName {
     #[inline]
     fn from(node: TypeParam) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
-impl From<TypeSynonym> for AnyHasName {
-    #[inline]
-    fn from(node: TypeSynonym) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
-impl From<TypedVar> for AnyHasName {
-    #[inline]
-    fn from(node: TypedVar) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<Union> for AnyHasName {
     #[inline]
@@ -7586,16 +7021,6 @@ impl std::fmt::Display for Item {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for Item_bsv {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for ModuleStmt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for Pat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -7801,11 +7226,6 @@ impl std::fmt::Display for Enum {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for EnumDecl {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for EnumList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -7871,16 +7291,6 @@ impl std::fmt::Display for FormatArgsExpr {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for Function {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for FunctionSignature {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for GenericArgList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -7936,22 +7346,7 @@ impl std::fmt::Display for InferType {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for Instantiation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for Interface {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for InterfaceStmt {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Interface_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -8081,21 +7476,6 @@ impl std::fmt::Display for MethodCallExpr {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for MethodDecl {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for MethodImpl {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for MethodSignature {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for Module {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -8147,16 +7527,6 @@ impl std::fmt::Display for Param {
     }
 }
 impl std::fmt::Display for ParamList {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for ParamList_bsv {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Param_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }
@@ -8326,11 +7696,6 @@ impl std::fmt::Display for SourceFile {
         std::fmt::Display::fmt(self.syntax(), f)
     }
 }
-impl std::fmt::Display for SourceFile_bsv {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
 impl std::fmt::Display for Static {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
@@ -8422,26 +7787,6 @@ impl std::fmt::Display for TypeBoundList {
     }
 }
 impl std::fmt::Display for TypeParam {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for TypeSynonym {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Type_bsv {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for TypedVar {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Typedef_bsv {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

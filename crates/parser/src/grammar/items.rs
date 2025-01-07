@@ -368,7 +368,7 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
     match p.current() {
         T![extern] if la == T![crate] => extern_crate(p, m),
         T![import] => use_item::import_(p, m),
-        T![package] => package_item(p, m),
+        // T![package] => package_item(p, m),
 
         T![typedef] => typedef_(p, m),
         T![type] => type_alias(p, m),
@@ -413,17 +413,6 @@ fn extern_crate(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, EXTERN_CRATE);
 }
 
-// BSV_TODO: Still uses Rust Module notation; also check whether curly
-// should be there.
-// test package_item
-// package a;
-pub(crate) fn package_item(p: &mut Parser<'_>, m: Marker) {
-    p.bump(T![package]);
-    name(p);
-    p.expect(T![;]);
-    m.complete(p, PACKAGE);
-}
-
 pub(crate) fn typedef_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![typedef]);
 
@@ -449,30 +438,6 @@ fn type_synonym_bsv(p: &mut Parser<'_>, m: Marker) {
     name_r(p, ITEM_RECOVERY_SET);
 
     m.complete(p, TYPE_ALIAS);
-}
-
-// test enum_decl
-// typedef BRAM1Port#(Bit#(8), Bit#(32)) CacheBRAM;
-fn enum_decl(p: &mut Parser<'_>) {
-    let m = p.start();
-    p.bump(T![enum]);
-
-    enum_list(p);
-    name(p);
-
-    p.expect(T![;]);
-    m.complete(p, ENUM_DECL);
-}
-
-fn enum_list(p: &mut Parser<'_>) {
-    let m = p.start();
-    p.expect(T!['{']);
-    name(p);
-    while p.eat(T![,]) {
-        name(p);
-    }
-    p.expect(T!['}']);
-    m.complete(p, ENUM_LIST);
 }
 
 // test type_alias

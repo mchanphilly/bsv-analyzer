@@ -25,10 +25,6 @@
 Import =
   'import' NameRef '::' '*' ';'
 
-Package =
-  Item_bsv*
-| 'package' Name ';' Item_bsv* 'endpackage'
-
 // TODO Extract out the cyclops symbols. Need to fiddle with macros to get it to work.
 Attr_bsv =
   '(' '*' fields:(AttrMeta_bsv (',' AttrMeta_bsv)*) '*' ')'
@@ -36,74 +32,16 @@ Attr_bsv =
 AttrMeta_bsv =
   key:NameRef ('=' value:Literal)?
 
-// TODO BSV Marry all top level items
-SourceFile_bsv =
-  Package*  // Usually there's only one.
-
-Item_bsv =  // Item_bsv invisible in syntax tree; access members directly
-  Typedef_bsv
-| EnumDecl
-| Interface_bsv
-// | Module_bsv
-// TODO expand into ordinary statements too
-
-Typedef_bsv =
-  TypeSynonym
-// | EnumDecl
-
-TypeSynonym =
-  'typedef' Type_bsv Name ';'
-
-EnumDecl =
-  'typedef' 'enum'
-  EnumList
-  Name
-
 EnumList =
   '{' enums:(Name (',' Name)*) '}'
-
-Interface_bsv =
-  'interface' Name ';'
-  InterfaceStmt*
-  'endinterface' (':' Name)?
-
-InterfaceStmt =
-  MethodDecl
-// | // TODO BSV: Add subinterfaces
-
-MethodDecl =
-  MethodSignature ';'
-
-MethodSignature =
-  'method' Type_bsv Name ParamList_bsv?
-
-FunctionSignature =
-  'function' Type_bsv Name ParamList_bsv?
-
-ParamList_bsv =
-  '(' params:(Param (',' Param)*) ')'
-
-Param_bsv =
-  Type_bsv Name
 
 // TODO BSV: can a module support more than one interface?
 // TODO BSV: Add ModuleParams?
 // Deprecated (TODO_REMOVE)
 Module_bsv =
   'module' Name '(' interface:Path ')' ';'
-  ModuleStmt*
+  AssocItem*
   'endmodule' (':' Name)?
-
-ModuleStmt =  // Similar to Item
-  Instantiation  // TODO BSV consider merging with generic actionvalue
-| Rule
-| MethodImpl
-| Function
-
-MethodImpl =
-  MethodSignature Guard?  // Note 'if' is mandatory in this Guard, but not rule
-  StmtList_bsv
-  'endmethod'
 
 // TODO BSV: I decided to have StmtList directly instead of with
 // BlockExpr because I think there aren't many keyword modifiers to
@@ -115,11 +53,6 @@ Rule =
   StmtList_bsv
   'endrule'
 
-Function =
-  FunctionSignature Guard?
-  StmtList_bsv
-  'endfunction'
-
 // Modeled off MatchGuard
 Guard =
   'if'? '(' condition:Expr ')'
@@ -130,26 +63,9 @@ StmtList_bsv =
 | 'begin' statements:Stmt* 'end'  // Treated similar to whitespace
 // | 'action' statements:Stmt* 'endaction'
 
-Instantiation =
-  TypedVar op:('<-' | '<=' | '=') Expr ';'
-
-// TODO BSV add polymorphism
-// TODO BSV check whether `let` permitted in ModuleInst
-TypedVar =
-  (Type_bsv | 'let') Name
-
 // TODO add polymorphism
 ModuleCall =
   NameRef ArgList
-
-// ArgList_bsv =
-// '(' args:(Expr_bsv (',' Expr_bsv)* ','?)? ')'
-
-// TODO deprecate. Action and ActionValue demoted from keywords.
-// TODO BSV check if this recursive structure works
-Type_bsv =
-  (NameRef | 'ActionValue')
-  ('#' '(' types:(Type_bsv (',' Type_bsv)*) ')')  // TODO BSV, not sophisticated enough?
 
 //   ArrayType
 // | DynTraitType
@@ -325,8 +241,10 @@ Meta =
 
 SourceFile =
   '#shebang'?
+  'package'?
   Attr*
   Item*
+  'endpackage'? (':' NameRef)?
 
 Item =
   Const
@@ -350,8 +268,9 @@ Item =
 | Use
 // | Package
 
-// Package =
-//   Attr* 'package' Name ';'
+// TODO_BSV This is actually broken since it lacks an ItemList
+Package =
+  Attr* 'package'? Name ';'
 
 MacroRules =
   Attr* Visibility?
@@ -424,7 +343,7 @@ Param =
     Pat (':' Type)?
   | Type
   | '...'
-  | Type_bsv Name  // TODO BSV: Less sophisticated pattern matching than Rust
+  | Type Name  // TODO BSV: Less sophisticated pattern matching than Rust
   )
 
 RetType =  // ? for Bluespec

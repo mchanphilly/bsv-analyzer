@@ -7,16 +7,26 @@ pub(super) fn opt_generic_arg_list(p: &mut Parser<'_>, colon_colon_required: boo
     if p.at(T![::]) && p.nth(2) == T![<] {
         m = p.start();
         p.bump(T![::]);
-    } else if !colon_colon_required && p.at(T![<]) && p.nth(1) != T![=] {
+    } else if !colon_colon_required && (p.at(T![<]) || p.at(T![#])) && p.nth(1) != T![=] {
         m = p.start();
     } else {
         return;
     }
 
+    // To accommodate both Bluespec and Rust
+    let (bra, ket) = match p.current() {
+        T![<] => (T![<], T![>]),
+        T![#] => {
+            p.bump(T![#]);
+            (T!['('], T![')'])
+        }
+        _ => unreachable!()
+    };
+
     delimited(
         p,
-        T![<],
-        T![>],
+        bra,
+        ket,
         T![,],
         || "expected generic argument".into(),
         GENERIC_ARG_FIRST,

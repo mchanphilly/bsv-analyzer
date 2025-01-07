@@ -241,7 +241,7 @@ fn n_attached_trivias<'a>(
     trivias: impl Iterator<Item = (SyntaxKind, &'a str)>,
 ) -> usize {
     match kind {
-        CONST | ENUM | FN | IMPL | MACRO_CALL | MACRO_DEF | MACRO_RULES | PACKAGE | RECORD_FIELD
+        CONST | ENUM | FN | IMPL | MACRO_CALL | MACRO_DEF | MACRO_RULES | RECORD_FIELD
         | STATIC | STRUCT | TRAIT | TUPLE_FIELD | TYPE_ALIAS | UNION | IMPORT | VARIANT
         | EXTERN_CRATE => {
             let mut res = 0;
