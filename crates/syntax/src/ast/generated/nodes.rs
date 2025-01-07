@@ -2813,7 +2813,6 @@ impl ast::HasDocComments for Item {}
 pub enum Item_bsv {
     EnumDecl(EnumDecl),
     Interface_bsv(Interface_bsv),
-    Module_bsv(Module_bsv),
     Typedef_bsv(Typedef_bsv),
 }
 
@@ -6194,10 +6193,6 @@ impl From<Interface_bsv> for Item_bsv {
     #[inline]
     fn from(node: Interface_bsv) -> Item_bsv { Item_bsv::Interface_bsv(node) }
 }
-impl From<Module_bsv> for Item_bsv {
-    #[inline]
-    fn from(node: Module_bsv) -> Item_bsv { Item_bsv::Module_bsv(node) }
-}
 impl From<Typedef_bsv> for Item_bsv {
     #[inline]
     fn from(node: Typedef_bsv) -> Item_bsv { Item_bsv::Typedef_bsv(node) }
@@ -6205,14 +6200,13 @@ impl From<Typedef_bsv> for Item_bsv {
 impl AstNode for Item_bsv {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, ENUM_DECL | INTERFACE_BSV | MODULE_BSV | TYPEDEF_BSV)
+        matches!(kind, ENUM_DECL | INTERFACE_BSV | TYPEDEF_BSV)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             ENUM_DECL => Item_bsv::EnumDecl(EnumDecl { syntax }),
             INTERFACE_BSV => Item_bsv::Interface_bsv(Interface_bsv { syntax }),
-            MODULE_BSV => Item_bsv::Module_bsv(Module_bsv { syntax }),
             TYPEDEF_BSV => Item_bsv::Typedef_bsv(Typedef_bsv { syntax }),
             _ => return None,
         };
@@ -6223,7 +6217,6 @@ impl AstNode for Item_bsv {
         match self {
             Item_bsv::EnumDecl(it) => &it.syntax,
             Item_bsv::Interface_bsv(it) => &it.syntax,
-            Item_bsv::Module_bsv(it) => &it.syntax,
             Item_bsv::Typedef_bsv(it) => &it.syntax,
         }
     }

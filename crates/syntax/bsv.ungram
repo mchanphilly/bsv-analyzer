@@ -44,7 +44,7 @@ Item_bsv =  // Item_bsv invisible in syntax tree; access members directly
   Typedef_bsv
 | EnumDecl
 | Interface_bsv
-| Module_bsv
+// | Module_bsv
 // TODO expand into ordinary statements too
 
 Typedef_bsv =
@@ -93,6 +93,7 @@ Param_bsv =
 
 // TODO BSV: can a module support more than one interface?
 // TODO BSV: Add ModuleParams?
+// Deprecated (TODO_REMOVE)
 Module_bsv =
   'module' Name '(' interface:Path ')' ';'
   ModuleStmt*
@@ -267,7 +268,7 @@ ConstArg =
 
 GenericParamList =
   '<' (GenericParam (',' GenericParam)* ','?)? '>'
-| '#' '(' ( GenericParam (',' GenericParam)*)? ')'  // Sort of. It's polymorphism.
+| '#'? '(' ( GenericParam (',' GenericParam)*)? ')'  // Sort of. It's polymorphism. # optional for module decls
 
 GenericParam =
   ConstParam
@@ -490,12 +491,13 @@ Static =
   ('=' body:Expr)? ';'
 
 // TODO_BSV clean (items require Attr, Vis, (Where, Generic))
-Interface =
+Interface =  // Actually classed in the Parser as a Trait.
   Attr* Visibility? WhereClause?
   'interface' Name GenericParamList? ';'
   AssocItemList
   'endinterface' (':' NameRef)?
 
+// TODO_BSV Eventually phase out in favor of Interface
 Trait =
   Attr* Visibility?
   'unsafe'? 'auto'?
@@ -515,6 +517,15 @@ AssocItem =
 | Fn
 | MacroCall
 | TypeAlias
+
+// TODO
+// // Module placeholder. This is currently function-like (generics, callable), but eventually
+// // it should also be struct-like (have fields) and be impl-like (have associated functions)
+// ModuleBsv =
+//   Attr* Visibility?
+//   'default'? 'const'? 'async'? 'gen'? 'unsafe'? Abi?
+//   'fn' Name GenericParamList? ParamList RetType? WhereClause?
+//   (body:BlockExpr | ';')
 
 Impl =
   Attr* Visibility?
