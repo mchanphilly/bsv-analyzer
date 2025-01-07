@@ -4,7 +4,7 @@ use crate::grammar::attributes::ATTRIBUTE_FIRST;
 
 use super::*;
 
-pub(crate) use atom::{block_expr, match_arm_list, stmt_list_bsv};
+pub(crate) use atom::{block_expr, match_arm_list, block_expr_bsv};
 pub(super) use atom::{literal, LITERAL_FIRST};
 
 #[derive(PartialEq, Eq)]
@@ -219,12 +219,22 @@ pub(super) fn module_call_bsv(p: &mut Parser<'_>) {
     m.complete(p, MODULE_CALL);
 }
 
-pub(super) fn expr_block_contents_bsv(p: &mut Parser<'_>, end: SyntaxKind) {
-    attributes::inner_attrs(p);
+// Not everything has a bra and ket. Function bodies only have a ket (whole signature is "bra")
+// while `begin/end` and `beginaction` and `endaction`, etc., have both.
+pub(super) fn stmt_list_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, end: SyntaxKind) {
+    let m = p.start();
+
+    if let Some(bra) = bra {
+        p.expect(bra);
+    }
+    // attributes::inner_attrs(p);
 
     while !p.at(EOF) && !p.at(end) {
         stmt(p, Semicolon::Required);
     }
+
+    p.expect(end);
+    m.complete(p, STMT_LIST);
 }
 
 pub(super) fn expr_block_contents(p: &mut Parser<'_>) {

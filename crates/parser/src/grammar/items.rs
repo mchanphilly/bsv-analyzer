@@ -537,14 +537,17 @@ fn macro_def(p: &mut Parser<'_>, m: Marker) {
 // // fn foo() {}
 fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
     let is_function;
+    let ket;
     match p.current() {
         T![function] => {
             is_function = true;
             p.bump(T![function]);
+            ket = T![endfunction];
         },
         T![method] => {
             is_function = false;
             p.bump(T![method]);
+            ket = T![endmethod];
         },
         _ => {
             unreachable!("should only be reachable on `function` or `method`");
@@ -572,23 +575,23 @@ fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
         param_list_m.complete(p, PARAM_LIST);
     }
 
-    // // test function_where_clause
-    // // fn foo<T>() where T: Copy {}
-    // generic_params::opt_where_clause(p);
-
-    // // test fn_decl
-    // // trait T { fn foo(); }
+    // test function_or_method_no_semi
+    // method Action get() = a.get();
     if !p.eat(T![;]) {
-        // TODO_BSV add body: also need to be resilient to nesting.
-        expressions::block_expr(p);
+        p.expect(T![=]);
+        // TODO_BSV: should be a function or method call here.
+        p.expect(T![;]);
+    }
 
-        if is_function {
-            p.expect(T![endfunction]);
-        } else {
-            p.expect(T![endmethod]);
-        }
-    } else if is_function {
-        p.error("function should have a body");
+    // Use context to judge whether we expect a body.
+    // Later we will want to allow methods to have bodies too. For that we'll
+    // probably need to take in context (e.g., inside interface no, inside module yes)
+    // with a carveout for the `method Action get() = a.get();` type of declaration, with `=`
+    let expect_body = is_function;
+    if expect_body {
+        // TODO_BSV add body: also need to be resilient to nesting.
+        expressions::block_expr_bsv(p, None, ket);
+        p.expect(ket);
     }
 
     m.complete(p, FN);
@@ -667,7 +670,7 @@ fn rule(p: &mut Parser<'_>) {
     opt_guard(p);
 
     if p.eat(T![;]) {
-        expressions::stmt_list_bsv(p, T![endrule]);
+        expressions::block_expr_bsv(p, None, T![endrule]);
         p.expect(T![endrule]);
     }
 

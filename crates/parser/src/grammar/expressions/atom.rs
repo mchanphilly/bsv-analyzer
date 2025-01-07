@@ -196,11 +196,9 @@ pub(super) fn atom_expr(
             //     end
             // endmethod
             let m = p.start();
-            // Could replace with the stmt_list_or_expr, but we'd only ever use the stmt_list branch.
-            p.bump(T![begin]);
-            stmt_list_bsv(p, T![end]);
-            p.expect(T![end]);
-            m.complete(p, STMT_LIST_BSV)
+            // Not sure why we don't directly call block_expr_bsv here
+            stmt_list_bsv(p, Some(T![begin]), T![end]);
+            m.complete(p, BLOCK_EXPR)
         }
 
         T![const] | T![static] | T![async] | T![move] | T![|] => closure_expr(p),
@@ -601,26 +599,18 @@ fn if_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(T![if]);
     expr_no_struct(p);
 
-    stmt_list_or_expr_bsv(p, T![begin], T![end]);
+    let (bra, ket) = (Some(T![begin]), T![end]);
+
+    block_expr_bsv(p, bra, ket);
 
     if p.eat(T![else]) {
         if p.at(T![if]) {
             if_expr(p);
         } else {
-            stmt_list_or_expr_bsv(p, T![begin], T![end]);
+            block_expr_bsv(p, bra, ket);
         }
     }
     m.complete(p, IF_EXPR_BSV)
-}
-
-// Shorthand for when we may have a sole expression OR a begin/end or action/endaction or other pair.
-fn stmt_list_or_expr_bsv(p: &mut Parser<'_>, start: SyntaxKind, end: SyntaxKind) {
-    if p.eat(start) {
-        stmt_list_bsv(p, end);
-        p.expect(end);
-    } else {
-        expr(p);  // expect a sole expression
-    }
 }
 
 // test label
@@ -845,12 +835,18 @@ pub(crate) fn block_expr(p: &mut Parser<'_>) {
     m.complete(p, BLOCK_EXPR);
 }
 
-// Observe the BSV version doesn't require braces. The caller should be removing
-// the braces.
-pub(crate) fn stmt_list_bsv(p: &mut Parser<'_>, end: SyntaxKind) -> CompletedMarker {
+// Observe the BSV version doesn't always have simple braces, but does need to stop at some point
+// e.g., method blah blah;
+//            [body]
+//       endmethod
+// We choose to start the statement list after the signature, since there's no good way
+// to mirror the Rust stmt_list { items } matched braces pattern. Unfortunately it also
+// means we would need to be cleverer to have TODO_BSV error resilience. Currently it's like
+// we better hope there's a body coming.
+pub(crate) fn block_expr_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, ket: SyntaxKind) -> CompletedMarker {
     let m = p.start();
-    expr_block_contents_bsv(p, end);  // TODO BSV migrate to whatever end brace, don't consume
-    m.complete(p, STMT_LIST_BSV)
+    stmt_list_bsv(p, bra, ket);  // Note we go don't bother going to expr_block_contents analogue.
+    m.complete(p, BLOCK_EXPR)
 }
 
 fn stmt_list(p: &mut Parser<'_>) -> CompletedMarker {
