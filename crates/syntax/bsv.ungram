@@ -424,30 +424,49 @@ RetType =
   '->' Type
 
 TypeAlias =
-(
+(  // Rust
   Attr* Visibility?
   'default'?
   'type' Name GenericParamList? (':' TypeBoundList?)? WhereClause?
   ('=' Type)? ';'
-)
-| (
+) | (  // Bluespec
   Attr* Visibility?
   'typedef' Type Name GenericParamList? (':' TypeBoundList?)? WhereClause? ';'
 )
 
 Struct =
+(  // Rust
   Attr* Visibility?
   'struct' Name GenericParamList? (
     WhereClause? (RecordFieldList | ';')
   | TupleFieldList WhereClause? ';'
   )
+) | (  // Bluespec
+  // Removed GenericParamList
+  // Removed TupleFieldList (not present in BSV)
+  // Removed WhereClause
+  // Removed struct declaration without definition
+  // Simplified grouping
+  Attr* Visibility?
+  'typedef' 'struct' Name
+  RecordFieldList ';'
+)
 
 RecordFieldList =
- '{' fields:(RecordField (',' RecordField)* ','?)? '}'
+  (  // Rust
+    '{' fields:(RecordField (',' RecordField)* ','?)? '}'
+  ) | (  // Bluespec
+    '{' fields:((RecordField)*)? '}'
+  )
 
 RecordField =
+(  // Rust
   Attr* Visibility?
   Name ':' Type
+) | (  // Bluespec
+  Attr* Visibility?
+  Type Name ';'  // moved semicolon here since always required
+)
 
 TupleFieldList =
   '(' fields:(TupleField (',' TupleField)* ','?)? ')'

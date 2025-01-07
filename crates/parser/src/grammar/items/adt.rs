@@ -9,6 +9,22 @@ pub(super) fn strukt(p: &mut Parser<'_>, m: Marker) {
     struct_or_union(p, m, true);
 }
 
+pub(super) fn strukt_bsv(p: &mut Parser<'_>, m: Marker) {
+    p.bump(T![struct]);
+
+    match p.current() {
+        T!['{'] => record_field_list_bsv(p),
+        _ => p.error( "expected `;` or `{`" ),
+    }
+
+    name_r(p, ITEM_RECOVERY_SET);
+
+    // TODO add in optional deriving tag
+
+    p.expect(T![;]);
+    m.complete(p, STRUCT);
+}
+
 // test union_item
 // struct U { i: i32, f: f32 }
 pub(super) fn union(p: &mut Parser<'_>, m: Marker) {
@@ -137,6 +153,46 @@ pub(crate) fn record_field_list(p: &mut Parser<'_>) {
             types::type_(p);
             m.complete(p, RECORD_FIELD);
         } else {
+            m.abandon(p);
+            p.err_and_bump("expected field declaration");
+        }
+    }
+}
+
+// test record_field_list
+// struct S { a: i32, b: f32 }
+pub(crate) fn record_field_list_bsv(p: &mut Parser<'_>) {
+    assert!(p.at(T!['{']));
+    let m = p.start();
+    p.bump(T!['{']);
+    while !p.at(T!['}']) && !p.at(EOF) {
+        // TODO see if we ever have { to start type
+        if p.at(T!['{']) {
+            error_block(p, "expected field");
+            continue;
+        }
+        record_field(p);  // ; included
+    }
+    p.expect(T!['}']);
+    m.complete(p, RECORD_FIELD_LIST);
+
+    fn record_field(p: &mut Parser<'_>) {
+        let m = p.start();
+        // test record_field_attrs
+
+        // Hmmm I don't think we have these in BSV
+        // // struct S { #[attr] f: f32 }
+        // attributes::outer_attrs(p);
+        // opt_visibility(p, false);
+        // typedef struct {
+        //     Integer a;
+        // }
+        if p.at(IDENT) {
+            types::type_(p);
+            name(p);
+            p.expect(T![;]);
+            m.complete(p, RECORD_FIELD);
+        } else {  // I think we can expect an identifier to start off the type.
             m.abandon(p);
             p.err_and_bump("expected field declaration");
         }

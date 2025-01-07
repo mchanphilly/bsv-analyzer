@@ -429,6 +429,8 @@ pub(crate) fn typedef_(p: &mut Parser<'_>, m: Marker) {
 
     // m should really be consumed inside here
     match p.current() {
+        T![struct] => adt::strukt_bsv(p, m),
+        // T![struct] => adt::strukt(p, m)
         // T![enum] => enum_decl(p),  // TODO
         _ => type_synonym_bsv(p, m),
     }
