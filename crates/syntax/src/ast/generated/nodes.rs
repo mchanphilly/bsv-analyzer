@@ -1473,7 +1473,6 @@ pub struct Param {
     pub(crate) syntax: SyntaxNode,
 }
 impl ast::HasAttrs for Param {}
-impl ast::HasName for Param {}
 impl Param {
     #[inline]
     pub fn pat(&self) -> Option<Pat> { support::child(&self.syntax) }
@@ -6685,7 +6684,6 @@ impl AstNode for AnyHasName {
                 | MODULE
                 | MODULE_BSV
                 | PACKAGE
-                | PARAM
                 | RECORD_FIELD
                 | RENAME
                 | RULE
@@ -6758,10 +6756,6 @@ impl From<Module_bsv> for AnyHasName {
 impl From<Package> for AnyHasName {
     #[inline]
     fn from(node: Package) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
-impl From<Param> for AnyHasName {
-    #[inline]
-    fn from(node: Param) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<RecordField> for AnyHasName {
     #[inline]

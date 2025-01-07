@@ -162,7 +162,7 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
 
         Flavor::Bsv => {
             types::type_(p);
-            name(p);
+            patterns::pattern(p);
         }
     }
     m.complete(p, PARAM);

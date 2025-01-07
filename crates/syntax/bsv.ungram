@@ -343,7 +343,7 @@ Param =
     Pat (':' Type)?
   | Type
   | '...'
-  | Type Name  // TODO BSV: Less sophisticated pattern matching than Rust
+  | Type Pat  // TODO BSV: Less sophisticated pattern matching than Rust
   )
 
 RetType =  // ? for Bluespec
