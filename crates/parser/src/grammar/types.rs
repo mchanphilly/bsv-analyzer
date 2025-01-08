@@ -68,6 +68,27 @@ pub(crate) fn type_(p: &mut Parser<'_>) {
     type_with_bounds_cond(p, true);
 }
 
+// For Bluespec use, since we don't have as complicated types.
+pub(crate) fn dumb_type_(p: &mut Parser<'_>) {
+    let pt = p.start();
+    let path = p.start();
+    let ps = p.start();
+
+    // TODO_BSV add option for qualifying with package name
+    // Could probably use a dumb version of this too
+    // let qual = path.complete(p, PATH);
+    // path_for_qualifier(p, mode, qual);
+
+    if p.at(IDENT) {
+        name_ref_r(p, TYPE_RECOVERY_SET);
+    }
+    generic_args::opt_generic_arg_list(p, false);
+
+    ps.complete(p, PATH_SEGMENT);
+    path.complete(p, PATH);
+    pt.complete(p, PATH_TYPE);
+}
+
 pub(super) fn type_no_bounds(p: &mut Parser<'_>) {
     type_with_bounds_cond(p, false);
 }

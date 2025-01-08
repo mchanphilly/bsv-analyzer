@@ -426,16 +426,32 @@ impl ast::UseTreeList {
 
 impl ast::Impl {
     pub fn self_ty(&self) -> Option<ast::Type> {
-        match self.target() {
-            (Some(t), None) | (_, Some(t)) => Some(t),
-            _ => None,
+        if let Some(_) = self.module_token() {
+            // Bluespec style
+            return match self.target() {
+                (Some(t), _) => Some(t),
+                _ => None,
+            };
+        } else {
+            return match self.target() {
+                (Some(t), None) | (_, Some(t)) => Some(t),
+                _ => None,
+            };
         }
     }
 
     pub fn trait_(&self) -> Option<ast::Type> {
-        match self.target() {
-            (Some(t), Some(_)) => Some(t),
-            _ => None,
+        if let Some(_) = self.module_token() {
+            // Bluespec style
+            return match self.target() {
+                (Some(_), Some(t)) => Some(t),
+                _ => None,
+            }
+        } else {
+            return match self.target() {
+                (Some(t), Some(_)) => Some(t),
+                _ => None,
+            }
         }
     }
 

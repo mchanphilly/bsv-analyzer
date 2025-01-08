@@ -99,6 +99,26 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, IMPL);
 }
 
+pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
+    p.bump(T![module]);
+
+    types::dumb_type_(p);
+
+    // TODO_BSV Add parametrization
+
+    p.expect(T!['(']);
+    impl_type(p);
+    p.expect(T![')']);
+    p.expect(T![;]);
+
+    borderless_assoc_item_list(p, T![endmodule]);
+
+    p.expect(T![endmodule]);
+
+    m.complete(p, IMPL);
+}
+
+
 // TODO_BSV
 // // test module_item
 // // module mkTop (Empty);
@@ -159,6 +179,9 @@ pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind) {
 //     fn bar(&self) {}
 // }
 pub(crate) fn assoc_item_list(p: &mut Parser<'_>) {
+    // TODO_BSV hypothesis: Reparser still relies on this for Trait and Impl
+    // SyntaxNodes, but if they were derived from Bluespec-style parsing
+    // then they will panic upon entering this. Check if that's true.
     assert!(p.at(T!['{']));
 
     let m = p.start();

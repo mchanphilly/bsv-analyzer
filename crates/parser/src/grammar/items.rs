@@ -289,6 +289,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
 
         T![function] | T![method] => function_or_method_(p, m),
         T![interface] => traits::interface_(p, m),
+        T![module] => traits::module_(p, m),
         // T![module] => traits::module_(p, m),  // TODO_BSV
         // test extern_block
         // unsafe extern "C" {}
@@ -579,6 +580,7 @@ fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
     // method Action get() = a.get();
     if !p.eat(T![;]) {
         p.expect(T![=]);
+        p.error("Language server doesn't yet implement shorthand assignment");
         // TODO_BSV: should be a function or method call here.
         p.expect(T![;]);
     }
@@ -587,7 +589,13 @@ fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
     // Later we will want to allow methods to have bodies too. For that we'll
     // probably need to take in context (e.g., inside interface no, inside module yes)
     // with a carveout for the `method Action get() = a.get();` type of declaration, with `=`
-    let expect_body = is_function;
+    const EXPECT_BODY_TOKENS: TokenSet = TokenSet::new(
+        &[T![method], T![interface], T![endinterface]]
+    );
+    let at_expect_body_token = p.at_ts(EXPECT_BODY_TOKENS);
+
+    let expect_body = is_function || !at_expect_body_token;
+
     if expect_body {
         // TODO_BSV add body: also need to be resilient to nesting.
         expressions::block_expr_bsv(p, None, ket);
