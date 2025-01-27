@@ -508,22 +508,16 @@ impl DefCollector<'_> {
             Name::new_symbol_root(sym::core.clone())
         };
 
-        let edition = match self.def_map.data.edition {
-            Edition::Edition2015 => Name::new_symbol_root(sym::rust_2015.clone()),
-            Edition::Edition2018 => Name::new_symbol_root(sym::rust_2018.clone()),
-            Edition::Edition2021 => Name::new_symbol_root(sym::rust_2021.clone()),
-            Edition::Edition2024 => Name::new_symbol_root(sym::rust_2024.clone()),
-        };
-
         let path_kind = match self.def_map.data.edition {
             Edition::Edition2015 => PathKind::Plain,
             _ => PathKind::Abs,
         };
         let path = ModPath::from_segments(
             path_kind,
-            [krate, Name::new_symbol_root(sym::prelude.clone()), edition],
+            [krate]
+            // Name::new_symbol_root(sym::prelude.clone())],
         );
-
+        // dbg!(&path);
         let (per_ns, _) =
             self.def_map.resolve_path(self.db, DefMap::ROOT, &path, BuiltinShadowMode::Other, None);
 
