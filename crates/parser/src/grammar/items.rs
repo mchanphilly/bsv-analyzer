@@ -561,8 +561,6 @@ fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
         }
     }
 
-    // TODO_BSV: We may need to modify visibility according to function or method. We'll see
-
     // Going to assume we *always* have a return type
     // even if Action. Actual language may be more permissive
     let ret_m = p.start();
@@ -572,13 +570,22 @@ fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
 
     name_r(p, ITEM_RECOVERY_SET);
 
+    // TODO BSV: Consider Self param for associated functions.
+    // Currently we just do a dumb all-methods = Self, all functions = not Self
     if p.at(T!['(']) {
-        params::param_list_bsv(p);
+        if is_function {
+            params::param_list_bsv_function(p);
+        } else {
+            params::param_list_bsv_method(p);
+        }
     }  else {
         // Arguments optional in Bluespec, unfortunately.
         // We replace with empty param list so we're sure to interpret
         // as "no parameters" and not "missing parameters"
         let param_list_m = p.start();
+        if !is_function {
+            p.start().complete(p, SELF_PARAM);
+        }
         param_list_m.complete(p, PARAM_LIST);
     }
 

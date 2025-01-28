@@ -28,8 +28,12 @@ pub(super) fn param_list_closure(p: &mut Parser<'_>) {
     list_(p, Flavor::Closure);
 }
 
-pub(super) fn param_list_bsv(p: &mut Parser<'_>) {
-    list_(p, Flavor::Bsv);
+pub(super) fn param_list_bsv_method(p: &mut Parser<'_>) {
+    list_(p, Flavor::BsvMethod);
+}
+
+pub(super) fn param_list_bsv_function(p: &mut Parser<'_>) {
+    list_(p, Flavor::BsvFunction);
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -38,7 +42,8 @@ enum Flavor {
     FnTrait, // Params for `Fn(...)`/`FnMut(...)`/`FnOnce(...)` annotations
     FnPointer,
     Closure,
-    Bsv,
+    BsvMethod,
+    BsvFunction,
 }
 
 fn list_(p: &mut Parser<'_>, flavor: Flavor) {
@@ -46,7 +51,7 @@ fn list_(p: &mut Parser<'_>, flavor: Flavor) {
 
     let (bra, ket) = match flavor {
         Closure => (T![|], T![|]),
-        FnDef | FnTrait | FnPointer | Bsv => (T!['('], T![')']),
+        FnDef | FnTrait | FnPointer | BsvMethod | BsvFunction => (T!['('], T![')']),
     };
 
     let list_marker = p.start();
@@ -62,6 +67,11 @@ fn list_(p: &mut Parser<'_>, flavor: Flavor) {
             Ok(()) => {}
             Err(m) => param_marker = Some(m),
         }
+    }
+
+    if let BsvMethod = flavor {
+        let m = p.start();
+        m.complete(p, SELF_PARAM);
     }
 
     while !p.at(EOF) && !p.at(ket) {
@@ -160,7 +170,7 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
             }
         }
 
-        Flavor::Bsv => {
+        Flavor::BsvMethod | Flavor::BsvFunction => {
             types::type_(p);
             patterns::pattern(p);
         }
