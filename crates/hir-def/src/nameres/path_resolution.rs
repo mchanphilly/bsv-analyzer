@@ -443,7 +443,7 @@ impl DefMap {
         //  - current module / scope
         //  - extern prelude / macro_use prelude
         //  - std prelude
-        dbg!(&self[module]);  // TODO_BSV_MODULE_HOOK
+        // dbg!(&self[module]);  // TODO_BSV_MODULE_HOOK
         let from_legacy_macro = self[module]
             .scope
             .get_legacy_macro(name)

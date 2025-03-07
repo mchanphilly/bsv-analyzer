@@ -517,7 +517,6 @@ impl DefCollector<'_> {
             [krate]
             // Name::new_symbol_root(sym::prelude.clone())],
         );
-        // dbg!(&path);
         let (per_ns, _) =
             self.def_map.resolve_path(self.db, DefMap::ROOT, &path, BuiltinShadowMode::Other, None);
 

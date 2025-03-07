@@ -306,7 +306,6 @@ impl<'a> SymbolCollector<'a> {
             is_alias: false,
             is_assoc,
         });
-        dbg!(&self.symbols);
     }
 
     fn push_module(&mut self, module_id: ModuleId) {
