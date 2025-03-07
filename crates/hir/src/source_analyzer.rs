@@ -49,7 +49,7 @@ use triomphe::Arc;
 use crate::{
     db::HirDatabase, semantics::PathResolution, Adt, AssocItem, BindingMode, BuiltinAttr,
     BuiltinType, Callable, Const, DeriveHelper, Field, Function, Local, Macro, ModuleDef, Static,
-    Struct, ToolModule, Trait, TraitAlias, TupleField, Type, TypeAlias, Variant,
+    Struct, ToolModule, Trait, TraitAlias, TupleField, Type, TypeAlias, Variant, Impl,
 };
 
 /// `SourceAnalyzer` is a convenience wrapper which exposes HIR API in terms of
@@ -1209,6 +1209,7 @@ fn resolve_hir_value_path(
             ValueNs::ConstId(it) => PathResolution::Def(Const::from(it).into()),
             ValueNs::StaticId(it) => PathResolution::Def(Static::from(it).into()),
             ValueNs::StructId(it) => PathResolution::Def(Struct::from(it).into()),
+            ValueNs::ImplId(it) => PathResolution::Def(Impl::from(it).into()),
             ValueNs::EnumVariantId(it) => PathResolution::Def(Variant::from(it).into()),
             ValueNs::ImplSelf(impl_id) => PathResolution::SelfType(impl_id.into()),
             ValueNs::GenericParam(id) => PathResolution::ConstParam(id.into()),

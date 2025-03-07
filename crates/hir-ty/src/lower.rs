@@ -766,6 +766,7 @@ impl<'a> TyLoweringContext<'a> {
         let last = path.segments().last();
         let (segment, generic_def) = match resolved {
             ValueTyDefId::FunctionId(it) => (last, Some(it.into())),
+            ValueTyDefId::ImplId(it) => (last, Some(it.into())),
             ValueTyDefId::StructId(it) => (last, Some(it.into())),
             ValueTyDefId::UnionId(it) => (last, Some(it.into())),
             ValueTyDefId::ConstId(it) => (last, Some(it.into())),
@@ -1373,6 +1374,7 @@ pub(crate) fn callable_item_sig(db: &dyn HirDatabase, def: CallableDefId) -> Pol
         CallableDefId::FunctionId(f) => fn_sig_for_fn(db, f),
         CallableDefId::StructId(s) => fn_sig_for_struct_constructor(db, s),
         CallableDefId::EnumVariantId(e) => fn_sig_for_enum_variant_constructor(db, e),
+        CallableDefId::ImplId(i) => fn_sig_for_impl(db, i),
     }
 }
 
@@ -1925,6 +1927,20 @@ fn type_for_static(db: &dyn HirDatabase, def: StaticId) -> Binders<Ty> {
     Binders::empty(Interner, ctx.lower_ty(&data.type_ref))
 }
 
+fn fn_sig_for_impl(db: &dyn HirDatabase, def: ImplId) -> PolyFnSig {
+    // let impl_data = db.impl_data(def);
+    // let resolver = def.resolver(db.upcast());
+    // let ctx = TyLoweringContext::new(db, &resolver, AdtId::from(def).into())
+    //     .with_type_param_mode(ParamLoweringMode::Variable);
+    // Note this contains generics.
+    let (ret, binders) = type_for_adt(db, def.into()).into_value_and_skipped_binders();
+    let params = iter::empty();
+    Binders::new(
+        binders,
+        CallableSig::from_params_and_return(params, ret, false, Safety::Safe, FnAbi::RustCall),
+    )
+}
+
 fn fn_sig_for_struct_constructor(db: &dyn HirDatabase, def: StructId) -> PolyFnSig {
     let struct_data = db.struct_data(def);
     let fields = struct_data.variant_data.fields();
@@ -2023,23 +2039,25 @@ pub enum TyDefId {
     AdtId(AdtId),
     TypeAliasId(TypeAliasId),
 }
-impl_from!(BuiltinType, AdtId(StructId, EnumId, UnionId), TypeAliasId for TyDefId);
+impl_from!(BuiltinType, AdtId(StructId, EnumId, UnionId, ImplId), TypeAliasId for TyDefId);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ValueTyDefId {
     FunctionId(FunctionId),
+    ImplId(ImplId),
     StructId(StructId),
     UnionId(UnionId),
     EnumVariantId(EnumVariantId),
     ConstId(ConstId),
     StaticId(StaticId),
 }
-impl_from!(FunctionId, StructId, UnionId, EnumVariantId, ConstId, StaticId for ValueTyDefId);
+impl_from!(FunctionId, ImplId, StructId, UnionId, EnumVariantId, ConstId, StaticId for ValueTyDefId);
 
 impl ValueTyDefId {
     pub(crate) fn to_generic_def_id(self, db: &dyn HirDatabase) -> Option<GenericDefId> {
         match self {
             Self::FunctionId(id) => Some(id.into()),
+            Self::ImplId(id) => Some(id.into()),
             Self::StructId(id) => Some(id.into()),
             Self::UnionId(id) => Some(id.into()),
             Self::EnumVariantId(var) => Some(var.lookup(db.upcast()).parent.into()),
@@ -2073,6 +2091,7 @@ pub(crate) fn ty_recover(db: &dyn HirDatabase, _cycle: &Cycle, def: &TyDefId) ->
 pub(crate) fn value_ty_query(db: &dyn HirDatabase, def: ValueTyDefId) -> Option<Binders<Ty>> {
     match def {
         ValueTyDefId::FunctionId(it) => Some(type_for_fn(db, it)),
+        ValueTyDefId::ImplId(it) => Some(type_for_adt(db, it.into())),
         ValueTyDefId::StructId(it) => type_for_struct_constructor(db, it),
         ValueTyDefId::UnionId(it) => Some(type_for_adt(db, it.into())),
         ValueTyDefId::EnumVariantId(it) => type_for_enum_variant_constructor(db, it),
@@ -2082,12 +2101,7 @@ pub(crate) fn value_ty_query(db: &dyn HirDatabase, def: ValueTyDefId) -> Option<
 }
 
 pub(crate) fn impl_self_ty_query(db: &dyn HirDatabase, impl_id: ImplId) -> Binders<Ty> {
-    let impl_data = db.impl_data(impl_id);
-    let resolver = impl_id.resolver(db.upcast());
-    let generics = generics(db.upcast(), impl_id.into());
-    let ctx = TyLoweringContext::new(db, &resolver, impl_id.into())
-        .with_type_param_mode(ParamLoweringMode::Variable);
-    make_binders(db, &generics, ctx.lower_ty(&impl_data.self_ty))
+    type_for_adt(db, impl_id.into())  // We actually removed the self_ty.
 }
 
 // returns None if def is a type arg

@@ -46,7 +46,7 @@ use crate::{
     path::{ImportAlias, ModPath, PathKind},
     per_ns::PerNs,
     tt,
-    visibility::{RawVisibility, Visibility},
+    visibility::{self, RawVisibility, Visibility},
     AdtId, AstId, AstIdWithPath, ConstLoc, CrateRootModuleId, EnumLoc, EnumVariantLoc,
     ExternBlockLoc, ExternCrateId, ExternCrateLoc, FunctionId, FunctionLoc, ImplLoc, Intern,
     ItemContainerId, LocalModuleId, Lookup, Macro2Id, Macro2Loc, MacroExpander, MacroId,
@@ -1738,9 +1738,19 @@ impl ModCollector<'_, '_> {
                 ModItem::MacroRules(id) => self.collect_macro_rules(id, module),
                 ModItem::Macro2(id) => self.collect_macro_def(id, module),
                 ModItem::Impl(imp) => {
+                    let it = &self.item_tree[imp];
                     let impl_id =
                         ImplLoc { container: module, id: ItemTreeId::new(self.tree_id, imp) }
                             .intern(db);
+                        
+                    let vis = resolve_vis(def_map, &RawVisibility::Public);
+                    update_def(
+                        self.def_collector,
+                        impl_id.into(),
+                        &it.name,
+                        vis,
+                        true,
+                    );
                     self.def_collector.def_map.modules[self.module_id].scope.define_impl(impl_id)
                 }
                 ModItem::Function(id) => {

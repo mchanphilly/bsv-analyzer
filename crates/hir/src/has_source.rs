@@ -107,6 +107,7 @@ impl HasSource for Adt {
             Adt::Struct(s) => Some(s.source(db)?.map(ast::Adt::Struct)),
             Adt::Union(u) => Some(u.source(db)?.map(ast::Adt::Union)),
             Adt::Enum(e) => Some(e.source(db)?.map(ast::Adt::Enum)),
+            Adt::Impl(i) => Some(i.source(db)?.map(ast::Adt::Impl)),
         }
     }
 }

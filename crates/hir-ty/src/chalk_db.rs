@@ -440,6 +440,9 @@ impl chalk_solve::RustIrDatabase<Interner> for ChalkContext<'_> {
             hir_def::AdtId::UnionId(id) => {
                 self.db.union_data(id).name.display(self.db.upcast(), edition).to_string()
             }
+            hir_def::AdtId::ImplId(id) => {
+                self.db.impl_data(id).name.display(self.db.upcast(), edition).to_string()
+            }
         }
     }
     fn adt_size_align(&self, _id: chalk_ir::AdtId<Interner>) -> Arc<rust_ir::AdtSizeAlign> {
@@ -758,6 +761,7 @@ pub(crate) fn adt_datum_query(
         // FIXME set fundamental flags correctly
         hir_def::AdtId::UnionId(_) => (false, false),
         hir_def::AdtId::EnumId(_) => (false, false),
+        hir_def::AdtId::ImplId(_) => (false, false),
     };
     let flags = rust_ir::AdtFlags {
         upstream: adt_id.module(db.upcast()).krate() != krate,
@@ -786,6 +790,10 @@ pub(crate) fn adt_datum_query(
     let (kind, variants) = match adt_id {
         hir_def::AdtId::StructId(id) => {
             (rust_ir::AdtKind::Struct, vec![variant_id_to_fields(id.into())])
+        }
+        hir_def::AdtId::ImplId(_) => {  // BSV indirection here, since Chalk only sees the three ADTs.
+            let dummy_fields = rust_ir::AdtVariantDatum { fields: vec![] };
+            (rust_ir::AdtKind::Struct, vec![dummy_fields])
         }
         hir_def::AdtId::EnumId(id) => {
             let variants = db

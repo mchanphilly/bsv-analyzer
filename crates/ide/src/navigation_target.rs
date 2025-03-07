@@ -405,7 +405,7 @@ impl TryToNav for hir::Impl {
 
         let (file_id, focus, syntax) = match &derive_path {
             Some(attr) => (attr.file_id.into(), None, attr.value.syntax()),
-            None => (file_id, value.self_ty(), value.syntax()),
+            None => (file_id, value.name(), value.syntax()),
         };
 
         Some(orig_range_with_focus(db, file_id, syntax, focus).map(
@@ -511,6 +511,7 @@ impl TryToNav for hir::Adt {
             hir::Adt::Struct(it) => it.try_to_nav(db),
             hir::Adt::Union(it) => it.try_to_nav(db),
             hir::Adt::Enum(it) => it.try_to_nav(db),
+            hir::Adt::Impl(it) => it.try_to_nav(db),
         }
     }
 }

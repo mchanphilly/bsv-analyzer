@@ -612,8 +612,9 @@ pub enum AdtId {
     StructId(StructId),
     UnionId(UnionId),
     EnumId(EnumId),
+    ImplId(ImplId),
 }
-impl_from!(StructId, UnionId, EnumId for AdtId);
+impl_from!(StructId, UnionId, EnumId, ImplId for AdtId);
 
 /// A macro
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -659,7 +660,7 @@ impl_from!(
     MacroId(Macro2Id, MacroRulesId, ProcMacroId),
     ModuleId,
     FunctionId,
-    AdtId(StructId, EnumId, UnionId),
+    AdtId(StructId, EnumId, UnionId, ImplId),
     EnumVariantId,
     ConstId,
     StaticId,
@@ -678,7 +679,7 @@ pub enum TypeOwnerId {
     StaticId(StaticId),
     ConstId(ConstId),
     InTypeConstId(InTypeConstId),
-    AdtId(AdtId),
+    AdtId(AdtId),  // (Hack: contains but doesn't use ImplId here)
     TraitId(TraitId),
     TraitAliasId(TraitAliasId),
     TypeAliasId(TypeAliasId),
@@ -957,6 +958,7 @@ impl GenericDefId {
             GenericDefId::AdtId(AdtId::StructId(it)) => file_id_and_params_of_item_loc(db, it),
             GenericDefId::AdtId(AdtId::UnionId(it)) => file_id_and_params_of_item_loc(db, it),
             GenericDefId::AdtId(AdtId::EnumId(it)) => file_id_and_params_of_item_loc(db, it),
+            GenericDefId::AdtId(AdtId::ImplId(it)) => file_id_and_params_of_item_loc(db, it),
             GenericDefId::TraitId(it) => file_id_and_params_of_item_loc(db, it),
             GenericDefId::TraitAliasId(it) => file_id_and_params_of_item_loc(db, it),
             GenericDefId::ImplId(it) => file_id_and_params_of_item_loc(db, it),
@@ -980,6 +982,7 @@ impl GenericDefId {
         match def {
             CallableDefId::FunctionId(f) => f.into(),
             CallableDefId::StructId(s) => s.into(),
+            CallableDefId::ImplId(i) => i.into(),
             CallableDefId::EnumVariantId(e) => e.lookup(db).parent.into(),
         }
     }
@@ -1000,6 +1003,7 @@ pub enum CallableDefId {
     FunctionId(FunctionId),
     StructId(StructId),
     EnumVariantId(EnumVariantId),
+    ImplId(ImplId),
 }
 
 impl InternValueTrivial for CallableDefId {}
@@ -1011,6 +1015,7 @@ impl From<CallableDefId> for ModuleDefId {
             CallableDefId::FunctionId(f) => ModuleDefId::FunctionId(f),
             CallableDefId::StructId(s) => ModuleDefId::AdtId(AdtId::StructId(s)),
             CallableDefId::EnumVariantId(e) => ModuleDefId::EnumVariantId(e),
+            CallableDefId::ImplId(e) => ModuleDefId::AdtId(AdtId::ImplId(e)),
         }
     }
 }
@@ -1021,6 +1026,7 @@ impl CallableDefId {
             CallableDefId::FunctionId(f) => f.krate(db),
             CallableDefId::StructId(s) => s.krate(db),
             CallableDefId::EnumVariantId(e) => e.krate(db),
+            CallableDefId::ImplId(i) => i.krate(db),
         }
     }
 }
@@ -1279,6 +1285,7 @@ impl HasModule for AdtId {
             AdtId::StructId(it) => it.module(db),
             AdtId::UnionId(it) => it.module(db),
             AdtId::EnumId(it) => it.module(db),
+            AdtId::ImplId(it) => it.module(db),
         }
     }
 }

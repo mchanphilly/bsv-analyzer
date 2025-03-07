@@ -433,6 +433,7 @@ pub(super) fn highlight_def(
                 hir::Adt::Struct(_) => HlTag::Symbol(SymbolKind::Struct),
                 hir::Adt::Enum(_) => HlTag::Symbol(SymbolKind::Enum),
                 hir::Adt::Union(_) => HlTag::Symbol(SymbolKind::Union),
+                hir::Adt::Impl(_) => HlTag::Symbol(SymbolKind::Impl),
             };
 
             Highlight::new(h)

@@ -911,6 +911,7 @@ pub struct Impl {
 impl ast::HasAttrs for Impl {}
 impl ast::HasDocComments for Impl {}
 impl ast::HasGenericParams for Impl {}
+impl ast::HasName for Impl {}
 impl ast::HasVisibility for Impl {}
 impl Impl {
     #[inline]
@@ -2470,6 +2471,7 @@ impl YieldExpr {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Adt {
     Enum(Enum),
+    Impl(Impl),
     Struct(Struct),
     Union(Union),
 }
@@ -5017,6 +5019,10 @@ impl From<Enum> for Adt {
     #[inline]
     fn from(node: Enum) -> Adt { Adt::Enum(node) }
 }
+impl From<Impl> for Adt {
+    #[inline]
+    fn from(node: Impl) -> Adt { Adt::Impl(node) }
+}
 impl From<Struct> for Adt {
     #[inline]
     fn from(node: Struct) -> Adt { Adt::Struct(node) }
@@ -5027,11 +5033,12 @@ impl From<Union> for Adt {
 }
 impl AstNode for Adt {
     #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, ENUM | STRUCT | UNION) }
+    fn can_cast(kind: SyntaxKind) -> bool { matches!(kind, ENUM | IMPL | STRUCT | UNION) }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             ENUM => Adt::Enum(Enum { syntax }),
+            IMPL => Adt::Impl(Impl { syntax }),
             STRUCT => Adt::Struct(Struct { syntax }),
             UNION => Adt::Union(Union { syntax }),
             _ => return None,
@@ -5042,6 +5049,7 @@ impl AstNode for Adt {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             Adt::Enum(it) => &it.syntax,
+            Adt::Impl(it) => &it.syntax,
             Adt::Struct(it) => &it.syntax,
             Adt::Union(it) => &it.syntax,
         }
@@ -6690,6 +6698,7 @@ impl AstNode for AnyHasName {
                 | FN
                 | FORMAT_ARGS_ARG
                 | IDENT_PAT
+                | IMPL
                 | INTERFACE
                 | MACRO_DEF
                 | MACRO_RULES
@@ -6744,6 +6753,10 @@ impl From<FormatArgsArg> for AnyHasName {
 impl From<IdentPat> for AnyHasName {
     #[inline]
     fn from(node: IdentPat) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<Impl> for AnyHasName {
+    #[inline]
+    fn from(node: Impl) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<Interface> for AnyHasName {
     #[inline]

@@ -57,6 +57,7 @@ impl From<AdtId> for Adt {
             AdtId::StructId(it) => Adt::Struct(it.into()),
             AdtId::UnionId(it) => Adt::Union(it.into()),
             AdtId::EnumId(it) => Adt::Enum(it.into()),
+            AdtId::ImplId(it) => Adt::Impl(it.into()),
         }
     }
 }
@@ -67,6 +68,7 @@ impl From<Adt> for AdtId {
             Adt::Struct(it) => AdtId::StructId(it.id),
             Adt::Union(it) => AdtId::UnionId(it.id),
             Adt::Enum(it) => AdtId::EnumId(it.id),
+            Adt::Impl(it) => AdtId::ImplId(it.id),
         }
     }
 }
@@ -207,6 +209,7 @@ impl From<Adt> for GenericDefId {
             Adt::Struct(it) => it.id.into(),
             Adt::Union(it) => it.id.into(),
             Adt::Enum(it) => it.id.into(),
+            Adt::Impl(it) => it.id.into(),
         }
     }
 }

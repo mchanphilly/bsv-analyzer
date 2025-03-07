@@ -167,6 +167,9 @@ pub(super) fn data_constructor<'a, DB: HirDatabase>(
         .filter_map(|ty| ty.as_adt().map(|adt| (adt, ty)))
         .filter(|_| should_continue())
         .filter_map(move |(adt, ty)| match adt {
+            Adt::Impl(_) => {
+                None
+            }
             Adt::Struct(strukt) => {
                 // Ignore unstable or not visible
                 if strukt.is_unstable(db) || !strukt.is_visible_from(db, module) {

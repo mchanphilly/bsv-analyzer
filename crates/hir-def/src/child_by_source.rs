@@ -133,6 +133,7 @@ impl ChildBySource for ItemScope {
                     insert_item_loc(db, map, file_id, id, keys::TRAIT_ALIAS)
                 }
                 ModuleDefId::AdtId(adt) => match adt {
+                    AdtId::ImplId(id) => insert_item_loc(db, map, file_id, id, keys::IMPL),
                     AdtId::StructId(id) => insert_item_loc(db, map, file_id, id, keys::STRUCT),
                     AdtId::UnionId(id) => insert_item_loc(db, map, file_id, id, keys::UNION),
                     AdtId::EnumId(id) => insert_item_loc(db, map, file_id, id, keys::ENUM),

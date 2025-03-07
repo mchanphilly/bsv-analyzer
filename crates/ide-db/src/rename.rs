@@ -146,6 +146,7 @@ impl Definition {
                 hir::Adt::Struct(it) => name_range(it, sema).and_then(syn_ctx_is_root),
                 hir::Adt::Union(it) => name_range(it, sema).and_then(syn_ctx_is_root),
                 hir::Adt::Enum(it) => name_range(it, sema).and_then(syn_ctx_is_root),
+                hir::Adt::Impl(it) => name_range(it, sema).and_then(syn_ctx_is_root),
             },
             Definition::Variant(it) => name_range(it, sema).and_then(syn_ctx_is_root),
             Definition::Const(it) => name_range(it, sema).and_then(syn_ctx_is_root),

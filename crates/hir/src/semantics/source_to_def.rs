@@ -284,6 +284,7 @@ impl SourceToDefCtx<'_, '_> {
         InFile { file_id, value }: InFile<&ast::Adt>,
     ) -> Option<AdtId> {
         match value {
+            ast::Adt::Impl(it) => self.impl_to_def(InFile::new(file_id, it)).map(AdtId::ImplId),
             ast::Adt::Enum(it) => self.enum_to_def(InFile::new(file_id, it)).map(AdtId::EnumId),
             ast::Adt::Struct(it) => {
                 self.struct_to_def(InFile::new(file_id, it)).map(AdtId::StructId)

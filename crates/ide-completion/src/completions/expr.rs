@@ -168,6 +168,9 @@ pub(crate) fn complete_expr_path(
                 let complete_self = self_ty == Some(adt);
 
                 match adt {
+                    hir::Adt::Impl(impl_def) => {
+                        // TODO BSV
+                    }
                     hir::Adt::Struct(strukt) => {
                         let path = ctx
                             .module

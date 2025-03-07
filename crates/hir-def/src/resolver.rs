@@ -109,6 +109,7 @@ pub enum ResolveValueResult {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum ValueNs {
     ImplSelf(ImplId),
+    ImplId(ImplId),
     LocalBinding(BindingId),
     FunctionId(FunctionId),
     ConstId(ConstId),
@@ -920,6 +921,7 @@ fn to_value_ns(per_ns: PerNs) -> Option<(ValueNs, Option<ImportId>)> {
     let res = match def {
         ModuleDefId::FunctionId(it) => ValueNs::FunctionId(it),
         ModuleDefId::AdtId(AdtId::StructId(it)) => ValueNs::StructId(it),
+        ModuleDefId::AdtId(AdtId::ImplId(it)) => ValueNs::ImplId(it),
         ModuleDefId::EnumVariantId(it) => ValueNs::EnumVariantId(it),
         ModuleDefId::ConstId(it) => ValueNs::ConstId(it),
         ModuleDefId::StaticId(it) => ValueNs::StaticId(it),
@@ -1055,10 +1057,17 @@ impl HasResolver for TraitAliasId {
 impl<T: Into<AdtId> + Copy> HasResolver for T {
     fn resolver(self, db: &dyn DefDatabase) -> Resolver {
         let def = self.into();
-        def.module(db)
+        let resolver = def.module(db)
             .resolver(db)
             .push_generic_params_scope(db, def.into())
-            .push_scope(Scope::AdtScope(def))
+            .push_scope(Scope::AdtScope(def));
+
+        if let AdtId::ImplId(impl_def) = def {
+            resolver
+            .push_impl_def_scope(impl_def)
+        } else {
+            resolver
+        }
     }
 }
 
@@ -1083,16 +1092,6 @@ impl HasResolver for StaticId {
 impl HasResolver for TypeAliasId {
     fn resolver(self, db: &dyn DefDatabase) -> Resolver {
         lookup_resolver(db, self).push_generic_params_scope(db, self.into())
-    }
-}
-
-impl HasResolver for ImplId {
-    fn resolver(self, db: &dyn DefDatabase) -> Resolver {
-        self.lookup(db)
-            .container
-            .resolver(db)
-            .push_generic_params_scope(db, self.into())
-            .push_impl_def_scope(self)
     }
 }
 

@@ -220,7 +220,24 @@ impl HirDisplay for Adt {
             Adt::Struct(it) => it.hir_fmt(f),
             Adt::Union(it) => it.hir_fmt(f),
             Adt::Enum(it) => it.hir_fmt(f),
+            Adt::Impl(it) => it.hir_fmt(f),
         }
+    }
+}
+
+impl HirDisplay for Impl {
+    fn hir_fmt(&self, f: &mut HirFormatter<'_>) -> Result<(), HirDisplayError> {
+        let module_id = self.module(f.db).id;
+        // FIXME: Render repr if its set explicitly?
+        // write_visibility(module_id, self.visibility(f.db), f)?;
+        f.write_str("impl ")?;
+        write!(f, "{}", self.name(f.db).display(f.db.upcast(), f.edition()))?;        
+
+        let def_id = GenericDefId::AdtId(AdtId::ImplId(self.id));
+        write_generic_params(def_id, f)?;
+        f.write_str(": fix hir_fmt if necessary")?;
+
+        Ok(())
     }
 }
 

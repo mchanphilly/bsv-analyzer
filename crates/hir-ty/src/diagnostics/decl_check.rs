@@ -148,7 +148,10 @@ impl<'a> DeclValidator<'a> {
             AdtId::EnumId(enum_id) => self.validate_enum(enum_id),
             AdtId::UnionId(_) => {
                 // FIXME: Unions aren't yet supported by this validator.
-            }
+            },
+            AdtId::ImplId(_) => {
+                // BSV TODO: Validate ADT
+            },
         }
     }
 

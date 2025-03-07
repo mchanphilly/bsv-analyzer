@@ -593,6 +593,7 @@ fn filename_and_frag_for_def(
             }
             Adt::Enum(e) => format!("enum.{}.html", e.name(db).unescaped().display(db.upcast())),
             Adt::Union(u) => format!("union.{}.html", u.name(db).unescaped().display(db.upcast())),
+            Adt::Impl(i) => format!("impl.{}.html", i.name(db).unescaped().display(db.upcast())),
         },
         Definition::Module(m) => match m.name(db) {
             // `#[doc(keyword = "...")]` is internal used only by rust compiler

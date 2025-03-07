@@ -43,6 +43,7 @@ impl InferenceContext<'_> {
         let (value, self_subst) = self.resolve_value_path_inner(path, id)?;
 
         let value_def: ValueTyDefId = match value {
+            ValueNs::ImplId(it) => it.into(),
             ValueNs::FunctionId(it) => it.into(),
             ValueNs::ConstId(it) => it.into(),
             ValueNs::StaticId(it) => it.into(),

@@ -114,6 +114,7 @@ impl<'a> SymbolCollector<'a> {
                 ModuleDefId::AdtId(AdtId::StructId(id)) => self.push_decl(id, false),
                 ModuleDefId::AdtId(AdtId::EnumId(id)) => self.push_decl(id, false),
                 ModuleDefId::AdtId(AdtId::UnionId(id)) => self.push_decl(id, false),
+                ModuleDefId::AdtId(hir_def::AdtId::ImplId(id)) => self.push_decl(id, false),
                 ModuleDefId::ConstId(id) => {
                     self.push_decl(id, false);
                     self.collect_from_body(id);
@@ -215,7 +216,7 @@ impl<'a> SymbolCollector<'a> {
     fn collect_from_impl(&mut self, impl_id: ImplId) {
         let impl_data = self.db.impl_data(impl_id);
         let impl_name =
-            Some(SmolStr::new(impl_data.self_ty.display(self.db, self.edition).to_string()));
+            Some(impl_data.name.as_str().into());
         self.with_container_name(impl_name, |s| {
             for &assoc_item_id in impl_data.items.iter() {
                 s.push_assoc_item(assoc_item_id)
@@ -305,6 +306,7 @@ impl<'a> SymbolCollector<'a> {
             is_alias: false,
             is_assoc,
         });
+        dbg!(&self.symbols);
     }
 
     fn push_module(&mut self, module_id: ModuleId) {

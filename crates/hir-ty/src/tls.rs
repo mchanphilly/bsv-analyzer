@@ -24,6 +24,7 @@ impl DebugContext<'_> {
             AdtId::StructId(it) => self.0.struct_data(it).name.clone(),
             AdtId::UnionId(it) => self.0.union_data(it).name.clone(),
             AdtId::EnumId(it) => self.0.enum_data(it).name.clone(),
+            AdtId::ImplId(it) => self.0.impl_data(it).name.clone(),
         };
         name.display(self.0.upcast(), Edition::LATEST).fmt(f)?;
         Ok(())
@@ -109,12 +110,13 @@ impl DebugContext<'_> {
             CallableDefId::FunctionId(ff) => self.0.function_data(ff).name.clone(),
             CallableDefId::StructId(s) => self.0.struct_data(s).name.clone(),
             CallableDefId::EnumVariantId(e) => self.0.enum_variant_data(e).name.clone(),
+            CallableDefId::ImplId(i) => self.0.impl_data(i).name.clone(),
         };
         match def {
             CallableDefId::FunctionId(_) => {
                 write!(fmt, "{{fn {}}}", name.display(self.0.upcast(), Edition::LATEST))
             }
-            CallableDefId::StructId(_) | CallableDefId::EnumVariantId(_) => {
+            CallableDefId::StructId(_) | CallableDefId::EnumVariantId(_) | CallableDefId::ImplId(_) => {
                 write!(fmt, "{{ctor {}}}", name.display(self.0.upcast(), Edition::LATEST))
             }
         }

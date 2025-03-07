@@ -1403,6 +1403,12 @@ impl<'a> InferenceContext<'a> {
                 let ty = self.insert_type_vars(ty.substitute(Interner, &substs));
                 forbid_unresolved_segments((ty, Some(strukt.into())), unresolved)
             }
+            TypeNs::AdtId(AdtId::ImplId(impl_def)) => {
+                let substs = ctx.substs_from_path(path, impl_def.into(), true);
+                let ty = self.db.ty(impl_def.into());
+                let ty = self.insert_type_vars(ty.substitute(Interner, &substs));
+                forbid_unresolved_segments((ty, None), unresolved)  // TODO BSV
+            }
             TypeNs::AdtId(AdtId::UnionId(u)) => {
                 let substs = ctx.substs_from_path(path, u.into(), true);
                 let ty = self.db.ty(u.into());
@@ -1477,6 +1483,7 @@ impl<'a> InferenceContext<'a> {
                         // FIXME Error E0071, expected struct, variant or union type, found enum `Foo`
                         None
                     }
+                    AdtId::ImplId(_) => None, 
                 });
                 (ty, variant)
             }
@@ -1545,6 +1552,7 @@ impl<'a> InferenceContext<'a> {
                         // FIXME Error E0071, expected struct, variant or union type, found enum `Foo`
                         None
                     }
+                    AdtId::ImplId(_) => None,  // Not super sure this will ever be used (BSV)
                 });
                 (ty, variant)
             }

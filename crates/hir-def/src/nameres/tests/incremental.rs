@@ -335,6 +335,7 @@ pub type Ty = ();
                         AdtId::StructId(it) => _ = db.struct_data(it),
                         AdtId::UnionId(it) => _ = db.union_data(it),
                         AdtId::EnumId(it) => _ = db.enum_data(it),
+                        AdtId::ImplId(it) => _ = db.impl_data(it),
                     },
                     ModuleDefId::ConstId(it) => _ = db.const_data(it),
                     ModuleDefId::StaticId(it) => _ = db.static_data(it),

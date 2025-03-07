@@ -425,6 +425,7 @@ impl Printer<'_> {
             }
             ModItem::Impl(it) => {
                 let Impl {
+                    name,
                     target_trait,
                     self_ty,
                     is_negative,
@@ -447,6 +448,7 @@ impl Printer<'_> {
                     self.print_path(&tr.path);
                     w!(self, " for ");
                 }
+                w!(self, "{}: ", name.display(self.db.upcast(), self.edition));
                 self.print_type_ref(self_ty);
                 self.print_where_clause_and_opening_brace(generic_params);
                 self.indented(|this| {

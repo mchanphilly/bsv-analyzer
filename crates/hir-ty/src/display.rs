@@ -707,6 +707,9 @@ fn render_const_scalar(
                 return f.write_str("<layout-error>");
             };
             match adt.0 {
+                hir_def::AdtId::ImplId(impl_def) => {
+                    write!(f, "const scalar? {}", f.db.impl_data(impl_def).name.display(f.db.upcast(), f.edition()))
+                },
                 hir_def::AdtId::StructId(s) => {
                     let data = f.db.struct_data(s);
                     write!(f, "{}", data.name.display(f.db.upcast(), f.edition()))?;
@@ -1028,6 +1031,10 @@ impl HirDisplay for Ty {
                         f.start_location_link(def.into());
                         write!(f, "{}", db.struct_data(s).name.display(f.db.upcast(), f.edition()))?
                     }
+                    CallableDefId::ImplId(i) => {
+                        f.start_location_link(def.into());
+                        write!(f, "{}", db.impl_data(i).name.display(f.db.upcast(), f.edition()))?
+                    }
                     CallableDefId::EnumVariantId(e) => {
                         f.start_location_link(def.into());
                         write!(
@@ -1084,6 +1091,7 @@ impl HirDisplay for Ty {
                             hir_def::AdtId::StructId(it) => db.struct_data(it).name.clone(),
                             hir_def::AdtId::UnionId(it) => db.union_data(it).name.clone(),
                             hir_def::AdtId::EnumId(it) => db.enum_data(it).name.clone(),
+                            hir_def::AdtId::ImplId(it) => db.impl_data(it).name.clone(),
                         };
                         write!(f, "{}", name.display(f.db.upcast(), f.edition()))?;
                     }

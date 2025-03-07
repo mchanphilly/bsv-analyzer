@@ -291,6 +291,7 @@ fn module_def_to_hl_tag(def: Definition) -> HlTag {
     let symbol = match def {
         Definition::Module(_) | Definition::ExternCrateDecl(_) => SymbolKind::Module,
         Definition::Function(_) => SymbolKind::Function,
+        Definition::Adt(hir::Adt::Impl(_)) => SymbolKind::Impl,
         Definition::Adt(hir::Adt::Struct(_)) => SymbolKind::Struct,
         Definition::Adt(hir::Adt::Enum(_)) => SymbolKind::Enum,
         Definition::Adt(hir::Adt::Union(_)) => SymbolKind::Union,

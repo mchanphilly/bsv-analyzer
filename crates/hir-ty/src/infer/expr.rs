@@ -2058,7 +2058,7 @@ impl InferenceContext<'_> {
                         );
                     }
                 }
-                CallableDefId::StructId(_) | CallableDefId::EnumVariantId(_) => {}
+                CallableDefId::StructId(_) | CallableDefId::EnumVariantId(_) | CallableDefId::ImplId(_) => {}
             }
         }
     }

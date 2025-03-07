@@ -823,6 +823,7 @@ impl PerNs {
                         PerNs::types(def, v, import)
                     }
                 }
+                AdtId::ImplId(_) => PerNs::both(def, def, v, import),
             },
             ModuleDefId::EnumVariantId(_) => PerNs::both(def, def, v, import),
             ModuleDefId::ConstId(_) | ModuleDefId::StaticId(_) => {

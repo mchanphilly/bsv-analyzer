@@ -542,6 +542,7 @@ fn res_to_kind(resolution: ScopeDef) -> CompletionItemKind {
             hir::Adt::Struct(_) => SymbolKind::Struct,
             hir::Adt::Union(_) => SymbolKind::Union,
             hir::Adt::Enum(_) => SymbolKind::Enum,
+            hir::Adt::Impl(_) => SymbolKind::Impl,
         }),
         ScopeDef::ModuleDef(Const(..)) => CompletionItemKind::SymbolKind(SymbolKind::Const),
         ScopeDef::ModuleDef(Static(..)) => CompletionItemKind::SymbolKind(SymbolKind::Static),

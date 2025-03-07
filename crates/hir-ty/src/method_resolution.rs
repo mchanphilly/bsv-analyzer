@@ -393,6 +393,7 @@ pub fn def_crates(
     match ty.kind(Interner) {
         &TyKind::Adt(AdtId(def_id), _) => {
             let rustc_has_incoherent_inherent_impls = match def_id {
+                hir_def::AdtId::ImplId(_) => false,
                 hir_def::AdtId::StructId(id) => db
                     .struct_data(id)
                     .flags
@@ -824,6 +825,7 @@ fn is_inherent_impl_coherent(
             | TyKind::Scalar(_) => true,
 
             &TyKind::Adt(AdtId(adt), _) => match adt {
+                hir_def::AdtId::ImplId(_) => false,
                 hir_def::AdtId::StructId(id) => db
                     .struct_data(id)
                     .flags

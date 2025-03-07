@@ -213,6 +213,7 @@ fn resolve_assoc_or_field(
         Adt::Struct(it) => it.into(),
         Adt::Union(it) => it.into(),
         Adt::Enum(_) => return None,
+        Adt::Impl(_) => return None,
     };
     resolve_field(db, variant_def, name, ns)
 }

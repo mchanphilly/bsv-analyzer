@@ -110,6 +110,7 @@ impl UninhabitedFrom<'_> {
                 }
                 BREAK_VISIBLY_UNINHABITED
             }
+            AdtId::ImplId(_) => CONTINUE_OPAQUELY_INHABITED,
         }
     }
 

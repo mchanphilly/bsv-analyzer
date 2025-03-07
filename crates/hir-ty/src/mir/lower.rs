@@ -517,7 +517,7 @@ impl<'ctx> MirLowerCtx<'ctx> {
                         );
                         Ok(Some(current))
                     }
-                    ValueNs::FunctionId(_) | ValueNs::StructId(_) | ValueNs::ImplSelf(_) => {
+                    ValueNs::FunctionId(_) | ValueNs::StructId(_) | ValueNs::ImplSelf(_) | ValueNs::ImplId(_) => {
                         // It's probably a unit struct or a zero sized function, so no action is needed.
                         Ok(Some(current))
                     }

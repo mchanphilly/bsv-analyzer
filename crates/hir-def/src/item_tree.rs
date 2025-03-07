@@ -848,6 +848,7 @@ pub struct TraitAlias {
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Impl {
+    pub name: Name,
     pub generic_params: Interned<GenericParams>,
     pub target_trait: Option<Interned<TraitRef>>,
     pub self_ty: Interned<TypeRef>,

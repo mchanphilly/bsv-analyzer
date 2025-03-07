@@ -269,6 +269,7 @@ impl From<hir::ModuleDefId> for SymbolKind {
             hir::ModuleDefId::AdtId(hir::AdtId::StructId(..)) => SymbolKind::Struct,
             hir::ModuleDefId::AdtId(hir::AdtId::EnumId(..)) => SymbolKind::Enum,
             hir::ModuleDefId::AdtId(hir::AdtId::UnionId(..)) => SymbolKind::Union,
+            hir::ModuleDefId::AdtId(hir::AdtId::ImplId(..)) => SymbolKind::Impl,
             hir::ModuleDefId::TraitId(..) => SymbolKind::Trait,
             hir::ModuleDefId::TraitAliasId(..) => SymbolKind::TraitAlias,
             hir::ModuleDefId::TypeAliasId(..) => SymbolKind::TypeAlias,

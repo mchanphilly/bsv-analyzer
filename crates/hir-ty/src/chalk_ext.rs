@@ -161,7 +161,7 @@ impl TyExt for Ty {
     fn as_fn_def(&self, db: &dyn HirDatabase) -> Option<FunctionId> {
         match self.callable_def(db) {
             Some(CallableDefId::FunctionId(func)) => Some(func),
-            Some(CallableDefId::StructId(_) | CallableDefId::EnumVariantId(_)) | None => None,
+            Some(CallableDefId::StructId(_) | CallableDefId::EnumVariantId(_) | CallableDefId::ImplId(_)) | None => None,
         }
     }
 

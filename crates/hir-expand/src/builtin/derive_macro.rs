@@ -256,6 +256,9 @@ fn parse_adt(tt: &tt::Subtree, call_site: Span) -> Result<BasicAdtInfo, ExpandEr
         ast::Adt::Union(it) => {
             (it.name(), it.generic_param_list(), it.where_clause(), AdtShape::Union)
         }
+        ast::Adt::Impl(it) => {  // Stop-gap
+            (it.name(), it.generic_param_list(), it.where_clause(), AdtShape::Union)
+        }
     };
 
     let mut param_type_set: FxHashSet<Name> = FxHashSet::default();
@@ -343,6 +346,7 @@ fn parse_adt(tt: &tt::Subtree, call_site: Span) -> Result<BasicAdtInfo, ExpandEr
         ast::Adt::Enum(it) => it.variant_list().map(|list| list.syntax().clone()),
         ast::Adt::Struct(it) => it.field_list().map(|list| list.syntax().clone()),
         ast::Adt::Union(it) => it.record_field_list().map(|list| list.syntax().clone()),
+        ast::Adt::Impl(_) => None,
     };
     let associated_types = field_list
         .into_iter()

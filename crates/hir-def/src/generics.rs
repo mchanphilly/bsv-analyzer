@@ -410,6 +410,7 @@ impl GenericParams {
             GenericDefId::AdtId(AdtId::StructId(id)) => id_to_generics(db, id, enabled_params),
             GenericDefId::AdtId(AdtId::EnumId(id)) => id_to_generics(db, id, enabled_params),
             GenericDefId::AdtId(AdtId::UnionId(id)) => id_to_generics(db, id, enabled_params),
+            GenericDefId::AdtId(AdtId::ImplId(id)) => id_to_generics(db, id, enabled_params),
             GenericDefId::TraitId(id) => id_to_generics(db, id, enabled_params),
             GenericDefId::TraitAliasId(id) => id_to_generics(db, id, enabled_params),
             GenericDefId::TypeAliasId(id) => id_to_generics(db, id, enabled_params),

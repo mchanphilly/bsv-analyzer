@@ -1754,6 +1754,7 @@ impl Evaluator<'_> {
                         AdtId::StructId(s) => s,
                         AdtId::UnionId(_) => not_supported!("unsizing unions"),
                         AdtId::EnumId(_) => not_supported!("unsizing enums"),
+                        AdtId::ImplId(_) => not_supported!("unsizing impl"),
                     };
                     let Some((last_field, _)) =
                         self.db.struct_data(id).variant_data.fields().iter().next_back()
@@ -2286,6 +2287,7 @@ impl Evaluator<'_> {
                         }
                     }
                     AdtId::UnionId(_) => (),
+                    AdtId::ImplId(_) => (),
                 },
                 _ => (),
             }
@@ -2344,6 +2346,7 @@ impl Evaluator<'_> {
                         )?;
                     }
                 }
+                AdtId::ImplId(_) => (),
                 AdtId::UnionId(_) => (),
                 AdtId::EnumId(e) => {
                     if let Some((ev, layout)) = detect_variant_from_bytes(
@@ -2508,6 +2511,7 @@ impl Evaluator<'_> {
                     span,
                 )
             }
+            CallableDefId::ImplId(_) => Ok(None),  // BSV, may be technical debt. Not sure how important the MIR is here.
             CallableDefId::StructId(id) => {
                 let (size, variant_layout, tag) =
                     self.layout_of_variant(id.into(), generic_args, locals)?;
@@ -2863,6 +2867,7 @@ impl Evaluator<'_> {
                     }
                     AdtId::UnionId(_) => (), // union fields don't need drop
                     AdtId::EnumId(_) => (),
+                    AdtId::ImplId(_) => (),
                 }
             }
             TyKind::AssociatedType(_, _)

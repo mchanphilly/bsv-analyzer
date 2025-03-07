@@ -102,7 +102,7 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
 pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![module]);
 
-    types::dumb_type_(p);
+    name_r(p, ITEM_RECOVERY_SET);
 
     // TODO_BSV Add parametrization
 

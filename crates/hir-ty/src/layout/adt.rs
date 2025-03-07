@@ -45,6 +45,12 @@ pub fn layout_of_adt_query(
             .collect::<Result<Vec<_>, _>>()
     };
     let (variants, repr) = match def {
+        AdtId::ImplId(impl_def) => {
+            let data = db.impl_data(impl_def);
+            let mut r = SmallVec::<[_; 1]>::new();
+            // r.push(handle_variant(impl_def.into(), &data.variant_data)?);
+            (r, None.unwrap_or_default())
+        }
         AdtId::StructId(s) => {
             let data = db.struct_data(s);
             let mut r = SmallVec::<[_; 1]>::new();

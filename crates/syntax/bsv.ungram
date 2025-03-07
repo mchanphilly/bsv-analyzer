@@ -431,6 +431,7 @@ Adt =
   Enum
 | Struct
 | Union
+| Impl
 
 Const =
   Attr* Visibility?
@@ -487,7 +488,7 @@ Impl =
   'impl' GenericParamList? ('const'? '!'? trait:Type 'for')? self_ty:Type WhereClause?
   AssocItemList
 ) | (  // Bluespec TODO add and test parameters i.e., # for both types and values
-  'module' self_ty:Type '(' trait:Type ')' ';'
+  'module' Name '(' trait:Type ')' ';'
   AssocItemList
   'endmodule' // (':' ? 
 )

@@ -339,8 +339,8 @@ impl TraitAliasData {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ImplData {
+    pub name: Name,
     pub target_trait: Option<Interned<TraitRef>>,
-    pub self_ty: Interned<TypeRef>,
     pub items: Box<[AssocItemId]>,
     pub is_negative: bool,
     pub is_unsafe: bool,
@@ -364,7 +364,6 @@ impl ImplData {
         let item_tree = tree_id.item_tree(db);
         let impl_def = &item_tree[tree_id.value];
         let target_trait = impl_def.target_trait.clone();
-        let self_ty = impl_def.self_ty.clone();
         let is_negative = impl_def.is_negative;
         let is_unsafe = impl_def.is_unsafe;
 
@@ -377,8 +376,8 @@ impl ImplData {
 
         (
             Arc::new(ImplData {
+                name: impl_def.name.clone(),
                 target_trait,
-                self_ty,
                 items,
                 is_negative,
                 is_unsafe,

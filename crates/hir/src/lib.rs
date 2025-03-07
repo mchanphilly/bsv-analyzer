@@ -303,7 +303,7 @@ pub enum ModuleDef {
 impl_from!(
     Module,
     Function,
-    Adt(Struct, Enum, Union),
+    Adt(Struct, Enum, Union, Impl),
     Variant,
     Const,
     Static,
@@ -381,6 +381,7 @@ impl ModuleDef {
                 Adt::Struct(it) => it.id.into(),
                 Adt::Enum(it) => it.id.into(),
                 Adt::Union(it) => it.id.into(),
+                Adt::Impl(it) => it.id.into(),
             },
             ModuleDef::Trait(it) => it.id.into(),
             ModuleDef::TraitAlias(it) => it.id.into(),
@@ -412,6 +413,7 @@ impl ModuleDef {
     pub fn as_def_with_body(self) -> Option<DefWithBody> {
         match self {
             ModuleDef::Function(it) => Some(it.into()),
+            ModuleDef::Adt(Adt::Impl(it)) => None,  // TODO BSV: Temporary
             ModuleDef::Const(it) => Some(it.into()),
             ModuleDef::Static(it) => Some(it.into()),
             ModuleDef::Variant(it) => Some(it.into()),
@@ -599,6 +601,11 @@ impl Module {
                 }
                 ModuleDef::Adt(adt) => {
                     match adt {
+                        Adt::Impl(i) => {  // TODO BSV: Might not actually work
+                            for diag in db.impl_data_with_diagnostics(i.id).1.iter() {
+                                emit_def_diagnostic(db, acc, diag, edition);
+                            }
+                        }
                         Adt::Struct(s) => {
                             for diag in db.struct_data_with_diagnostics(s.id).1.iter() {
                                 emit_def_diagnostic(db, acc, diag, edition);
@@ -1563,8 +1570,9 @@ pub enum Adt {
     Struct(Struct),
     Union(Union),
     Enum(Enum),
+    Impl(Impl),
 }
-impl_from!(Struct, Union, Enum for Adt);
+impl_from!(Struct, Union, Enum, Impl for Adt);
 
 impl Adt {
     pub fn has_non_default_type_params(self, db: &dyn HirDatabase) -> bool {
@@ -1617,6 +1625,7 @@ impl Adt {
             Adt::Struct(s) => s.module(db),
             Adt::Union(s) => s.module(db),
             Adt::Enum(e) => e.module(db),
+            Adt::Impl(i) => i.module(db),
         }
     }
 
@@ -1625,6 +1634,7 @@ impl Adt {
             Adt::Struct(s) => s.name(db),
             Adt::Union(u) => u.name(db),
             Adt::Enum(e) => e.name(db),
+            Adt::Impl(i) => i.name(db),
         }
     }
 
@@ -1634,6 +1644,7 @@ impl Adt {
             Adt::Struct(s) => s.id.resolver(db.upcast()),
             Adt::Union(u) => u.id.resolver(db.upcast()),
             Adt::Enum(e) => e.id.resolver(db.upcast()),
+            Adt::Impl(i) => i.id.resolver(db.upcast()),
         };
         resolver
             .generic_params()
@@ -1669,6 +1680,7 @@ impl HasVisibility for Adt {
             Adt::Struct(it) => it.visibility(db),
             Adt::Union(it) => it.visibility(db),
             Adt::Enum(it) => it.visibility(db),
+            Adt::Impl(it) => Visibility::Public,  // TODO BSV
         }
     }
 }
@@ -4005,6 +4017,10 @@ impl Impl {
         self.id.lookup(db.upcast()).container.into()
     }
 
+    pub fn name(self, db: &dyn HirDatabase) -> Name {
+        db.impl_data(self.id).name.clone()
+    }
+
     pub fn as_builtin_derive_path(self, db: &dyn HirDatabase) -> Option<InMacroFile<ast::Path>> {
         let src = self.source(db)?;
 
@@ -4349,6 +4365,7 @@ impl Type {
                 ValueTyDefId::FunctionId(it) => GenericDefId::FunctionId(it),
                 ValueTyDefId::StructId(it) => GenericDefId::AdtId(AdtId::StructId(it)),
                 ValueTyDefId::UnionId(it) => GenericDefId::AdtId(AdtId::UnionId(it)),
+                ValueTyDefId::ImplId(it) => GenericDefId::AdtId(AdtId::ImplId(it)),
                 ValueTyDefId::EnumVariantId(it) => {
                     GenericDefId::AdtId(AdtId::EnumId(it.lookup(db.upcast()).parent))
                 }
@@ -5308,6 +5325,7 @@ pub enum CallableKind {
     Closure(Closure),
     FnPtr,
     FnImpl(FnTrait),
+    Impl(Impl),
 }
 
 impl Callable {
@@ -5315,6 +5333,7 @@ impl Callable {
         match self.callee {
             Callee::Def(CallableDefId::FunctionId(it)) => CallableKind::Function(it.into()),
             Callee::Def(CallableDefId::StructId(it)) => CallableKind::TupleStruct(it.into()),
+            Callee::Def(CallableDefId::ImplId(it)) => CallableKind::Impl(it.into()),
             Callee::Def(CallableDefId::EnumVariantId(it)) => {
                 CallableKind::TupleEnumVariant(it.into())
             }

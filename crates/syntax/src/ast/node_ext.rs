@@ -1136,6 +1136,7 @@ impl From<ast::Adt> for ast::Item {
             ast::Adt::Enum(it) => ast::Item::Enum(it),
             ast::Adt::Struct(it) => ast::Item::Struct(it),
             ast::Adt::Union(it) => ast::Item::Union(it),
+            ast::Adt::Impl(it) => ast::Item::Impl(it),
         }
     }
 }

@@ -122,6 +122,7 @@ impl<'db> MatchCheckCtx<'db> {
                 Some(id.to_enum_variant_id(db, eid).into())
             }
             Struct | UnionField => match adt {
+                hir_def::AdtId::ImplId(_) => None,
                 hir_def::AdtId::EnumId(_) => None,
                 hir_def::AdtId::StructId(id) => Some(id.into()),
                 hir_def::AdtId::UnionId(id) => Some(id.into()),

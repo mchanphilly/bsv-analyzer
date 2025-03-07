@@ -192,6 +192,10 @@ fn signature_help_for_call(
             res.doc = strukt.docs(db);
             format_to!(res.signature, "struct {}", strukt.name(db).display(db, edition));
         }
+        hir::CallableKind::Impl(impl_def) => {
+            res.doc = impl_def.docs(db);
+            format_to!(res.signature, "module {}", impl_def.name(db).display(db, edition));
+        }
         hir::CallableKind::TupleEnumVariant(variant) => {
             res.doc = variant.docs(db);
             format_to!(
@@ -264,7 +268,7 @@ fn signature_help_for_call(
         | hir::CallableKind::Closure(_)
         | hir::CallableKind::FnPtr
         | hir::CallableKind::FnImpl(_) => render(callable.return_type()),
-        hir::CallableKind::TupleStruct(_) | hir::CallableKind::TupleEnumVariant(_) => {}
+        hir::CallableKind::TupleStruct(_) | hir::CallableKind::TupleEnumVariant(_) | hir::CallableKind::Impl(_) => {}
     }
     Some(res)
 }
@@ -303,6 +307,10 @@ fn signature_help_for_generics(
         hir::GenericDef::Adt(hir::Adt::Struct(it)) => {
             res.doc = it.docs(db);
             format_to!(res.signature, "struct {}", it.name(db).display(db, edition));
+        }
+        hir::GenericDef::Adt(hir::Adt::Impl(it)) => {
+            res.doc = it.docs(db);
+            format_to!(res.signature, "module/impl {}", it.name(db).display(db, edition));
         }
         hir::GenericDef::Adt(hir::Adt::Union(it)) => {
             res.doc = it.docs(db);

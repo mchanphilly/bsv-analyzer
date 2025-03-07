@@ -316,6 +316,7 @@ impl HirDisplay for Pat {
                         AdtId::StructId(s) => Some(s.into()),
                         AdtId::UnionId(u) => Some(u.into()),
                         AdtId::EnumId(_) => None,
+                        AdtId::ImplId(_) => None,
                     }),
                 };
 
