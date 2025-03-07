@@ -415,8 +415,8 @@ fn rename_self_to_param(
 
 fn text_edit_from_self_param(self_param: &ast::SelfParam, new_name: &str) -> Option<TextEdit> {
     fn target_type_name(impl_def: &ast::Impl) -> Option<String> {
-        if let Some(ast::Type::PathType(p)) = impl_def.self_ty() {
-            return Some(p.path()?.segment()?.name_ref()?.text().to_string());
+        if let Some(name) = ast::HasName::name(impl_def) {
+            return Some(name.text().to_string());
         }
         None
     }

@@ -428,8 +428,8 @@ impl ast::Impl {
     pub fn self_ty(&self) -> Option<ast::Type> {
         if let Some(_) = self.module_token() {
             // Bluespec style
-            return match self.target() {
-                (Some(t), _) => Some(t),
+            return match self.target() {  // TODO Fix BSV to move to using the Name node instead.
+                // (Some(t), _) => Some(t),
                 _ => None,
             };
         } else {
@@ -444,7 +444,7 @@ impl ast::Impl {
         if let Some(_) = self.module_token() {
             // Bluespec style
             return match self.target() {
-                (Some(_), Some(t)) => Some(t),
+                (Some(t), _) => Some(t),
                 _ => None,
             }
         } else {

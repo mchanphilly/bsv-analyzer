@@ -608,6 +608,7 @@ fn classify_name(
 
                 NameKind::IdentPat(pat_ctx)
             },
+            ast::Impl(_) => NameKind::Impl,
             ast::MacroDef(_) => NameKind::MacroDef,
             ast::MacroRules(_) => NameKind::MacroRules,
             ast::Module(module) => NameKind::Module(module),
@@ -958,7 +959,7 @@ fn classify_name_ref(
                 ast::Impl(it) => {
                     match it.trait_() {
                         Some(t) if t.syntax() == node => TypeLocation::ImplTrait,
-                        _ => match it.self_ty() {
+                        _ => match it.name() {
                             Some(t) if t.syntax() == node => TypeLocation::ImplTarget,
                             _ => return None,
                         },

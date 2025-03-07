@@ -565,7 +565,7 @@ impl<'a> Ctx<'a> {
         // as if it was an non-trait impl. Ideally we want to create a unique missing ref that only
         // equals itself.
         let name = impl_def.name()?.as_name();
-        let self_ty = self.lower_type_ref(&impl_def.self_ty()?);
+        // let self_ty = self.lower_type_ref(&impl_def.self_ty()?);
         let target_trait = impl_def.trait_().and_then(|tr| self.lower_trait_ref(&tr));
         let is_negative = impl_def.excl_token().is_some();
         let is_unsafe = impl_def.unsafe_token().is_some();
@@ -581,7 +581,7 @@ impl<'a> Ctx<'a> {
         // type alias rather than a type parameter, so this is handled by the resolver.
         let generic_params = self.lower_generic_params(HasImplicitSelf::No, impl_def);
         let res =
-            Impl { name, generic_params, target_trait, self_ty, is_negative, is_unsafe, items, ast_id };
+            Impl { name, generic_params, target_trait, is_negative, is_unsafe, items, ast_id };
         let id = id(self.data().impls.alloc(res));
         self.write_generic_params_attributes(id.into());
         Some(id)

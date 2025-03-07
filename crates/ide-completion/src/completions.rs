@@ -699,6 +699,7 @@ pub(super) fn complete_name(
         }
         NameKind::ConstParam
         | NameKind::Enum
+        | NameKind::Impl
         | NameKind::MacroDef
         | NameKind::MacroRules
         | NameKind::Rename

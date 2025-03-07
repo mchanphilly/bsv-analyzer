@@ -851,7 +851,7 @@ pub struct Impl {
     pub name: Name,
     pub generic_params: Interned<GenericParams>,
     pub target_trait: Option<Interned<TraitRef>>,
-    pub self_ty: Interned<TypeRef>,
+    // pub self_ty: Interned<TypeRef>,
     pub is_negative: bool,
     pub is_unsafe: bool,
     pub items: Box<[AssocItem]>,

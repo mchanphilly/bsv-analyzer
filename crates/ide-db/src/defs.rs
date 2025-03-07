@@ -475,6 +475,7 @@ impl NameClass {
                         .map(Definition::Macro)
                         .unwrap_or(Definition::Function(def))
                 }
+                ast::Item::Impl(it) => Definition::Adt(hir::Adt::Impl(sema.to_def(&it)?)),
                 ast::Item::Module(it) => Definition::Module(sema.to_def(&it)?),
                 ast::Item::Static(it) => Definition::Static(sema.to_def(&it)?),
                 ast::Item::Trait(it) => Definition::Trait(sema.to_def(&it)?),

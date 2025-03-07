@@ -427,7 +427,7 @@ impl Printer<'_> {
                 let Impl {
                     name,
                     target_trait,
-                    self_ty,
+                    // self_ty,
                     is_negative,
                     is_unsafe,
                     items,
@@ -449,7 +449,7 @@ impl Printer<'_> {
                     w!(self, " for ");
                 }
                 w!(self, "{}: ", name.display(self.db.upcast(), self.edition));
-                self.print_type_ref(self_ty);
+                // self.print_type_ref(self_ty);
                 self.print_where_clause_and_opening_brace(generic_params);
                 self.indented(|this| {
                     for item in &**items {

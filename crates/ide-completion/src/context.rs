@@ -316,6 +316,7 @@ pub(crate) enum NameKind {
     Enum,
     Function,
     IdentPat(PatternContext),
+    Impl,
     MacroDef,
     MacroRules,
     /// Fake node
