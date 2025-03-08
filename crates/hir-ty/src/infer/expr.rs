@@ -127,6 +127,7 @@ impl InferenceContext<'_> {
     fn infer_expr_inner(&mut self, tgt_expr: ExprId, expected: &Expectation) -> Ty {
         self.db.unwind_if_cancelled();
 
+        // dbg!(&self.body[tgt_expr]);
         let ty = match &self.body[tgt_expr] {
             Expr::Missing => self.err_ty(),
             &Expr::If { condition, then_branch, else_branch } => {
@@ -1014,6 +1015,7 @@ impl InferenceContext<'_> {
             }
         };
         // use a new type variable if we got unknown here
+        // dbg!(&ty);
         let ty = self.insert_type_vars_shallow(ty);
         self.write_expr_ty(tgt_expr, ty.clone());
         if self.resolve_ty_shallow(&ty).is_never() {

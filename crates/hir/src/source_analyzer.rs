@@ -103,7 +103,9 @@ impl SourceAnalyzer {
             }
         };
         let resolver = resolver_for_scope(db.upcast(), def, scope);
-        SourceAnalyzer { resolver, def: Some((def, body, source_map)), infer, file_id }
+        let res = SourceAnalyzer { resolver, def: Some((def, body, source_map)), infer, file_id };
+        dbg!(&res);
+        res
     }
 
     pub(crate) fn new_for_resolver(

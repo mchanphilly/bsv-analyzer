@@ -34,7 +34,7 @@ How many worker threads to handle priming caches. The default `0` means to pick 
 --
 Pass `--all-targets` to cargo invocation.
 --
-[[bsv_analyzer.cargo.autoreload]]bsv_analyzer.cargo.autoreload (default: `false`)::
+[[bsv_analyzer.cargo.autoreload]]bsv_analyzer.cargo.autoreload (default: `true`)::
 +
 --
 Automatically refresh project info via `cargo metadata` on
@@ -321,43 +321,22 @@ Enables completions of private items and fields that are defined in the current 
 Default:
 ----
 {
-  "Arc::new": {
-    "postfix": "arc",
-    "body": "Arc::new(${receiver})",
-    "requires": "std::sync::Arc",
-    "description": "Put the expression into an `Arc`",
-    "scope": "expr"
-  },
-  "Rc::new": {
-    "postfix": "rc",
-    "body": "Rc::new(${receiver})",
-    "requires": "std::rc::Rc",
-    "description": "Put the expression into an `Rc`",
-    "scope": "expr"
-  },
-  "Box::pin": {
-    "postfix": "pinbox",
-    "body": "Box::pin(${receiver})",
-    "requires": "std::boxed::Box",
-    "description": "Put the expression into a pinned `Box`",
-    "scope": "expr"
-  },
   "Err": {
     "postfix": "err",
     "body": "Err(${receiver})",
     "description": "Wrap the expression in a `Result::Err`",
     "scope": "expr"
   },
-  "Some": {
-    "postfix": "some",
-    "body": "Some(${receiver})",
-    "description": "Wrap the expression in an `Option::Some`",
-    "scope": "expr"
-  },
   "Ok": {
     "postfix": "ok",
     "body": "Ok(${receiver})",
     "description": "Wrap the expression in a `Result::Ok`",
+    "scope": "expr"
+  },
+  "Some": {
+    "postfix": "some",
+    "body": "Some(${receiver})",
+    "description": "Wrap the expression in an `Option::Some`",
     "scope": "expr"
   }
 }
@@ -380,10 +359,10 @@ Term search fuel in "units of work" for autocompletion (Defaults to 1000).
 --
 List of rust-analyzer diagnostics to disable.
 --
-[[bsv_analyzer.diagnostics.enable]]bsv_analyzer.diagnostics.enable (default: `true`)::
+[[bsv_analyzer.diagnostics.enable]]bsv_analyzer.diagnostics.enable (default: `false`)::
 +
 --
-Whether to show native rust-analyzer diagnostics.
+Whether to show native rust-analyzer diagnostics.  // TODO BSV
 --
 [[bsv_analyzer.diagnostics.experimental.enable]]bsv_analyzer.diagnostics.experimental.enable (default: `false`)::
 +
@@ -461,24 +440,24 @@ Enables highlighting of all break points for a loop or block context while the c
 Whether to show `Debug` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.actions.enable]]bsv_analyzer.hover.actions.enable (default: `false`)::
+[[bsv_analyzer.hover.actions.enable]]bsv_analyzer.hover.actions.enable (default: `true`)::
 +
 --
 Whether to show HoverActions in Rust files.
 --
-[[bsv_analyzer.hover.actions.gotoTypeDef.enable]]bsv_analyzer.hover.actions.gotoTypeDef.enable (default: `false`)::
+[[bsv_analyzer.hover.actions.gotoTypeDef.enable]]bsv_analyzer.hover.actions.gotoTypeDef.enable (default: `true`)::
 +
 --
 Whether to show `Go to Type Definition` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.actions.implementations.enable]]bsv_analyzer.hover.actions.implementations.enable (default: `false`)::
+[[bsv_analyzer.hover.actions.implementations.enable]]bsv_analyzer.hover.actions.implementations.enable (default: `true`)::
 +
 --
 Whether to show `Implementations` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.actions.references.enable]]bsv_analyzer.hover.actions.references.enable (default: `false`)::
+[[bsv_analyzer.hover.actions.references.enable]]bsv_analyzer.hover.actions.references.enable (default: `true`)::
 +
 --
 Whether to show `References` action. Only applies when
@@ -586,17 +565,17 @@ The path structure for newly inserted paths to use.
 --
 Whether to prefix external (including std, core) crate imports with `::`. e.g. "use ::std::io::Read;".
 --
-[[bsv_analyzer.inlayHints.bindingModeHints.enable]]bsv_analyzer.inlayHints.bindingModeHints.enable (default: `false`)::
+[[bsv_analyzer.inlayHints.bindingModeHints.enable]]bsv_analyzer.inlayHints.bindingModeHints.enable (default: `true`)::
 +
 --
 Whether to show inlay type hints for binding modes.
 --
-[[bsv_analyzer.inlayHints.chainingHints.enable]]bsv_analyzer.inlayHints.chainingHints.enable (default: `false`)::
+[[bsv_analyzer.inlayHints.chainingHints.enable]]bsv_analyzer.inlayHints.chainingHints.enable (default: `true`)::
 +
 --
 Whether to show inlay type hints for method chains.
 --
-[[bsv_analyzer.inlayHints.closingBraceHints.enable]]bsv_analyzer.inlayHints.closingBraceHints.enable (default: `false`)::
+[[bsv_analyzer.inlayHints.closingBraceHints.enable]]bsv_analyzer.inlayHints.closingBraceHints.enable (default: `true`)::
 +
 --
 Whether to show inlay hints after a closing `}` to indicate what item it belongs to.
@@ -677,13 +656,13 @@ Whether to prefer using parameter names as the name for elided lifetime hints if
 --
 Maximum length for inlay hints. Set to null to have an unlimited length.
 --
-[[bsv_analyzer.inlayHints.parameterHints.enable]]bsv_analyzer.inlayHints.parameterHints.enable (default: `false`)::
+[[bsv_analyzer.inlayHints.parameterHints.enable]]bsv_analyzer.inlayHints.parameterHints.enable (default: `true`)::
 +
 --
 Whether to show function parameter name inlay hints at the call
 site.
 --
-[[bsv_analyzer.inlayHints.rangeExclusiveHints.enable]]bsv_analyzer.inlayHints.rangeExclusiveHints.enable (default: `false`)::
+[[bsv_analyzer.inlayHints.rangeExclusiveHints.enable]]bsv_analyzer.inlayHints.rangeExclusiveHints.enable (default: `true`)::
 +
 --
 Whether to show exclusive range inlay hints.
@@ -694,12 +673,12 @@ Whether to show exclusive range inlay hints.
 Whether to show inlay hints for compiler inserted reborrows.
 This setting is deprecated in favor of #rust-analyzer.inlayHints.expressionAdjustmentHints.enable#.
 --
-[[bsv_analyzer.inlayHints.renderColons]]bsv_analyzer.inlayHints.renderColons (default: `false`)::
+[[bsv_analyzer.inlayHints.renderColons]]bsv_analyzer.inlayHints.renderColons (default: `true`)::
 +
 --
 Whether to render leading colons for type hints, and trailing colons for parameter hints.
 --
-[[bsv_analyzer.inlayHints.typeHints.enable]]bsv_analyzer.inlayHints.typeHints.enable (default: `false`)::
+[[bsv_analyzer.inlayHints.typeHints.enable]]bsv_analyzer.inlayHints.typeHints.enable (default: `true`)::
 +
 --
 Whether to show inlay type hints for variables.
@@ -710,7 +689,7 @@ Whether to show inlay type hints for variables.
 Whether to hide inlay type hints for `let` statements that initialize to a closure.
 Only applies to closures with blocks, same as `#rust-analyzer.inlayHints.closureReturnTypeHints.enable#`.
 --
-[[bsv_analyzer.inlayHints.typeHints.hideNamedConstructor]]bsv_analyzer.inlayHints.typeHints.hideNamedConstructor (default: `false`)::
+[[bsv_analyzer.inlayHints.typeHints.hideNamedConstructor]]bsv_analyzer.inlayHints.typeHints.hideNamedConstructor (default: `true`)::
 +
 --
 Whether to hide inlay type hints for constructors.

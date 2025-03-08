@@ -141,11 +141,11 @@ config_data! {
         hover_show_traitAssocItems: Option<usize> = None,
 
         /// Whether to show inlay type hints for binding modes.
-        inlayHints_bindingModeHints_enable: bool                   = false,
+        inlayHints_bindingModeHints_enable: bool                   = true,
         /// Whether to show inlay type hints for method chains.
-        inlayHints_chainingHints_enable: bool                      = false,
+        inlayHints_chainingHints_enable: bool                      = true,
         /// Whether to show inlay hints after a closing `}` to indicate what item it belongs to.
-        inlayHints_closingBraceHints_enable: bool                  = false,
+        inlayHints_closingBraceHints_enable: bool                  = true,
         /// Minimum number of lines required before the `}` until the hint is shown (set to 0 or 1
         /// to always show them).
         inlayHints_closingBraceHints_minLines: usize               = 25,
@@ -179,21 +179,21 @@ config_data! {
         inlayHints_maxLength: Option<usize>                        = Some(25),
         /// Whether to show function parameter name inlay hints at the call
         /// site.
-        inlayHints_parameterHints_enable: bool                     = false,
+        inlayHints_parameterHints_enable: bool                     = true,
         /// Whether to show exclusive range inlay hints.
-        inlayHints_rangeExclusiveHints_enable: bool                = false,
+        inlayHints_rangeExclusiveHints_enable: bool                = true,
         /// Whether to show inlay hints for compiler inserted reborrows.
         /// This setting is deprecated in favor of #rust-analyzer.inlayHints.expressionAdjustmentHints.enable#.
         inlayHints_reborrowHints_enable: ReborrowHintsDef          = ReborrowHintsDef::Never,
         /// Whether to render leading colons for type hints, and trailing colons for parameter hints.
-        inlayHints_renderColons: bool                              = false,
+        inlayHints_renderColons: bool                              = true,
         /// Whether to show inlay type hints for variables.
-        inlayHints_typeHints_enable: bool                          = false,
+        inlayHints_typeHints_enable: bool                          = true,
         /// Whether to hide inlay type hints for `let` statements that initialize to a closure.
         /// Only applies to closures with blocks, same as `#rust-analyzer.inlayHints.closureReturnTypeHints.enable#`.
         inlayHints_typeHints_hideClosureInitialization: bool       = false,
         /// Whether to hide inlay type hints for constructors.
-        inlayHints_typeHints_hideNamedConstructor: bool            = false,
+        inlayHints_typeHints_hideNamedConstructor: bool            = true,
 
         /// Enables the experimental support for interpreting tests.
         interpret_tests: bool = false,

@@ -1609,7 +1609,7 @@ pub(crate) fn handle_inlay_hints(
     );
 
     let inlay_hints_config = snap.config.inlay_hints();
-    Ok(Some(
+    let res = Ok(Some(
         snap.analysis
             .inlay_hints(&inlay_hints_config, file_id, Some(range))?
             .into_iter()
@@ -1623,7 +1623,10 @@ pub(crate) fn handle_inlay_hints(
                 )
             })
             .collect::<Cancellable<Vec<_>>>()?,
-    ))
+    ));
+
+    dbg!(&res);
+    res
 }
 
 pub(crate) fn handle_inlay_hints_resolve(

@@ -1716,7 +1716,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.bindingModeHints.enable": {
                         "markdownDescription": "Whether to show inlay type hints for binding modes.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1726,7 +1726,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.chainingHints.enable": {
                         "markdownDescription": "Whether to show inlay type hints for method chains.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1736,7 +1736,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.closingBraceHints.enable": {
                         "markdownDescription": "Whether to show inlay hints after a closing `}` to indicate what item it belongs to.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1901,7 +1901,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.genericParameterHints.type.enable": {
                         "markdownDescription": "Whether to show generic type parameter name inlay hints.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1965,7 +1965,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.parameterHints.enable": {
                         "markdownDescription": "Whether to show function parameter name inlay hints at the call\nsite.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1975,7 +1975,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.rangeExclusiveHints.enable": {
                         "markdownDescription": "Whether to show exclusive range inlay hints.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -2005,7 +2005,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.renderColons": {
                         "markdownDescription": "Whether to render leading colons for type hints, and trailing colons for parameter hints.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -2015,7 +2015,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.typeHints.enable": {
                         "markdownDescription": "Whether to show inlay type hints for variables.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }

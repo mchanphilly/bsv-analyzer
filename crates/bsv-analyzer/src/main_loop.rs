@@ -422,24 +422,24 @@ impl GlobalState {
                 }
             }
 
-            // let client_refresh = became_quiescent || state_changed;
-            // if client_refresh {
-            //     // Refresh semantic tokens if the client supports it.
-            //     if self.config.semantic_tokens_refresh() {
-            //         self.semantic_tokens_cache.lock().clear();
-            //         self.send_request::<lsp_types::request::SemanticTokensRefresh>((), |_, _| ());
-            //     }
+            let client_refresh = became_quiescent || state_changed;
+            if client_refresh {
+                // Refresh semantic tokens if the client supports it.
+                if self.config.semantic_tokens_refresh() {
+                    self.semantic_tokens_cache.lock().clear();
+                    self.send_request::<lsp_types::request::SemanticTokensRefresh>((), |_, _| ());
+                }
 
-            //     // Refresh code lens if the client supports it.
-            //     if self.config.code_lens_refresh() {
-            //         self.send_request::<lsp_types::request::CodeLensRefresh>((), |_, _| ());
-            //     }
+                // Refresh code lens if the client supports it.
+                if self.config.code_lens_refresh() {
+                    self.send_request::<lsp_types::request::CodeLensRefresh>((), |_, _| ());
+                }
 
-            //     // Refresh inlay hints if the client supports it.
-            //     if self.config.inlay_hints_refresh() {
-            //         self.send_request::<lsp_types::request::InlayHintRefreshRequest>((), |_, _| ());
-            //     }
-            // }
+                // Refresh inlay hints if the client supports it.
+                if self.config.inlay_hints_refresh() {
+                    self.send_request::<lsp_types::request::InlayHintRefreshRequest>((), |_, _| ());
+                }
+            }
 
             let project_or_mem_docs_changed =
                 became_quiescent || state_changed || memdocs_added_or_removed;
@@ -1091,10 +1091,10 @@ impl GlobalState {
             // .on::<RETRY, lsp_request::WillRenameFiles>(handlers::handle_will_rename_files)
             .on::<NO_RETRY, lsp_request::GotoDefinition>(handlers::handle_goto_definition)  // TODO BSV
             .on::<NO_RETRY, lsp_request::GotoDeclaration>(handlers::handle_goto_declaration)
-            // .on::<NO_RETRY, lsp_request::GotoImplementation>(handlers::handle_goto_implementation)
+            .on::<NO_RETRY, lsp_request::GotoImplementation>(handlers::handle_goto_implementation)
             .on::<NO_RETRY, lsp_request::GotoTypeDefinition>(handlers::handle_goto_type_definition)
-            // .on::<NO_RETRY, lsp_request::InlayHintRequest>(handlers::handle_inlay_hints)
-            // .on_identity::<NO_RETRY, lsp_request::InlayHintResolveRequest, _>(handlers::handle_inlay_hints_resolve)
+            .on::<NO_RETRY, lsp_request::InlayHintRequest>(handlers::handle_inlay_hints)
+            .on_identity::<NO_RETRY, lsp_request::InlayHintResolveRequest, _>(handlers::handle_inlay_hints_resolve)
             // .on::<NO_RETRY, lsp_request::CodeLensRequest>(handlers::handle_code_lens)
             // .on_identity::<NO_RETRY, lsp_request::CodeLensResolve, _>(handlers::handle_code_lens_resolve)
             // .on::<NO_RETRY, lsp_request::PrepareRenameRequest>(handlers::handle_prepare_rename)
