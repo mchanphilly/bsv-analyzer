@@ -1447,9 +1447,9 @@ fn hir_fmt_generics(
     let parameters_to_write = generic_args_sans_defaults(f, generic_def, parameters);
 
     if !parameters_to_write.is_empty() {
-        write!(f, "<")?;
+        write!(f, "#(")?;
         hir_fmt_generic_arguments(f, parameters_to_write, self_)?;
-        write!(f, ">")?;
+        write!(f, ")")?;
     }
 
     Ok(())
