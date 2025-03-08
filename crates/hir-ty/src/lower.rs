@@ -1973,6 +1973,15 @@ fn type_for_struct_constructor(db: &dyn HirDatabase, def: StructId) -> Option<Bi
     }
 }
 
+/// Build the type of our impl (module) statement
+fn type_for_impl_constructor(db: &dyn HirDatabase, def: ImplId) -> Binders<Ty> {
+    let generics = generics(db.upcast(), AdtId::from(def).into());
+    let substs = generics.bound_vars_subst(db, DebruijnIndex::INNERMOST);
+    let ty = TyKind::FnDef(CallableDefId::ImplId(def).to_chalk(db), substs).intern(Interner);
+
+    make_binders(db, &generics, ty)
+}
+
 fn fn_sig_for_enum_variant_constructor(db: &dyn HirDatabase, def: EnumVariantId) -> PolyFnSig {
     let var_data = db.enum_variant_data(def);
     let fields = var_data.variant_data.fields();
@@ -2091,7 +2100,7 @@ pub(crate) fn ty_recover(db: &dyn HirDatabase, _cycle: &Cycle, def: &TyDefId) ->
 pub(crate) fn value_ty_query(db: &dyn HirDatabase, def: ValueTyDefId) -> Option<Binders<Ty>> {
     match def {
         ValueTyDefId::FunctionId(it) => Some(type_for_fn(db, it)),
-        ValueTyDefId::ImplId(it) => Some(type_for_adt(db, it.into())),
+        ValueTyDefId::ImplId(it) => Some(type_for_impl_constructor(db, it)),
         ValueTyDefId::StructId(it) => type_for_struct_constructor(db, it),
         ValueTyDefId::UnionId(it) => Some(type_for_adt(db, it.into())),
         ValueTyDefId::EnumVariantId(it) => type_for_enum_variant_constructor(db, it),
