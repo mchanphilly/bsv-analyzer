@@ -3,6 +3,8 @@
 //! fn f(a: i32, b: i32) -> i32 { a + b }
 //! let _x /* i32 */= f(4, 4);
 //! ```
+use std::f64::consts::E;
+
 use hir::Semantics;
 use ide_db::{famous_defs::FamousDefs, RootDatabase};
 
@@ -90,15 +92,29 @@ pub(super) fn hints(
         None
     };
 
-    let render_colons = config.render_colons && !matches!(type_ascriptable, Some(Some(_)));
-    if render_colons {
-        label.prepend_str(": ");
+    // let render_colons = config.render_colons && !matches!(type_ascriptable, Some(Some(_)));
+    // if render_colons {
+    //     label.prepend_str(": ");
+    // }
+    let text_range;
+
+    // Special case for Bluespec-style let statements
+    if let Some(Some(let_token)) = match_ast! {
+        match parent {
+            ast::LetStmt(it) => {
+                Some(it.let_token())
+            },
+            _ => None,
+        }
+    } {
+        text_range = let_token.text_range();
+    } else {
+        text_range = match pat.name() {
+            Some(name) => name.syntax().text_range(),
+            None => pat.syntax().text_range(),
+        };
     }
 
-    let text_range = match pat.name() {
-        Some(name) => name.syntax().text_range(),
-        None => pat.syntax().text_range(),
-    };
     acc.push(InlayHint {
         range: match type_ascriptable {
             Some(Some(t)) => text_range.cover(t.text_range()),
@@ -106,9 +122,9 @@ pub(super) fn hints(
         },
         kind: InlayKind::Type,
         label,
-        text_edit,
+        text_edit: None,
         position: InlayHintPosition::After,
-        pad_left: !render_colons,
+        pad_left: true,
         pad_right: false,
         resolve_parent: Some(pat.syntax().text_range()),
     });
