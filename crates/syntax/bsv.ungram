@@ -520,10 +520,17 @@ Stmt =
 | LetStmt
 
 LetStmt =
+  (
   Attr* 'let' Pat (':' Type)?
   '=' initializer:Expr
   LetElse?
   ';'
+  ) | (
+  ('let' | Type) Pat
+  ('<-' | '=')
+  initializer:Expr
+  ';'
+  )
 
 LetElse =
   'else' BlockExpr

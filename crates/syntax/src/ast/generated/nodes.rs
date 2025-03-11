@@ -1088,6 +1088,8 @@ impl LetStmt {
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     #[inline]
+    pub fn l_thin_arrow_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![<-]) }
+    #[inline]
     pub fn eq_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![=]) }
     #[inline]
     pub fn let_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![let]) }

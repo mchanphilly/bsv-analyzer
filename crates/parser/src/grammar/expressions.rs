@@ -58,18 +58,22 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
     // }
     attributes::outer_attrs(p);
 
-    if p.at(T![let]) {
-        let_stmt(p, semicolon);
-        m.complete(p, LET_STMT);
-        return;
-    }
-
     // test block_items
     // fn a() { fn b() {} }
     let m = match items::opt_item(p, m) {
         Ok(()) => return,
         Err(m) => m,
     };
+
+    // Bluespec requires a little heuristic for explicit type variable declarations.
+    let let_heuristic =
+        p.at(IDENT) &&
+        (p.nth_at(1, IDENT) | p.nth_at(1, T![#]));
+    if p.at(T![let]) || let_heuristic {
+        let_stmt(p, semicolon);
+        m.complete(p, LET_STMT);
+        return;
+    }
 
     if !p.at_ts(EXPR_FIRST) {
         p.err_and_bump("expected expression, item or let statement");
@@ -115,39 +119,38 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 // test let_stmt
 // fn f() { let x: i32 = 92; }
 pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
-    p.bump(T![let]);
-    patterns::pattern(p);
-    if p.at(T![:]) {
-        // test let_stmt_ascription
-        // fn f() { let x: i32; }
+    // Either have a `let` at the beginning or a type.
+    if !p.eat(T![let]) {
         types::ascription(p);
     }
 
-    let mut expr_after_eq: Option<CompletedMarker> = None;
+    patterns::pattern(p);
+
     if p.eat(T![=]) || p.eat(T![<-]) {
         // test let_stmt_init
         // fn f() { let x = 92; }
-        expr_after_eq = expressions::expr(p);
+        expressions::expr(p);
     }
 
-    if p.at(T![else]) {
-        // test_err let_else_right_curly_brace
-        // fn func() { let Some(_) = {Some(1)} else { panic!("h") };}
-        if let Some(expr) = expr_after_eq {
-            if BlockLike::is_blocklike(expr.kind()) {
-                p.error(
-                    "right curly brace `}` before `else` in a `let...else` statement not allowed",
-                )
-            }
-        }
+    // Not supported in Bluespec
+    // if p.at(T![else]) {
+    //     // test_err let_else_right_curly_brace
+    //     // fn func() { let Some(_) = {Some(1)} else { panic!("h") };}
+    //     if let Some(expr) = expr_after_eq {
+    //         if BlockLike::is_blocklike(expr.kind()) {
+    //             p.error(
+    //                 "right curly brace `}` before `else` in a `let...else` statement not allowed",
+    //             )
+    //         }
+    //     }
 
-        // test let_else
-        // fn f() { let Some(x) = opt else { return }; }
-        let m = p.start();
-        p.bump(T![else]);
-        block_expr(p);
-        m.complete(p, LET_ELSE);
-    }
+    //     // test let_else
+    //     // fn f() { let Some(x) = opt else { return }; }
+    //     let m = p.start();
+    //     p.bump(T![else]);
+    //     block_expr(p);
+    //     m.complete(p, LET_ELSE);
+    // }
 
     match with_semi {
         Semicolon::Forbidden => (),

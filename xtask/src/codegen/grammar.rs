@@ -642,6 +642,7 @@ impl Field {
                 let name = match name.as_str() {
                     ";" => "semicolon",
                     "->" => "thin_arrow",
+                    "<-" => "l_thin_arrow",
                     "'{'" => "l_curly",
                     "'}'" => "r_curly",
                     "'('" => "l_paren",
@@ -661,6 +662,7 @@ impl Field {
                     "..." => "dotdotdot",
                     "..=" => "dotdoteq",
                     "=>" => "fat_arrow",
+                    "<=" => "l_fat_arrow",
                     "@" => "at",
                     ":" => "colon",
                     "::" => "coloncolon",

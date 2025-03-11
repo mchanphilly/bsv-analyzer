@@ -136,14 +136,15 @@ fn is_dyn_weak(p: &Parser<'_>) -> bool {
 }
 
 pub(super) fn ascription(p: &mut Parser<'_>) {
-    assert!(p.at(T![:]));
-    p.bump(T![:]);
-    if p.at(T![=]) {
-        // recover from `let x: = expr;`, `const X: = expr;` and similar
-        // hopefully no type starts with `=`
-        p.error("missing type");
-        return;
-    }
+    // assert!(p.at(T![:]));
+    // p.bump(T![:]);
+    // if p.at(T![=]) {
+    //     // recover from `let x: = expr;`, `const X: = expr;` and similar
+    //     // hopefully no type starts with `=`
+    //     p.error("missing type");
+    //     return;
+    // }
+    // assert!(p.at(IDENT));  // Not while dual-supporting
     type_(p);
 }
 
