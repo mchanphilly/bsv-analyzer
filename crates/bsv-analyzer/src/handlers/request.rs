@@ -1625,7 +1625,7 @@ pub(crate) fn handle_inlay_hints(
             .collect::<Cancellable<Vec<_>>>()?,
     ));
 
-    dbg!(&res);
+    // dbg!(&res);
     res
 }
 
