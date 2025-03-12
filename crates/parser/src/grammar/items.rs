@@ -293,7 +293,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         T![type] => type_alias(p, m),
         T![typedef] => typedef_(p, m),  // handles synonyms, structs, enums
 
-        T![function] | T![method] => function_or_method_(p, m),
+        T![function] | T![method] | T![rule] => bsv_assoc(p, m),
         T![interface] => traits::interface_(p, m),
         T![module] => traits::module_(p, m),
         // T![module] => traits::module_(p, m),  // TODO_BSV
@@ -540,53 +540,106 @@ fn macro_def(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, MACRO_DEF);
 }
 
+enum BsvType {
+    Function,
+    Method,
+    Rule,
+}
+
 // // test fn_
 // // fn foo() {}
-fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
-    let is_function;
-    let ket;
-    match p.current() {
-        T![function] => {
-            is_function = true;
-            p.bump(T![function]);
-            ket = T![endfunction];
-        },
-        T![method] => {
-            is_function = false;
-            p.bump(T![method]);
-            ket = T![endmethod];
-        },
-        _ => {
-            unreachable!("should only be reachable on `function` or `method`");
+fn bsv_assoc(p: &mut Parser<'_>, m: Marker) {
+    fn inner_guard(p: &mut Parser<'_>, has_if: bool) {
+        let guard_m = p.start();
+        if has_if {
+            p.expect(T![if]);
         }
+        p.expect(T!['(']);
+        if p.at(T![;]) {
+            p.error("expected guard");
+        } else {
+            expr(p);  // May need better error recovery
+        }
+        p.eat(T![')']);
+        guard_m.complete(p, MATCH_GUARD);
     }
 
-    // Going to assume we *always* have a return type
-    // even if Action. Actual language may be more permissive
-    let ret_m = p.start();
-    types::type_(p);  // Not sure the difference. It used to be below.
-    // types::type_no_bounds(p);
-    ret_m.complete(p, RET_TYPE);
+    // let has_self;
+    // let has_return;
+    // let ket;
+    let item_type = match p.current() {
+        T![function] => {
+            // has_self = false;
+            // has_return = true;
+            p.bump(T![function]);
+            // ket = T![endfunction];
+            BsvType::Function
+        },
+        T![method] => {
+            // has_self = true;
+            // has_return = true;
+            p.bump(T![method]);
+            // ket = T![endmethod];
+            BsvType::Method
+        },
+        T![rule] => {
+            // has_self = false;
+            // has_return = false;
+            p.bump(T![rule]);
+            // ket = T![endrule];
+            BsvType::Rule
+        }
+        _ => {
+            unreachable!("should only be reachable on `function`, `method`, `rule`");
+        }
+    };
+
+    match item_type {
+        BsvType::Function | BsvType::Method => {
+            // Going to assume we *always* have a return type
+            // even if Action. Actual language may be more permissive
+            let ret_m = p.start();
+            types::type_(p);  // Not sure the difference. It used to be below.
+            // types::type_no_bounds(p);
+            ret_m.complete(p, RET_TYPE);
+        }
+        BsvType::Rule => {},
+    }
 
     name_r(p, ITEM_RECOVERY_SET);
 
     // TODO BSV: Consider Self param for associated functions.
     // Currently we just do a dumb all-methods = Self, all functions = not Self
+    let mut did_guard = false;
     if p.at(T!['(']) {
-        if is_function {
-            params::param_list_bsv_function(p);
-        } else {
-            params::param_list_bsv_method(p);
+        match item_type {
+            BsvType::Function => params::param_list_bsv_function(p),
+            BsvType::Method => params::param_list_bsv_method(p),
+            BsvType::Rule => {
+                // Probable guard
+                did_guard = true;
+                inner_guard(p, false);
+            }
         }
     }  else {
         // Arguments optional in Bluespec, unfortunately.
         // We replace with empty param list so we're sure to interpret
         // as "no parameters" and not "missing parameters"
         let param_list_m = p.start();
-        if !is_function {
+        if let BsvType::Method = item_type {
             p.start().complete(p, SELF_PARAM);
         }
         param_list_m.complete(p, PARAM_LIST);
+    }
+
+    // TODO add guard here
+    if p.at(T![if]) {
+        if did_guard {
+            p.error("second guard detected; maybe rule has forbidden param list?");
+        } else {
+            did_guard = true;
+            inner_guard(p, true);
+        }
     }
 
     // test function_or_method_no_semi
@@ -598,18 +651,24 @@ fn function_or_method_(p: &mut Parser<'_>, m: Marker) {
         p.expect(T![;]);
     }
 
-    // Use context to judge whether we expect a body.
-    // Later we will want to allow methods to have bodies too. For that we'll
-    // probably need to take in context (e.g., inside interface no, inside module yes)
-    // with a carveout for the `method Action get() = a.get();` type of declaration, with `=`
-    const EXPECT_BODY_TOKENS: TokenSet = TokenSet::new(
+    // Use context to judge whether we expect a body, e.g.,
+    // method Action foo;  // no body
+    // method Action baz;
+    // Later we will want a carveout for the `method Action get() = a.get();`
+    // shorthand type of declaration, with `=`
+    const NO_BODY_TOKENS: TokenSet = TokenSet::new(
         &[T![method], T![interface], T![endinterface]]
     );
-    let at_expect_body_token = p.at_ts(EXPECT_BODY_TOKENS);
+    let at_no_body_token = p.at_ts(NO_BODY_TOKENS);
 
-    let expect_body = is_function || !at_expect_body_token;
+    let expect_body = /*has_self ||*/ !at_no_body_token;
 
     if expect_body {
+        let ket = match item_type {
+            BsvType::Function => T![endfunction],
+            BsvType::Method => T![endmethod],
+            BsvType::Rule => T![endrule],
+        };
         // TODO_BSV add body: also need to be resilient to nesting.
         expressions::block_expr_bsv(p, None, ket);
         p.expect(ket);

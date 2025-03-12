@@ -700,6 +700,8 @@ impl Fn {
     #[inline]
     pub fn abi(&self) -> Option<Abi> { support::child(&self.syntax) }
     #[inline]
+    pub fn guard(&self) -> Option<MatchGuard> { support::child(&self.syntax) }
+    #[inline]
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     #[inline]
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
@@ -720,6 +722,8 @@ impl Fn {
         support::token(&self.syntax, T![endmethod])
     }
     #[inline]
+    pub fn endrule_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![endrule]) }
+    #[inline]
     pub fn fn_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![fn]) }
     #[inline]
     pub fn function_token(&self) -> Option<SyntaxToken> {
@@ -729,6 +733,8 @@ impl Fn {
     pub fn gen_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![gen]) }
     #[inline]
     pub fn method_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![method]) }
+    #[inline]
+    pub fn rule_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![rule]) }
     #[inline]
     pub fn unsafe_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![unsafe]) }
 }

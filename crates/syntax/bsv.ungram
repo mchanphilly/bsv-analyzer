@@ -317,9 +317,15 @@ Fn =
 ) | (  // Bluespec
   // Attr* Visibility?
   // param list optional in Bluespec
-  ('method' | 'function') RetType Name ParamList?
+  // TODO modify guard name to not just Match
+  (
+    ('method' | 'function') RetType
+  ) | (
+    'rule'
+  )
+  Name ParamList? guard:MatchGuard?
   (body:BlockExpr | ';')
-  ('endmethod' | 'endfunction')
+  ('endmethod' | 'endfunction' | 'endrule')
 )
 
 Abi =
