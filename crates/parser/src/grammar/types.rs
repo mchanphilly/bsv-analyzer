@@ -144,7 +144,9 @@ pub(super) fn ascription(p: &mut Parser<'_>) {
     //     p.error("missing type");
     //     return;
     // }
+
     // assert!(p.at(IDENT));  // Not while dual-supporting
+    p.eat(T![:]);  // optional
     type_(p);
 }
 
