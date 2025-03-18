@@ -610,7 +610,7 @@ fn if_expr(p: &mut Parser<'_>) -> CompletedMarker {
             block_expr_bsv(p, bra, ket);
         }
     }
-    m.complete(p, IF_EXPR_BSV)
+    m.complete(p, IF_EXPR)
 }
 
 // test label

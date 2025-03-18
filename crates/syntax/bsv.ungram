@@ -723,10 +723,6 @@ IfExpr =
   Attr* 'if' condition:Expr then_branch:BlockExpr
   ('else' else_branch:(IfExpr | BlockExpr))?
 
-IfExpr_bsv =
-  'if' condition:Expr then_branch:StmtList_bsv
-  ('else' else_branch:(IfExpr | StmtList_bsv))?
-
 LoopExpr =
   Attr* Label? 'loop'
   loop_body:BlockExpr
