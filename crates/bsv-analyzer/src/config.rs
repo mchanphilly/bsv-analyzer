@@ -451,8 +451,8 @@ config_data! {
 
         /// List of rust-analyzer diagnostics to disable.
         diagnostics_disabled: FxHashSet<String> = FxHashSet::default(),
-        /// Whether to show native rust-analyzer diagnostics.  // TODO BSV
-        diagnostics_enable: bool                = false,
+        /// Whether to show native rust-analyzer diagnostics.
+        diagnostics_enable: bool                = true,
         /// Whether to show experimental rust-analyzer diagnostics that might
         /// have more false positives than usual.
         diagnostics_experimental_enable: bool    = false,

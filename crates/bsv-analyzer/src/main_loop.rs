@@ -19,7 +19,7 @@ use vfs::{loader::LoadingProgress, AbsPathBuf, FileId};
 
 use crate::{
     config::Config,
-    diagnostics::{DiagnosticsGeneration, NativeDiagnosticsFetchKind},
+    diagnostics::{fetch_native_diagnostics, DiagnosticsGeneration, NativeDiagnosticsFetchKind},
     discover::{DiscoverArgument, DiscoverCommand, DiscoverProjectMessage},
     flycheck::{self, FlycheckMessage},
     global_state::{
@@ -444,25 +444,25 @@ impl GlobalState {
             let project_or_mem_docs_changed =
                 became_quiescent || state_changed || memdocs_added_or_removed;
             if project_or_mem_docs_changed && self.config.publish_diagnostics(None) {
-                // self.update_diagnostics();
+                self.update_diagnostics();
             }
-            if project_or_mem_docs_changed && self.config.test_explorer() {
-                // self.update_tests();
-            }
+            // if project_or_mem_docs_changed && self.config.test_explorer() {
+            //     self.update_tests();
+            // }
         }
 
-        // if let Some(diagnostic_changes) = self.diagnostics.take_changes() {
-        //     for file_id in diagnostic_changes {
-        //         let uri = file_id_to_url(&self.vfs.read().0, file_id);
-        //         let version = from_proto::vfs_path(&uri)
-        //             .ok()
-        //             .and_then(|path| self.mem_docs.get(&path).map(|it| it.version));
+        if let Some(diagnostic_changes) = self.diagnostics.take_changes() {
+            for file_id in diagnostic_changes {
+                let uri = file_id_to_url(&self.vfs.read().0, file_id);
+                let version = from_proto::vfs_path(&uri)
+                    .ok()
+                    .and_then(|path| self.mem_docs.get(&path).map(|it| it.version));
 
-        //         let diagnostics =
-        //             self.diagnostics.diagnostics_for(file_id).cloned().collect::<Vec<_>>();
-        //         self.publish_diagnostics(uri, version, diagnostics);
-        //     }
-        // }
+                let diagnostics =
+                    self.diagnostics.diagnostics_for(file_id).cloned().collect::<Vec<_>>();
+                self.publish_diagnostics(uri, version, diagnostics);
+            }
+        }
 
         if self.config.cargo_autoreload_config(None)
             || self.config.discover_workspace_config().is_some()
@@ -517,86 +517,86 @@ impl GlobalState {
     }
 
     fn update_diagnostics(&mut self) {
-        // let db = self.analysis_host.raw_database();
-        // let generation = self.diagnostics.next_generation();
-        // let subscriptions = {
-        //     let vfs = &self.vfs.read().0;
-        //     self.mem_docs
-        //         .iter()
-        //         .map(|path| vfs.file_id(path).unwrap())
-        //         .filter(|&file_id| {
-        //             let source_root = db.file_source_root(file_id);
-        //             // Only publish diagnostics for files in the workspace, not from crates.io deps
-        //             // or the sysroot.
-        //             // While theoretically these should never have errors, we have quite a few false
-        //             // positives particularly in the stdlib, and those diagnostics would stay around
-        //             // forever if we emitted them here.
-        //             !db.source_root(source_root).is_library
-        //         })
-        //         .collect::<std::sync::Arc<_>>()
-        // };
-        // tracing::trace!("updating notifications for {:?}", subscriptions);
-        // // Split up the work on multiple threads, but we don't wanna fill the entire task pool with
-        // // diagnostic tasks, so we limit the number of tasks to a quarter of the total thread pool.
-        // let max_tasks = self.config.main_loop_num_threads().div(4).max(1);
-        // let chunk_length = subscriptions.len() / max_tasks;
-        // let remainder = subscriptions.len() % max_tasks;
+        let db = self.analysis_host.raw_database();
+        let generation = self.diagnostics.next_generation();
+        let subscriptions = {
+            let vfs = &self.vfs.read().0;
+            self.mem_docs
+                .iter()
+                .map(|path| vfs.file_id(path).unwrap())
+                .filter(|&file_id| {
+                    let source_root = db.file_source_root(file_id);
+                    // Only publish diagnostics for files in the workspace, not from crates.io deps
+                    // or the sysroot.
+                    // While theoretically these should never have errors, we have quite a few false
+                    // positives particularly in the stdlib, and those diagnostics would stay around
+                    // forever if we emitted them here.
+                    !db.source_root(source_root).is_library
+                })
+                .collect::<std::sync::Arc<_>>()
+        };
+        tracing::trace!("updating notifications for {:?}", subscriptions);
+        // Split up the work on multiple threads, but we don't wanna fill the entire task pool with
+        // diagnostic tasks, so we limit the number of tasks to a quarter of the total thread pool.
+        let max_tasks = self.config.main_loop_num_threads().div(4).max(1);
+        let chunk_length = subscriptions.len() / max_tasks;
+        let remainder = subscriptions.len() % max_tasks;
 
-        // let mut start = 0;
-        // for task_idx in 0..max_tasks {
-        //     let extra = if task_idx < remainder { 1 } else { 0 };
-        //     let end = start + chunk_length + extra;
-        //     let slice = start..end;
-        //     if slice.is_empty() {
-        //         break;
-        //     }
-        //     // Diagnostics are triggered by the user typing
-        //     // so we run them on a latency sensitive thread.
-        //     let snapshot = self.snapshot();
-        //     self.task_pool.handle.spawn_with_sender(ThreadIntent::LatencySensitive, {
-        //         let subscriptions = subscriptions.clone();
-        //         // Do not fetch semantic diagnostics (and populate query results) if we haven't even
-        //         // loaded the initial workspace yet.
-        //         let fetch_semantic =
-        //             self.vfs_done && self.fetch_workspaces_queue.last_op_result().is_some();
-        //         move |sender| {
-        //             // We aren't observing the semantics token cache here
-        //             let snapshot = AssertUnwindSafe(&snapshot);
-        //             let Ok(diags) = std::panic::catch_unwind(|| {
-        //                 fetch_native_diagnostics(
-        //                     &snapshot,
-        //                     subscriptions.clone(),
-        //                     slice.clone(),
-        //                     NativeDiagnosticsFetchKind::Syntax,
-        //                 )
-        //             }) else {
-        //                 return;
-        //             };
-        //             sender
-        //                 .send(Task::Diagnostics(DiagnosticsTaskKind::Syntax(generation, diags)))
-        //                 .unwrap();
+        let mut start = 0;
+        for task_idx in 0..max_tasks {
+            let extra = if task_idx < remainder { 1 } else { 0 };
+            let end = start + chunk_length + extra;
+            let slice = start..end;
+            if slice.is_empty() {
+                break;
+            }
+            // Diagnostics are triggered by the user typing
+            // so we run them on a latency sensitive thread.
+            let snapshot = self.snapshot();
+            self.task_pool.handle.spawn_with_sender(ThreadIntent::LatencySensitive, {
+                let subscriptions = subscriptions.clone();
+                // Do not fetch semantic diagnostics (and populate query results) if we haven't even
+                // loaded the initial workspace yet.
+                let fetch_semantic =
+                    self.vfs_done && self.fetch_workspaces_queue.last_op_result().is_some();
+                move |sender| {
+                    // We aren't observing the semantics token cache here
+                    let snapshot = AssertUnwindSafe(&snapshot);
+                    let Ok(diags) = std::panic::catch_unwind(|| {
+                        fetch_native_diagnostics(
+                            &snapshot,
+                            subscriptions.clone(),
+                            slice.clone(),
+                            NativeDiagnosticsFetchKind::Syntax,
+                        )
+                    }) else {
+                        return;
+                    };
+                    sender
+                        .send(Task::Diagnostics(DiagnosticsTaskKind::Syntax(generation, diags)))
+                        .unwrap();
 
-        //             if fetch_semantic {
-        //                 let Ok(diags) = std::panic::catch_unwind(|| {
-        //                     fetch_native_diagnostics(
-        //                         &snapshot,
-        //                         subscriptions.clone(),
-        //                         slice.clone(),
-        //                         NativeDiagnosticsFetchKind::Semantic,
-        //                     )
-        //                 }) else {
-        //                     return;
-        //                 };
-        //                 sender
-        //                     .send(Task::Diagnostics(DiagnosticsTaskKind::Semantic(
-        //                         generation, diags,
-        //                     )))
-        //                     .unwrap();
-        //             }
-        //         }
-        //     });
-        //     start = end;
-        // }
+                    if fetch_semantic {
+                        let Ok(diags) = std::panic::catch_unwind(|| {
+                            fetch_native_diagnostics(
+                                &snapshot,
+                                subscriptions.clone(),
+                                slice.clone(),
+                                NativeDiagnosticsFetchKind::Semantic,
+                            )
+                        }) else {
+                            return;
+                        };
+                        sender
+                            .send(Task::Diagnostics(DiagnosticsTaskKind::Semantic(
+                                generation, diags,
+                            )))
+                            .unwrap();
+                    }
+                }
+            });
+            start = end;
+        }
     }
 
     // fn update_tests(&mut self) {
