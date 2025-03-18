@@ -197,7 +197,7 @@ pub(super) fn atom_expr(
             // endmethod
             let m = p.start();
             // Not sure why we don't directly call block_expr_bsv here
-            stmt_list_bsv(p, Some(T![begin]), T![end]);
+            stmt_list_bsv(p, Some(T![begin]), T![end], true);
             m.complete(p, BLOCK_EXPR)
         }
 
@@ -601,13 +601,13 @@ fn if_expr(p: &mut Parser<'_>) -> CompletedMarker {
 
     let (bra, ket) = (Some(T![begin]), T![end]);
 
-    block_expr_bsv(p, bra, ket);
+    block_expr_bsv(p, bra, ket, true);
 
     if p.eat(T![else]) {
         if p.at(T![if]) {
             if_expr(p);
         } else {
-            block_expr_bsv(p, bra, ket);
+            block_expr_bsv(p, bra, ket, true);
         }
     }
     m.complete(p, IF_EXPR)
@@ -843,9 +843,9 @@ pub(crate) fn block_expr(p: &mut Parser<'_>) {
 // to mirror the Rust stmt_list { items } matched braces pattern. Unfortunately it also
 // means we would need to be cleverer to have TODO_BSV error resilience. Currently it's like
 // we better hope there's a body coming.
-pub(crate) fn block_expr_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, ket: SyntaxKind) -> CompletedMarker {
+pub(crate) fn block_expr_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, ket: SyntaxKind, include_ket: bool) -> CompletedMarker {
     let m = p.start();
-    stmt_list_bsv(p, bra, ket);  // Note we go don't bother going to expr_block_contents analogue.
+    stmt_list_bsv(p, bra, ket, include_ket);  // Note we go don't bother going to expr_block_contents analogue.
     m.complete(p, BLOCK_EXPR)
 }
 

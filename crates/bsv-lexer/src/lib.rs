@@ -551,9 +551,9 @@ impl Cursor<'_> {
         // Known prefixes must have been handled earlier. So if
         // we see a prefix here, it is definitely an unknown prefix.
         match self.first() {
-            '#' | '"' | '\'' => UnknownPrefix,
+            '"' | '\'' => UnknownPrefix,
             c if !c.is_ascii() && c.is_emoji_char() => self.fake_ident_or_unknown_prefix(),
-            _ => Ident,
+            _ => Ident,  // e.g., Bit#(32)
         }
     }
 

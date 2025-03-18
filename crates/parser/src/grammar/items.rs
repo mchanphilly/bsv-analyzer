@@ -670,7 +670,7 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker) {
             BsvType::Rule => T![endrule],
         };
         // TODO_BSV add body: also need to be resilient to nesting.
-        expressions::block_expr_bsv(p, None, ket);
+        expressions::block_expr_bsv(p, None, ket, false);
         p.expect(ket);
     }
 
@@ -739,25 +739,25 @@ fn opt_guard(p: &mut Parser<'_>) -> bool {
     }
 }
 
-fn rule(p: &mut Parser<'_>) {
-    let m = p.start();
+// fn rule(p: &mut Parser<'_>) {
+//     let m = p.start();
 
-    p.bump(T![rule]);
+//     p.bump(T![rule]);
 
-    // TODO BSV check if rules actually require names
-    name(p);
+//     // TODO BSV check if rules actually require names
+//     name(p);
 
-    opt_guard(p);
+//     opt_guard(p);
 
-    if p.eat(T![;]) {
-        expressions::block_expr_bsv(p, None, T![endrule]);
-        p.expect(T![endrule]);
-    }
+//     if p.eat(T![;]) {
+//         expressions::block_expr_bsv(p, None, T![endrule], );
+//         p.expect(T![endrule]);
+//     }
 
-    // TODO BSV check if this is an appropriate way to complete without
-    // a body, or if we should be doing an error or something.
-    m.complete(p, RULE);
-}
+//     // TODO BSV check if this is an appropriate way to complete without
+//     // a body, or if we should be doing an error or something.
+//     m.complete(p, RULE);
+// }
 
 pub(super) fn macro_call_after_excl(p: &mut Parser<'_>) -> BlockLike {
     p.expect(T![!]);
