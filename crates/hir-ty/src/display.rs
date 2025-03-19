@@ -1065,13 +1065,13 @@ impl HirDisplay for Ty {
                         // parent's params (those from enclosing impl or trait, if any).
                         let (fn_params, parent_params) = parameters.split_at(without_impl + impl_);
 
-                        write!(f, "<")?;
+                        write!(f, "#(")?;
                         hir_fmt_generic_arguments(f, parent_params, None)?;
                         if !parent_params.is_empty() && !fn_params.is_empty() {
                             write!(f, ", ")?;
                         }
                         hir_fmt_generic_arguments(f, &fn_params[0..without_impl], None)?;
-                        write!(f, ">")?;
+                        write!(f, ")")?;
                     }
                 }
                 write!(f, "(")?;
@@ -1673,7 +1673,7 @@ fn write_bounds_like_dyn_trait(
                     );
                     if let [self_, params @ ..] = params {
                         if !params.is_empty() {
-                            write!(f, "<")?;
+                            write!(f, "#(")?;
                             hir_fmt_generic_arguments(f, params, self_.ty(Interner))?;
                             // there might be assoc type bindings, so we leave the angle brackets open
                             angle_open = true;
@@ -1683,7 +1683,7 @@ fn write_bounds_like_dyn_trait(
             }
             WhereClause::TypeOutlives(to) if Either::Left(&to.ty) == this => {
                 if !is_fn_trait && angle_open {
-                    write!(f, ">")?;
+                    write!(f, ")")?;
                     angle_open = false;
                 }
                 if !first {
@@ -1694,7 +1694,7 @@ fn write_bounds_like_dyn_trait(
             WhereClause::TypeOutlives(_) => {}
             WhereClause::LifetimeOutlives(lo) if Either::Right(&lo.a) == this => {
                 if !is_fn_trait && angle_open {
-                    write!(f, ">")?;
+                    write!(f, ")")?;
                     angle_open = false;
                 }
                 if !first {
@@ -1716,7 +1716,7 @@ fn write_bounds_like_dyn_trait(
                 if angle_open {
                     write!(f, ", ")?;
                 } else {
-                    write!(f, "<")?;
+                    write!(f, "#(")?;
                     angle_open = true;
                 }
                 if let AliasTy::Projection(proj) = alias {
@@ -1728,13 +1728,13 @@ fn write_bounds_like_dyn_trait(
 
                     let proj_arg_count = generics(f.db.upcast(), assoc_ty_id.into()).len_self();
                     if proj_arg_count > 0 {
-                        write!(f, "<")?;
+                        write!(f, "#(")?;
                         hir_fmt_generic_arguments(
                             f,
                             &proj.substitution.as_slice(Interner)[..proj_arg_count],
                             None,
                         )?;
-                        write!(f, ">")?;
+                        write!(f, ")")?;
                     }
                     write!(f, " = ")?;
                 }
@@ -2133,7 +2133,7 @@ impl HirDisplay for Path {
                 for arg in &generic_args.args[generic_args.has_self_type as usize..] {
                     if first {
                         first = false;
-                        write!(f, "<")?;
+                        write!(f, "#(")?;
                     } else {
                         write!(f, ", ")?;
                     }
@@ -2142,7 +2142,7 @@ impl HirDisplay for Path {
                 for binding in generic_args.bindings.iter() {
                     if first {
                         first = false;
-                        write!(f, "<")?;
+                        write!(f, "#(")?;
                     } else {
                         write!(f, ", ")?;
                     }
@@ -2162,12 +2162,12 @@ impl HirDisplay for Path {
                 // There may be no generic arguments to print, in case of a trait having only a
                 // single `Self` bound which is converted to `<Ty as Trait>::Assoc`.
                 if !first {
-                    write!(f, ">")?;
+                    write!(f, ")")?;
                 }
 
                 // Current position: `<Ty as Trait<Args>|`
                 if generic_args.has_self_type {
-                    write!(f, ">")?;
+                    write!(f, ")")?;
                 }
             }
         }

@@ -47,7 +47,7 @@ impl SignatureHelp {
     }
 
     fn push_generic_param(&mut self, param: &str) {
-        self.push_param("<", param);
+        self.push_param("#(", param);
     }
 
     fn push_record_field(&mut self, param: &str) {

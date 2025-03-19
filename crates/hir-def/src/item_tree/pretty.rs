@@ -548,7 +548,7 @@ impl Printer<'_> {
             return;
         }
 
-        w!(self, "<");
+        w!(self, "#(");
         let mut first = true;
         for (idx, lt) in params.iter_lt() {
             if !first {
@@ -575,7 +575,7 @@ impl Printer<'_> {
                 }
             }
         }
-        w!(self, ">");
+        w!(self, ")");
     }
 
     fn print_where_clause_and_opening_brace(&mut self, params: &GenericParams) {
