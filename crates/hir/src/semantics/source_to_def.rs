@@ -560,6 +560,7 @@ impl SourceToDefCtx<'_, '_> {
                 ast::Item::Static(it) => {
                     this.static_to_def(InFile::new(file_id, it)).map(Into::into)
                 }
+                ast::Item::Impl(it) => this.impl_to_def(InFile::new(file_id, it)).map(Into::into),
                 _ => None,
             }
         })
