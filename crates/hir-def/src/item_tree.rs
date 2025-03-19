@@ -856,6 +856,7 @@ pub struct Impl {
     pub is_unsafe: bool,
     pub items: Box<[AssocItem]>,
     pub ast_id: FileAstId<ast::Impl>,
+    // TODO add params
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

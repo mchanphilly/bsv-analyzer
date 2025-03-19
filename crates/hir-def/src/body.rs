@@ -168,6 +168,34 @@ impl Body {
                     is_async_fn = data.is_async();
                     src.map(|it| it.body().map(ast::Expr::from))
                 }
+                DefWithBodyId::ImplId(i) => {
+                    // let data = db.impl_data(i);
+                    let i = i.lookup(db);
+                    let src = i.source(db);
+                    // params = src.value.param_list().map(move |param_list| {
+                    //     let item_tree = i.id.item_tree(db);
+                    //     let func = &item_tree[i.id.value];
+                    //     let krate = i.container.module(db).krate;
+                    //     let crate_graph = db.crate_graph();
+                    //     (
+                    //         param_list,
+                    //         (0..func.params.len()).map(move |idx| {
+                    //             item_tree
+                    //                 .attrs(
+                    //                     db,
+                    //                     krate,
+                    //                     AttrOwner::Param(
+                    //                         i.id.value,
+                    //                         Idx::from_raw(RawIdx::from(idx as u32)),
+                    //                     ),
+                    //                 )
+                    //                 .is_cfg_enabled(&crate_graph[krate].cfg_options)
+                    //         }),
+                    //     )
+                    // });
+                    // is_async_fn = data.is_async();
+                    src.map(|it| it.body().map(ast::Expr::from))
+                }
                 DefWithBodyId::ConstId(c) => {
                     let c = c.lookup(db);
                     let src = c.source(db);

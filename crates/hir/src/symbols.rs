@@ -248,6 +248,9 @@ impl<'a> SymbolCollector<'a> {
             DefWithBodyId::FunctionId(id) => {
                 Some(self.db.function_data(id).name.display_no_db(self.edition).to_smolstr())
             }
+            DefWithBodyId::ImplId(id) => {
+                Some(self.db.impl_data(id).name.display_no_db(self.edition).to_smolstr())
+            }
             DefWithBodyId::StaticId(id) => {
                 Some(self.db.static_data(id).name.display_no_db(self.edition).to_smolstr())
             }

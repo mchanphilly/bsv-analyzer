@@ -1136,6 +1136,7 @@ impl HasResolver for DefWithBodyId {
         match self {
             DefWithBodyId::ConstId(c) => c.resolver(db),
             DefWithBodyId::FunctionId(f) => f.resolver(db),
+            DefWithBodyId::ImplId(i) => i.resolver(db),
             DefWithBodyId::StaticId(s) => s.resolver(db),
             DefWithBodyId::VariantId(v) => v.resolver(db),
             DefWithBodyId::InTypeConstId(c) => c.lookup(db).owner.resolver(db),

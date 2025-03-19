@@ -87,6 +87,9 @@ pub(crate) fn infer_query(db: &dyn HirDatabase, def: DefWithBodyId) -> Arc<Infer
     let mut ctx = InferenceContext::new(db, def, &body, resolver);
 
     match def {
+        DefWithBodyId::ImplId(i) => {
+            ctx.collect_impl(i);  // TODO currently does nothing
+        }
         DefWithBodyId::FunctionId(f) => {
             ctx.collect_fn(f);
         }
@@ -840,6 +843,93 @@ impl<'a> InferenceContext<'a> {
         self.make_tait_coercion_table(iter::once(&return_ty));
 
         self.return_ty = return_ty;
+    }
+
+    fn collect_impl(&mut self, imp: ImplId) {
+        // let data = self.db.impl(imp);
+        // let ctx = crate::lower::TyLoweringContext::new(self.db, &self.resolver, self.owner.into())
+        //     .with_type_param_mode(ParamLoweringMode::Placeholder)
+        //     .with_impl_trait_mode(ImplTraitLoweringMode::Param);
+        // let mut param_tys =
+        //     data.params.iter().map(|type_ref| ctx.lower_ty(type_ref)).collect::<Vec<_>>();
+        // // Check if function contains a va_list, if it does then we append it to the parameter types
+        // // that are collected from the function data
+        // if data.is_varargs() {
+        //     let va_list_ty = match self.resolve_va_list() {
+        //         Some(va_list) => TyBuilder::adt(self.db, va_list)
+        //             .fill_with_defaults(self.db, || self.table.new_type_var())
+        //             .build(),
+        //         None => self.err_ty(),
+        //     };
+
+        //     param_tys.push(va_list_ty);
+        // }
+        // let mut param_tys = param_tys.into_iter().chain(iter::repeat(self.table.new_type_var()));
+        // if let Some(self_param) = self.body.self_param {
+        //     if let Some(ty) = param_tys.next() {
+        //         let ty = self.insert_type_vars(ty);
+        //         let ty = self.normalize_associated_types_in(ty);
+        //         self.write_binding_ty(self_param, ty);
+        //     }
+        // }
+        // let mut tait_candidates = FxHashSet::default();
+        // for (ty, pat) in param_tys.zip(&*self.body.params) {
+        //     let ty = self.insert_type_vars(ty);
+        //     let ty = self.normalize_associated_types_in(ty);
+
+        //     self.infer_top_pat(*pat, &ty);
+        //     if ty
+        //         .data(Interner)
+        //         .flags
+        //         .intersects(TypeFlags::HAS_TY_OPAQUE.union(TypeFlags::HAS_TY_INFER))
+        //     {
+        //         tait_candidates.insert(ty);
+        //     }
+        // }
+        // let return_ty = &*data.ret_type;
+
+        // let ctx = crate::lower::TyLoweringContext::new(self.db, &self.resolver, self.owner.into())
+        //     .with_type_param_mode(ParamLoweringMode::Placeholder)
+        //     .with_impl_trait_mode(ImplTraitLoweringMode::Opaque);
+        // let return_ty = ctx.lower_ty(return_ty);
+        // let return_ty = self.insert_type_vars(return_ty);
+
+        // let return_ty = if let Some(rpits) = self.db.return_type_impl_traits(imp) {
+        //     // RPIT opaque types use substitution of their parent function.
+        //     let fn_placeholders = TyBuilder::placeholder_subst(self.db, imp);
+        //     let mut mode = ImplTraitReplacingMode::ReturnPosition(FxHashSet::default());
+        //     let result =
+        //         self.insert_inference_vars_for_impl_trait(return_ty, fn_placeholders, &mut mode);
+        //     if let ImplTraitReplacingMode::ReturnPosition(taits) = mode {
+        //         tait_candidates.extend(taits);
+        //     }
+        //     let rpits = rpits.skip_binders();
+        //     for (id, _) in rpits.impl_traits.iter() {
+        //         if let Entry::Vacant(e) = self.result.type_of_rpit.entry(id) {
+        //             never!("Missed RPIT in `insert_inference_vars_for_rpit`");
+        //             e.insert(TyKind::Error.intern(Interner));
+        //         }
+        //     }
+        //     result
+        // } else {
+        //     return_ty
+        // };
+
+        // self.return_ty = self.normalize_associated_types_in(return_ty);
+        // self.return_coercion = Some(CoerceMany::new(self.return_ty.clone()));
+
+        // // Functions might be defining usage sites of TAITs.
+        // // To define an TAITs, that TAIT must appear in the function's signatures.
+        // // So, it suffices to check for params and return types.
+        // if self
+        //     .return_ty
+        //     .data(Interner)
+        //     .flags
+        //     .intersects(TypeFlags::HAS_TY_OPAQUE.union(TypeFlags::HAS_TY_INFER))
+        // {
+        //     tait_candidates.insert(self.return_ty.clone());
+        // }
+        // self.make_tait_coercion_table(tait_candidates.iter());
     }
 
     fn collect_fn(&mut self, func: FunctionId) {

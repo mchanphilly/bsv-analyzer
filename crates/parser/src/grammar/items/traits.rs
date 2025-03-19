@@ -111,7 +111,7 @@ pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
     p.expect(T![')']);
     p.expect(T![;]);
 
-    borderless_assoc_item_list(p, T![endmodule]);
+    expressions::block_expr_bsv(p, None, T![endmodule], false);
 
     p.expect(T![endmodule]);
 

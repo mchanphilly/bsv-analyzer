@@ -145,6 +145,7 @@ impl From<DefWithBody> for DefWithBodyId {
     fn from(def: DefWithBody) -> Self {
         match def {
             DefWithBody::Function(it) => DefWithBodyId::FunctionId(it.id),
+            DefWithBody::Impl(it) => DefWithBodyId::ImplId(it.id),
             DefWithBody::Static(it) => DefWithBodyId::StaticId(it.id),
             DefWithBody::Const(it) => DefWithBodyId::ConstId(it.id),
             DefWithBody::Variant(it) => DefWithBodyId::VariantId(it.into()),
@@ -156,6 +157,7 @@ impl From<DefWithBody> for DefWithBodyId {
 impl From<DefWithBodyId> for DefWithBody {
     fn from(def: DefWithBodyId) -> Self {
         match def {
+            DefWithBodyId::ImplId(it) => DefWithBody::Impl(it.into()),
             DefWithBodyId::FunctionId(it) => DefWithBody::Function(it.into()),
             DefWithBodyId::StaticId(it) => DefWithBody::Static(it.into()),
             DefWithBodyId::ConstId(it) => DefWithBody::Const(it.into()),

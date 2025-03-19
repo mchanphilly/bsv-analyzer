@@ -304,6 +304,7 @@ impl Definition {
 
         if let Definition::Local(var) = self {
             let def = match var.parent(db) {
+                DefWithBody::Impl(it) => it.source(db).map(|src| src.syntax().cloned()),
                 DefWithBody::Function(f) => f.source(db).map(|src| src.syntax().cloned()),
                 DefWithBody::Const(c) => c.source(db).map(|src| src.syntax().cloned()),
                 DefWithBody::Static(s) => s.source(db).map(|src| src.syntax().cloned()),
@@ -321,6 +322,7 @@ impl Definition {
 
         if let Definition::InlineAsmOperand(op) = self {
             let def = match op.parent(db) {
+                DefWithBody::Impl(it) => it.source(db).map(|src| src.syntax().cloned()),
                 DefWithBody::Function(f) => f.source(db).map(|src| src.syntax().cloned()),
                 DefWithBody::Const(c) => c.source(db).map(|src| src.syntax().cloned()),
                 DefWithBody::Static(s) => s.source(db).map(|src| src.syntax().cloned()),
@@ -726,38 +728,38 @@ impl<'a> FindUsages<'a> {
                             (|| {
                                 let impl_ = impl_?;
                                 is_possibly_self.push(sema.original_range(impl_.syntax()));
-                                let assoc_items = impl_.assoc_item_list()?;
-                                let type_aliases = assoc_items
-                                    .syntax()
-                                    .descendants()
-                                    .filter_map(ast::TypeAlias::cast);
-                                for type_alias in type_aliases {
-                                    let Some(ty) = type_alias.ty() else { continue };
-                                    let Some(name) = type_alias.name() else { continue };
-                                    let contains_self = ty
-                                        .syntax()
-                                        .descendants_with_tokens()
-                                        .any(|node| node.kind() == SyntaxKind::SELF_TYPE_KW);
-                                    if !contains_self {
-                                        continue;
-                                    }
-                                    if seen.insert(InFileWrapper::new(
-                                        file_id,
-                                        name.syntax().text_range(),
-                                    )) {
-                                        if let Some(def) = is_alias(&type_alias) {
-                                            cov_mark::hit!(self_type_alias);
-                                            insert_type_alias(
-                                                sema.db,
-                                                &mut to_process,
-                                                name.text().as_str(),
-                                                def.into(),
-                                            );
-                                        } else {
-                                            cov_mark::hit!(same_name_different_def_type_alias);
-                                        }
-                                    }
-                                }
+                                // let assoc_items = impl_.assoc_item_list()?;
+                                // let type_aliases = assoc_items
+                                //     .syntax()
+                                //     .descendants()
+                                //     .filter_map(ast::TypeAlias::cast);
+                                // for type_alias in type_aliases {
+                                //     let Some(ty) = type_alias.ty() else { continue };
+                                //     let Some(name) = type_alias.name() else { continue };
+                                //     let contains_self = ty
+                                //         .syntax()
+                                //         .descendants_with_tokens()
+                                //         .any(|node| node.kind() == SyntaxKind::SELF_TYPE_KW);
+                                //     if !contains_self {
+                                //         continue;
+                                //     }
+                                //     if seen.insert(InFileWrapper::new(
+                                //         file_id,
+                                //         name.syntax().text_range(),
+                                //     )) {
+                                //         if let Some(def) = is_alias(&type_alias) {
+                                //             cov_mark::hit!(self_type_alias);
+                                //             insert_type_alias(
+                                //                 sema.db,
+                                //                 &mut to_process,
+                                //                 name.text().as_str(),
+                                //                 def.into(),
+                                //             );
+                                //         } else {
+                                //             cov_mark::hit!(same_name_different_def_type_alias);
+                                //         }
+                                //     }
+                                // }
                                 Some(())
                             })();
                         }

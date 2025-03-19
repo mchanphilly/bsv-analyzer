@@ -570,10 +570,10 @@ impl<'a> Ctx<'a> {
         let is_negative = impl_def.excl_token().is_some();
         let is_unsafe = impl_def.unsafe_token().is_some();
 
-        // We cannot use `assoc_items()` here as that does not include macro calls.
         let items = impl_def
-            .assoc_item_list()
+            .body()
             .into_iter()
+            .flat_map(|it| it.stmt_list())
             .flat_map(|it| it.assoc_items())
             .filter_map(|item| self.lower_assoc_item(&item))
             .collect();

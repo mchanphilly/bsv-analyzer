@@ -47,6 +47,10 @@ impl MirBody {
                 let data = db.function_data(id);
                 w!(this, "fn {}() ", data.name.display(db.upcast(), Edition::LATEST));
             }
+            hir_def::DefWithBodyId::ImplId(id) => {
+                let data = db.impl_data(id);
+                w!(this, "impl {}() ", data.name.display(db.upcast(), Edition::LATEST));
+            }
             hir_def::DefWithBodyId::StaticId(id) => {
                 let data = db.static_data(id);
                 w!(this, "static {}: _ = ", data.name.display(db.upcast(), Edition::LATEST));

@@ -2139,6 +2139,9 @@ pub fn mir_body_query(db: &dyn HirDatabase, def: DefWithBodyId) -> Result<Arc<Mi
     let krate = def.krate(db.upcast());
     let edition = db.crate_graph()[krate].edition;
     let detail = match def {
+        DefWithBodyId::ImplId(it) => {
+            db.impl_data(it).name.display(db.upcast(), edition).to_string()
+        }
         DefWithBodyId::FunctionId(it) => {
             db.function_data(it).name.display(db.upcast(), edition).to_string()
         }

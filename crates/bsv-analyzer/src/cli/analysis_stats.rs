@@ -656,6 +656,7 @@ impl flags::AnalysisStats {
             let msg = move || {
                 if verbosity.is_verbose() {
                     let source = match body_id {
+                        DefWithBody::Impl(it) => it.source(db).map(|it| it.syntax().cloned()),
                         DefWithBody::Function(it) => it.source(db).map(|it| it.syntax().cloned()),
                         DefWithBody::Static(it) => it.source(db).map(|it| it.syntax().cloned()),
                         DefWithBody::Const(it) => it.source(db).map(|it| it.syntax().cloned()),
@@ -970,6 +971,7 @@ impl flags::AnalysisStats {
             let msg = move || {
                 if verbosity.is_verbose() {
                     let source = match body_id {
+                        DefWithBody::Impl(it) => it.source(db).map(|it| it.syntax().cloned()),
                         DefWithBody::Function(it) => it.source(db).map(|it| it.syntax().cloned()),
                         DefWithBody::Static(it) => it.source(db).map(|it| it.syntax().cloned()),
                         DefWithBody::Const(it) => it.source(db).map(|it| it.syntax().cloned()),

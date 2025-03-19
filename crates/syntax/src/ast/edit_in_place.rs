@@ -70,7 +70,7 @@ impl GenericParamsOwnerEdit for ast::Impl {
 
     fn get_or_create_where_clause(&self) -> ast::WhereClause {
         if self.where_clause().is_none() {
-            let position = match self.assoc_item_list() {
+            let position = match self.body() {
                 Some(items) => Position::before(items.syntax()),
                 None => Position::last_child_of(self.syntax()),
             };
@@ -617,12 +617,18 @@ impl Removable for ast::Use {
 }
 
 impl ast::Impl {
-    pub fn get_or_create_assoc_item_list(&self) -> ast::AssocItemList {
-        if self.assoc_item_list().is_none() {
-            let assoc_item_list = make::assoc_item_list().clone_for_update();
-            ted::append_child(self.syntax(), assoc_item_list.syntax());
+    pub fn get_or_create_body(&self) -> ast::BlockExpr {
+        if self.body().is_none() {
+            let body = make::ext::empty_block_expr().clone_for_update();
+            match self.semicolon_token() {
+                Some(semi) => {
+                    ted::replace(semi, body.syntax());
+                    ted::insert(Position::before(body.syntax), make::tokens::single_space());
+                }
+                None => ted::append_child(self.syntax(), body.syntax()),
+            }
         }
-        self.assoc_item_list().unwrap()
+        self.body().unwrap()
     }
 }
 

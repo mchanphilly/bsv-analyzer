@@ -495,7 +495,7 @@ Impl =
   AssocItemList
 ) | (  // Bluespec TODO add and test parameters i.e., # for both types and values
   'module' Name '(' trait:Type ')' ';'
-  AssocItemList
+  body:BlockExpr
   'endmodule' // (':' ? 
 )
 

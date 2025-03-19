@@ -867,6 +867,7 @@ impl TryFrom<DefWithBody> for Definition {
     fn try_from(def: DefWithBody) -> Result<Self, Self::Error> {
         match def {
             DefWithBody::Function(it) => Ok(it.into()),
+            DefWithBody::Impl(it) => Ok(it.into()),
             DefWithBody::Static(it) => Ok(it.into()),
             DefWithBody::Const(it) => Ok(it.into()),
             DefWithBody::Variant(it) => Ok(it.into()),

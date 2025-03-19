@@ -1731,18 +1731,20 @@ impl VariantDef {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DefWithBody {
     Function(Function),
+    Impl(Impl),
     Static(Static),
     Const(Const),
     Variant(Variant),
     InTypeConst(InTypeConst),
 }
-impl_from!(Function, Const, Static, Variant, InTypeConst for DefWithBody);
+impl_from!(Impl, Function, Const, Static, Variant, InTypeConst for DefWithBody);
 
 impl DefWithBody {
     pub fn module(self, db: &dyn HirDatabase) -> Module {
         match self {
             DefWithBody::Const(c) => c.module(db),
             DefWithBody::Function(f) => f.module(db),
+            DefWithBody::Impl(i) => i.module(db),
             DefWithBody::Static(s) => s.module(db),
             DefWithBody::Variant(v) => v.module(db),
             DefWithBody::InTypeConst(c) => c.module(db),
@@ -1752,6 +1754,7 @@ impl DefWithBody {
     pub fn name(self, db: &dyn HirDatabase) -> Option<Name> {
         match self {
             DefWithBody::Function(f) => Some(f.name(db)),
+            DefWithBody::Impl(i) => Some(i.name(db)),
             DefWithBody::Static(s) => Some(s.name(db)),
             DefWithBody::Const(c) => c.name(db),
             DefWithBody::Variant(v) => Some(v.name(db)),
@@ -1763,6 +1766,11 @@ impl DefWithBody {
     pub fn body_type(self, db: &dyn HirDatabase) -> Type {
         match self {
             DefWithBody::Function(it) => it.ret_type(db),
+            DefWithBody::Impl(it) => Type::new_with_resolver_inner(  // TODO BSV: Check if this is right
+                db,
+                &DefWithBodyId::from(it.id).resolver(db.upcast()),
+                TyKind::Error.intern(Interner),
+            ),
             DefWithBody::Static(it) => it.ty(db),
             DefWithBody::Const(it) => it.ty(db),
             DefWithBody::Variant(it) => it.parent_enum(db).variant_body_ty(db),
@@ -1777,6 +1785,7 @@ impl DefWithBody {
     fn id(&self) -> DefWithBodyId {
         match self {
             DefWithBody::Function(it) => it.id.into(),
+            DefWithBody::Impl(it) => it.id.into(),
             DefWithBody::Static(it) => it.id.into(),
             DefWithBody::Const(it) => it.id.into(),
             DefWithBody::Variant(it) => it.into(),
@@ -2025,6 +2034,7 @@ impl DefWithBody {
 
         let def: ModuleDef = match self {
             DefWithBody::Function(it) => it.into(),
+            DefWithBody::Impl(it) => it.into(),
             DefWithBody::Static(it) => it.into(),
             DefWithBody::Const(it) => it.into(),
             DefWithBody::Variant(it) => it.into(),
@@ -3106,6 +3116,7 @@ impl AsAssocItem for ModuleDef {
 impl AsAssocItem for DefWithBody {
     fn as_assoc_item(self, db: &dyn HirDatabase) -> Option<AssocItem> {
         match self {
+            DefWithBody::Impl(_) => None,  // Never nested modules statements, AFAIK
             DefWithBody::Function(it) => it.as_assoc_item(db),
             DefWithBody::Const(it) => it.as_assoc_item(db),
             DefWithBody::Static(_) | DefWithBody::Variant(_) | DefWithBody::InTypeConst(_) => None,

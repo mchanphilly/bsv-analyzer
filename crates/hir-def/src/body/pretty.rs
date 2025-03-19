@@ -30,6 +30,10 @@ pub(super) fn print_body_hir(
     edition: Edition,
 ) -> String {
     let header = match owner {
+        DefWithBodyId::ImplId(it) => it
+            .lookup(db)
+            .id
+            .resolved(db, |it| format!("impl {}", it.name.display(db.upcast(), edition))),
         DefWithBodyId::FunctionId(it) => it
             .lookup(db)
             .id

@@ -194,6 +194,7 @@ impl ExprCollector<'_> {
             Awaitable::Yes
         } else {
             match self.owner {
+                DefWithBodyId::ImplId(..) => Awaitable::No("impl"),
                 DefWithBodyId::FunctionId(..) => Awaitable::No("non-async function"),
                 DefWithBodyId::StaticId(..) => Awaitable::No("static"),
                 DefWithBodyId::ConstId(..) | DefWithBodyId::InTypeConstId(..) => {

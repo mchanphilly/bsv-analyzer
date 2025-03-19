@@ -440,7 +440,7 @@ fn inner_attributes(
             ast::SourceFile(_) => syntax.clone(),
             ast::ExternBlock(it) => it.extern_item_list()?.syntax().clone(),
             ast::Fn(it) => it.body()?.stmt_list()?.syntax().clone(),
-            ast::Impl(it) => it.assoc_item_list()?.syntax().clone(),
+            ast::Impl(it) => it.body()?.syntax().clone(),
             ast::Module(it) => it.item_list()?.syntax().clone(),
             ast::BlockExpr(it) => {
                 if !it.may_carry_attributes() {

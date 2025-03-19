@@ -724,6 +724,7 @@ impl From<DefWithBodyId> for TypeOwnerId {
     fn from(value: DefWithBodyId) -> Self {
         match value {
             DefWithBodyId::FunctionId(it) => it.into(),
+            DefWithBodyId::ImplId(it) => it.into(),
             DefWithBodyId::StaticId(it) => it.into(),
             DefWithBodyId::ConstId(it) => it.into(),
             DefWithBodyId::InTypeConstId(it) => it.into(),
@@ -873,13 +874,14 @@ impl GeneralConstId {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DefWithBodyId {
     FunctionId(FunctionId),
+    ImplId(ImplId),
     StaticId(StaticId),
     ConstId(ConstId),
     InTypeConstId(InTypeConstId),
     VariantId(EnumVariantId),
 }
 
-impl_from!(FunctionId, ConstId, StaticId, InTypeConstId for DefWithBodyId);
+impl_from!(FunctionId, ImplId, ConstId, StaticId, InTypeConstId for DefWithBodyId);
 
 impl From<EnumVariantId> for DefWithBodyId {
     fn from(id: EnumVariantId) -> Self {
@@ -891,6 +893,7 @@ impl DefWithBodyId {
     pub fn as_generic_def_id(self, db: &dyn DefDatabase) -> Option<GenericDefId> {
         match self {
             DefWithBodyId::FunctionId(f) => Some(f.into()),
+            DefWithBodyId::ImplId(i) => Some(i.into()),
             DefWithBodyId::StaticId(_) => None,
             DefWithBodyId::ConstId(c) => Some(c.into()),
             DefWithBodyId::VariantId(c) => Some(c.lookup(db).parent.into()),
@@ -1331,6 +1334,7 @@ impl HasModule for DefWithBodyId {
     fn module(&self, db: &dyn DefDatabase) -> ModuleId {
         match self {
             DefWithBodyId::FunctionId(it) => it.module(db),
+            DefWithBodyId::ImplId(it) => it.module(db),
             DefWithBodyId::StaticId(it) => it.module(db),
             DefWithBodyId::ConstId(it) => it.module(db),
             DefWithBodyId::VariantId(it) => it.module(db),

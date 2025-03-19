@@ -116,8 +116,10 @@ pub(crate) fn real_span_map(db: &dyn ExpandDatabase, file_id: EditionedFileId) -
             }
         }
         ast::Item::Impl(it) if !collect_attrs(it).map(TupleExt::tail).any(|it| it.is_left()) => {
-            if let Some(assoc_item_list) = it.assoc_item_list() {
-                pairs.extend(assoc_item_list.assoc_items().map(ast::Item::from).map(item_to_entry));
+            if let Some(body) = it.body() {
+                if let Some(stmt_list) = body.stmt_list() {
+                    pairs.extend(stmt_list.assoc_items().map(ast::Item::from).map(item_to_entry));
+                }
             }
         }
         ast::Item::Module(it) if !collect_attrs(it).map(TupleExt::tail).any(|it| it.is_left()) => {

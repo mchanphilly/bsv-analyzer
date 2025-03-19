@@ -134,6 +134,10 @@ fn check_impl(ra_fixture: &str, allow_none: bool, only_types: bool, display_sour
             let loc = it.lookup(&db);
             loc.source(&db).value.syntax().text_range().start()
         }
+        DefWithBodyId::ImplId(it) => {
+            let loc = it.lookup(&db);
+            loc.source(&db).value.syntax().text_range().start()
+        }
         DefWithBodyId::ConstId(it) => {
             let loc = it.lookup(&db);
             loc.source(&db).value.syntax().text_range().start()
@@ -378,6 +382,10 @@ fn infer_with_mismatches(content: &str, include_mismatches: bool) -> String {
     visit_module(&db, &def_map, module.local_id, &mut |it| defs.push(it));
     defs.sort_by_key(|def| match def {
         DefWithBodyId::FunctionId(it) => {
+            let loc = it.lookup(&db);
+            loc.source(&db).value.syntax().text_range().start()
+        }
+        DefWithBodyId::ImplId(it) => {
             let loc = it.lookup(&db);
             loc.source(&db).value.syntax().text_range().start()
         }

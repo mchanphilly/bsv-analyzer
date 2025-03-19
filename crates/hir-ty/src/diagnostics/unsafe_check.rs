@@ -25,6 +25,7 @@ pub fn missing_unsafe(db: &dyn HirDatabase, def: DefWithBodyId) -> (Vec<ExprId>,
         DefWithBodyId::StaticId(_)
         | DefWithBodyId::ConstId(_)
         | DefWithBodyId::VariantId(_)
+        | DefWithBodyId::ImplId(_)
         | DefWithBodyId::InTypeConstId(_) => false,
     };
 

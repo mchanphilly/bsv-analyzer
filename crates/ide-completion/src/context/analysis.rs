@@ -771,7 +771,7 @@ fn classify_name_ref(
                     ast::Item::Enum(it) => it.variant_list().is_none(),
                     ast::Item::ExternBlock(it) => it.extern_item_list().is_none(),
                     ast::Item::Fn(it) => it.body().is_none() && it.semicolon_token().is_none(),
-                    ast::Item::Impl(it) => it.assoc_item_list().is_none(),
+                    ast::Item::Impl(it) => it.body().is_none(),
                     ast::Item::Module(it) => {
                         it.item_list().is_none() && it.semicolon_token().is_none()
                     }

@@ -6,8 +6,8 @@ use crate::{
     ast::{
         self,
         operators::{ArithOp, BinaryOp, CmpOp, LogicOp, Ordering, RangeOp, UnaryOp},
-        support, ArgList, AstChildren, AstNode, BlockExpr, ClosureExpr, Const, Expr, Fn,
-        FormatArgsArg, FormatArgsExpr, MacroDef, Static, TokenTree,
+        support, ArgList, AstChildren, AstNode, BlockExpr, ClosureExpr, Const, Expr, Fn, Impl,
+        FormatArgsArg, FormatArgsExpr, MacroDef, Static, TokenTree, AssocItem, StmtList,
     },
     AstToken,
     SyntaxKind::*,
@@ -179,6 +179,7 @@ impl ast::BinExpr {
                 T![&]  => BinaryOp::ArithOp(ArithOp::BitAnd),
 
                 T![=]   => BinaryOp::Assignment { op: None },
+                T![<-]  => BinaryOp::Assignment { op: None },
                 T![+=]  => BinaryOp::Assignment { op: Some(ArithOp::Add) },
                 T![*=]  => BinaryOp::Assignment { op: Some(ArithOp::Mul) },
                 T![-=]  => BinaryOp::Assignment { op: Some(ArithOp::Sub) },
@@ -484,6 +485,11 @@ impl Fn {
         support::child(&self.syntax)
     }
 }
+impl Impl {
+    pub fn body(&self) -> Option<BlockExpr> {
+        support::child(&self.syntax)
+    }
+}
 impl Static {
     pub fn body(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -496,6 +502,11 @@ impl FormatArgsExpr {
 }
 impl ArgList {
     pub fn args(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+}
+impl StmtList {
+    pub fn assoc_items(&self) -> AstChildren<AssocItem> {
         support::children(&self.syntax)
     }
 }
