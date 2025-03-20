@@ -2517,6 +2517,7 @@ pub enum Expr {
     ClosureExpr(ClosureExpr),
     ContinueExpr(ContinueExpr),
     FieldExpr(FieldExpr),
+    Fn(Fn),
     ForExpr(ForExpr),
     FormatArgsExpr(FormatArgsExpr),
     IfExpr(IfExpr),
@@ -5204,6 +5205,10 @@ impl From<FieldExpr> for Expr {
     #[inline]
     fn from(node: FieldExpr) -> Expr { Expr::FieldExpr(node) }
 }
+impl From<Fn> for Expr {
+    #[inline]
+    fn from(node: Fn) -> Expr { Expr::Fn(node) }
+}
 impl From<ForExpr> for Expr {
     #[inline]
     fn from(node: ForExpr) -> Expr { Expr::ForExpr(node) }
@@ -5317,6 +5322,7 @@ impl AstNode for Expr {
                 | CLOSURE_EXPR
                 | CONTINUE_EXPR
                 | FIELD_EXPR
+                | FN
                 | FOR_EXPR
                 | FORMAT_ARGS_EXPR
                 | IF_EXPR
@@ -5358,6 +5364,7 @@ impl AstNode for Expr {
             CLOSURE_EXPR => Expr::ClosureExpr(ClosureExpr { syntax }),
             CONTINUE_EXPR => Expr::ContinueExpr(ContinueExpr { syntax }),
             FIELD_EXPR => Expr::FieldExpr(FieldExpr { syntax }),
+            FN => Expr::Fn(Fn { syntax }),
             FOR_EXPR => Expr::ForExpr(ForExpr { syntax }),
             FORMAT_ARGS_EXPR => Expr::FormatArgsExpr(FormatArgsExpr { syntax }),
             IF_EXPR => Expr::IfExpr(IfExpr { syntax }),
@@ -5401,6 +5408,7 @@ impl AstNode for Expr {
             Expr::ClosureExpr(it) => &it.syntax,
             Expr::ContinueExpr(it) => &it.syntax,
             Expr::FieldExpr(it) => &it.syntax,
+            Expr::Fn(it) => &it.syntax,
             Expr::ForExpr(it) => &it.syntax,
             Expr::FormatArgsExpr(it) => &it.syntax,
             Expr::IfExpr(it) => &it.syntax,

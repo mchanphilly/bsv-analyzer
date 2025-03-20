@@ -297,6 +297,14 @@ pub enum Expr {
     Underscore,
     OffsetOf(OffsetOf),
     InlineAsm(InlineAsm),
+    // AssocItem {
+    //     args: Box<[PatId]>,
+    //     arg_types: Box<[Option<Interned<TypeRef>>]>,
+    //     ret_type: Option<Interned<TypeRef>>,
+    //     body: ExprId,
+    //     assoc_item_kind: AssocItemKind,
+    //     guard: Option<ExprId>,
+    // }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -431,6 +439,14 @@ pub enum ClosureKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AssocItemKind {
+    Rule,
+    Method,
+    Function,
+    // TODO see about adding one for sub Interfaces if applicable
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CaptureBy {
     /// `move |x| y + x`.
     Value,
@@ -475,9 +491,10 @@ pub enum Statement {
         expr: ExprId,
         has_semi: bool,
     },
+    // OLD:
     // At the moment, we only use this to figure out if a return expression
     // is really the last statement of a block. See #16566
-    Item,
+    Item,  // This should be mostly unused now that we're classing Fn (at least top level, as expr)
 }
 
 impl Expr {
@@ -566,6 +583,9 @@ impl Expr {
             Expr::Closure { body, .. } => {
                 f(*body);
             }
+            // Expr::AssocItem { body, .. } => {
+            //     f(*body);
+            // }
             Expr::BinaryOp { lhs, rhs, .. } => {
                 f(*lhs);
                 f(*rhs);

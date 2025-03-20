@@ -312,6 +312,10 @@ impl InferenceContext<'_> {
 
                 ty
             }
+            // Expr::AssocItem {body, ..} => {
+            //     unreachable!()
+            //     // self.infer_block(tgt_expr, *id, statements, None, None, expected)
+            // }
             Expr::Call { callee, args, .. } => {
                 let callee_ty = self.infer_expr(*callee, &Expectation::none());
                 let mut derefs = Autoderef::new(&mut self.table, callee_ty.clone(), false);

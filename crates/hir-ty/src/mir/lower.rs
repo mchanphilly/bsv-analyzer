@@ -1288,6 +1288,7 @@ impl<'ctx> MirLowerCtx<'ctx> {
                 Ok(Some(current))
             }
             Expr::Underscore => Ok(Some(current)),
+            // Expr::AssocItem => not_supported!("assoc item MIR not yet supported"),
         }
     }
 

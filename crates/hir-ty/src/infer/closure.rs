@@ -872,6 +872,9 @@ impl InferenceContext<'_> {
             | Expr::Literal(_)
             | Expr::Const(_)
             | Expr::Underscore => (),
+            // Expr::AssocItem { args, arg_types, ret_type, body, assoc_item_kind, guard } => {
+            //     self.consume_expr(*body);
+            // },
         }
     }
 

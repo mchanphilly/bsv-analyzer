@@ -556,6 +556,7 @@ Expr =
 | ClosureExpr
 | ContinueExpr
 | FieldExpr
+| Fn
 | ForExpr
 | FormatArgsExpr
 | IfExpr

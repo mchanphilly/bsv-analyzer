@@ -35,10 +35,7 @@ use crate::{
             self, FormatAlignment, FormatArgs, FormatArgsPiece, FormatArgument, FormatArgumentKind,
             FormatArgumentsCollector, FormatCount, FormatDebugHex, FormatOptions,
             FormatPlaceholder, FormatSign, FormatTrait,
-        },
-        Array, Binding, BindingAnnotation, BindingId, BindingProblems, CaptureBy, ClosureKind,
-        Expr, ExprId, Label, LabelId, Literal, LiteralOrConst, MatchArm, Movability, OffsetOf, Pat,
-        PatId, RecordFieldPat, RecordLitField, Statement,
+        }, Array, AssocItemKind, Binding, BindingAnnotation, BindingId, BindingProblems, CaptureBy, ClosureKind, Expr, ExprId, Label, LabelId, Literal, LiteralOrConst, MatchArm, Movability, OffsetOf, Pat, PatId, RecordFieldPat, RecordLitField, Statement
     },
     item_scope::BuiltinShadowMode,
     lang_item::LangItem,
@@ -600,6 +597,78 @@ impl ExprCollector<'_> {
                 };
                 result_expr_id
             }),
+            ast::Expr::Fn(f) => {
+                let assoc_item_kind: AssocItemKind = match () {
+                    _ if f.rule_token().is_some() => AssocItemKind::Rule,
+                    _ if f.method_token().is_some() => AssocItemKind::Method,
+                    _ if f.function_token().is_some() => AssocItemKind::Function,
+                    _ => {
+                        dbg!("Unsupported item in collect_stmt");
+                        return None;
+                    },
+                };
+                // let (result_expr_id, prev_binding_owner) =
+                // self.initialize_binding_owner(syntax_ptr);
+
+                // let mut args = Vec::new();
+                // let mut arg_types = Vec::new();
+                // if let Some(pl) = f.param_list() {
+                //     let num_params = pl.params().count();
+                //     args.reserve_exact(num_params);
+                //     arg_types.reserve_exact(num_params);
+                //     for param in pl.params() {
+                //         let pat = self.collect_pat_top(param.pat());
+                //         let type_ref =
+                //             param.ty().map(|it| Interned::new(TypeRef::from_ast(&self.ctx(), it)));
+                //         args.push(pat);
+                //         arg_types.push(type_ref);
+                //     }
+                // }
+                let ret_type = f
+                    .ret_type()
+                    .and_then(|r| r.ty())
+                    .map(|it| Interned::new(TypeRef::from_ast(&self.ctx(), it)));
+
+                // let prev_is_lowering_coroutine = mem::take(&mut self.is_lowering_coroutine);
+                // let prev_try_block_label = self.current_try_block_label.take();
+
+                // let awaitable = if f.async_token().is_some() {
+                //     Awaitable::Yes
+                // } else {
+                //     Awaitable::No("non-async closure")
+                // };
+                // let body =
+                //     self.with_awaitable_block(awaitable, |this| this.collect_expr_opt(f.body()));
+
+                // let closure_kind = if self.is_lowering_coroutine {
+                //     let movability = if f.static_token().is_some() {
+                //         Movability::Static
+                //     } else {
+                //         Movability::Movable
+                //     };
+                //     ClosureKind::Coroutine(movability)
+                // } else if f.async_token().is_some() {
+                //     ClosureKind::Async
+                // } else {
+                //     ClosureKind::Closure
+                // };
+                // let capture_by =
+                //     if f.move_token().is_some() { CaptureBy::Value } else { CaptureBy::Ref };
+                // self.is_lowering_coroutine = prev_is_lowering_coroutine;
+                // self.current_binding_owner = prev_binding_owner;
+                // self.current_try_block_label = prev_try_block_label;
+                // self.body.exprs[result_expr_id] = Expr::Closure {
+                //     args: args.into(),
+                //     arg_types: arg_types.into(),
+                //     ret_type,
+                //     body,
+                //     closure_kind,
+                //     capture_by,
+                // };
+                // result_expr_id
+
+                self.collect_block(f.body().unwrap())
+            }
             ast::Expr::BinExpr(e) => {
                 let op = e.op_kind();
                 if let Some(ast::BinaryOp::Assignment { op: None }) = op {
@@ -1146,7 +1215,18 @@ impl ExprCollector<'_> {
                     statements.push(Statement::Expr { expr, has_semi });
                 }
             }
-            ast::Stmt::Item(_item) => statements.push(Statement::Item),
+            ast::Stmt::Item(item) => {
+                // We'll collect functions now
+                if let Some(item) = ast::Fn::cast(item.syntax().clone()) {
+                    let has_semi = item.semicolon_token().is_some();  // Should be yes
+                    let expr = ast::Expr::Fn(item);
+                    let expr = self.collect_expr(expr);
+                    statements.push(Statement::Expr { expr, has_semi });
+                } else {
+                    statements.push(Statement::Item);  // For cases where
+                    unreachable!("All items should be Expr right now");
+                }
+            }
         }
     }
 

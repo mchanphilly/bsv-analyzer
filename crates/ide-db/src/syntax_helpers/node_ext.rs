@@ -353,6 +353,7 @@ pub fn for_each_tail_expr(expr: &ast::Expr, cb: &mut dyn FnMut(&ast::Expr)) {
         | ast::Expr::YeetExpr(_)
         | ast::Expr::OffsetOfExpr(_)
         | ast::Expr::FormatArgsExpr(_)
+        | ast::Expr::Fn(_)
         | ast::Expr::AsmExpr(_) => cb(expr),
     }
 }

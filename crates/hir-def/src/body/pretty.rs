@@ -258,6 +258,9 @@ impl Printer<'_> {
                 );
             }
             Expr::Path(path) => self.print_path(path),
+            // Expr::AssocItem{ args, arg_types, ret_type, body, assoc_item_kind, guard } => {
+            //     w!(self, "fn TODO print_expr");
+            // }
             Expr::If { condition, then_branch, else_branch } => {
                 w!(self, "if ");
                 self.print_expr(*condition);
