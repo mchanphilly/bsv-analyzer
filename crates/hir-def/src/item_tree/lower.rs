@@ -575,7 +575,18 @@ impl<'a> Ctx<'a> {
             .into_iter()
             .flat_map(|it| it.stmt_list())
             .flat_map(|it| it.assoc_items())
-            .filter_map(|item| self.lower_assoc_item(&item))
+            .filter_map(|item| {
+                if let ast::AssocItem::Fn(func) = &item {
+                    if func.method_token().is_some() {
+                        self.lower_assoc_item(&item)
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            }
+            )
             .collect();
         // Note that trait impls don't get implicit `Self` unlike traits, because here they are a
         // type alias rather than a type parameter, so this is handled by the resolver.
