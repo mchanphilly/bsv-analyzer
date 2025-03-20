@@ -1576,7 +1576,7 @@ impl<'db> SemanticsImpl<'db> {
             }
             ChildContainer::TraitId(it) => it.resolver(self.db.upcast()),
             ChildContainer::TraitAliasId(it) => it.resolver(self.db.upcast()),
-            ChildContainer::ImplId(it) => it.resolver(self.db.upcast()),
+            // ChildContainer::ImplId(it) => it.resolver(self.db.upcast()),
             ChildContainer::ModuleId(it) => it.resolver(self.db.upcast()),
             ChildContainer::EnumId(it) => it.resolver(self.db.upcast()),
             ChildContainer::VariantId(it) => it.resolver(self.db.upcast()),

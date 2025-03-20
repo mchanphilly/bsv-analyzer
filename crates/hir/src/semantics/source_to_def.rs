@@ -574,7 +574,10 @@ impl SourceToDefCtx<'_, '_> {
                 ast::Item::TraitAlias(it) => {
                     self.trait_alias_to_def(container.with_value(it))?.into()
                 }
-                ast::Item::Impl(it) => self.impl_to_def(container.with_value(it))?.into(),
+                ast::Item::Impl(it) => {
+                    let def: DefWithBodyId = self.impl_to_def(container.with_value(it))?.into();
+                    def.into()
+                }
                 ast::Item::Enum(it) => self.enum_to_def(container.with_value(it))?.into(),
                 ast::Item::TypeAlias(it) => {
                     self.type_alias_to_def(container.with_value(it))?.into()
@@ -616,7 +619,7 @@ pub(crate) enum ChildContainer {
     ModuleId(ModuleId),
     TraitId(TraitId),
     TraitAliasId(TraitAliasId),
-    ImplId(ImplId),
+    // ImplId(ImplId),
     EnumId(EnumId),
     VariantId(VariantId),
     TypeAliasId(TypeAliasId),
@@ -629,7 +632,7 @@ impl_from! {
     ModuleId,
     TraitId,
     TraitAliasId,
-    ImplId,
+    // ImplId,
     EnumId,
     VariantId,
     TypeAliasId,
@@ -646,7 +649,7 @@ impl ChildContainer {
             ChildContainer::ModuleId(it) => it.child_by_source(db, file_id),
             ChildContainer::TraitId(it) => it.child_by_source(db, file_id),
             ChildContainer::TraitAliasId(_) => DynMap::default(),
-            ChildContainer::ImplId(it) => it.child_by_source(db, file_id),
+            // ChildContainer::ImplId(it) => it.child_by_source(db, file_id),
             ChildContainer::EnumId(it) => it.child_by_source(db, file_id),
             ChildContainer::VariantId(it) => it.child_by_source(db, file_id),
             ChildContainer::TypeAliasId(_) => DynMap::default(),
