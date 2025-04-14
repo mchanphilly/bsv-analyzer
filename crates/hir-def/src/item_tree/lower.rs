@@ -599,7 +599,8 @@ impl<'a> Ctx<'a> {
     }
 
     fn lower_use(&mut self, use_item: &ast::Use) -> Option<FileItemTreeId<Use>> {
-        let visibility = self.lower_visibility(use_item);
+        // let visibility = self.lower_visibility(use_item);
+        let visibility = RawVisibilityId::PUB;  // Bluespec default. Not true if (..) used
         let ast_id = self.source_ast_id_map.ast_id(use_item);
         let (use_tree, _) = lower_use_tree(self.db, use_item.use_tree()?, &mut |range| {
             self.span_map().span_for_range(range).ctx

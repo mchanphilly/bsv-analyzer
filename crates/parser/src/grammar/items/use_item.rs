@@ -4,17 +4,21 @@ use super::*;
 // import FIFO::*;
 pub(super) fn import_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![import]);
-    name_ref(p);
-    if p.current() == T![:] && p.at(T![::]) && p.nth(2) == T![*] {
-        p.bump(T![::]);
-        p.bump(T![*]);
+    if use_tree(p, true) {
         p.expect(T![;]);
-        m.complete(p, IMPORT);
-    } else {
-        m.abandon(p);
-        let msg = "expected one of `::` and `*`";
-        p.err_recover(msg, ITEM_RECOVERY_SET);
+        m.complete(p, USE);
     }
+
+    // if p.current() == T![:] && p.at(T![::]) && p.nth(2) == T![*] {
+    //     p.bump(T![::]);
+    //     p.bump(T![*]);
+    //     p.expect(T![;]);
+    //     m.complete(p, IMPORT);
+    // } else {
+    //     m.abandon(p);
+    //     let msg = "expected one of `::` and `*`";
+    //     p.err_recover(msg, ITEM_RECOVERY_SET);
+    // }
 }
 
 // test use_tree
