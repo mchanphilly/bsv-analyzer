@@ -47,6 +47,7 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![begin],
         T![end],
         T![|],
+        T![action],
         T![async],
         T![box],
         T![break],
@@ -198,6 +199,11 @@ pub(super) fn atom_expr(
             let m = p.start();
             // Not sure why we don't directly call block_expr_bsv here
             stmt_list_bsv(p, Some(T![begin]), T![end], true);
+            m.complete(p, BLOCK_EXPR)
+        }
+        T![action] => {  // TODO add special treatment if you'd like
+            let m = p.start();
+            stmt_list_bsv(p, Some(T![action]), T![endaction], true);
             m.complete(p, BLOCK_EXPR)
         }
 

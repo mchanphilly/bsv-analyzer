@@ -58,22 +58,23 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
     // }
     attributes::outer_attrs(p);
 
+    // Bluespec requires a little heuristic for explicit type variable declarations.
+    let let_heuristic =
+        p.at(IDENT) &&
+        (p.nth_at(1, IDENT) | p.nth_at(1, T![#]));
+
+    if p.at(T![let]) || let_heuristic {
+        let_stmt(p, semicolon);
+        m.complete(p, LET_STMT);
+        return;
+    }
+
     // test block_items
     // fn a() { fn b() {} }
     let m = match items::opt_item(p, m) {
         Ok(()) => return,
         Err(m) => m,
     };
-
-    // Bluespec requires a little heuristic for explicit type variable declarations.
-    let let_heuristic =
-        p.at(IDENT) &&
-        (p.nth_at(1, IDENT) | p.nth_at(1, T![#]));
-    if p.at(T![let]) || let_heuristic {
-        let_stmt(p, semicolon);
-        m.complete(p, LET_STMT);
-        return;
-    }
 
     if !p.at_ts(EXPR_FIRST) {
         p.err_and_bump("expected expression, item or let statement");

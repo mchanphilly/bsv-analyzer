@@ -1222,8 +1222,16 @@ impl ExprCollector<'_> {
                     let expr = ast::Expr::Fn(item);
                     let expr = self.collect_expr(expr);
                     statements.push(Statement::Expr { expr, has_semi });
+                } else if let Some(item) = ast::Trait::cast(item.syntax().clone()) {
+                    // TODO patch up Trait
+                    // let has_semi = item.semicolon_token().is_some();  // Should be yes
+                    // let expr = ast::Expr::Trait(item);
+                    // let expr = self.collect_expr(expr);
+                    // statements.push(Statement::Expr { expr, has_semi });
+                    statements.push(Statement::Item);  // For cases where
                 } else {
                     statements.push(Statement::Item);  // For cases where
+                    dbg!(item);
                     unreachable!("All items should be Expr right now");
                 }
             }

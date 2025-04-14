@@ -388,9 +388,15 @@ impl BlockExpr {
     #[inline]
     pub fn stmt_list(&self) -> Option<StmtList> { support::child(&self.syntax) }
     #[inline]
+    pub fn action_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![action]) }
+    #[inline]
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     #[inline]
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
+    #[inline]
+    pub fn endaction_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endaction])
+    }
     #[inline]
     pub fn gen_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![gen]) }
     #[inline]

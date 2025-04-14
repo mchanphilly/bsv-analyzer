@@ -586,6 +586,9 @@ Expr =
 | LetExpr
 | UnderscoreExpr
 
+// TraitExpr =  // TODO something with
+//   'interface' Name '=' CallExpr ';'
+
 OffsetOfExpr =
   Attr* 'builtin' '#' 'offset_of' '(' Type ',' fields:(NameRef ('.' NameRef)* ) ')'
 
@@ -657,7 +660,7 @@ TryExpr =
   Attr* Expr '?'
 
 BlockExpr =
-  Attr* Label? ('try' | 'unsafe' | ('async' 'move'?) | ('gen' 'move'?) | 'const') StmtList
+  Attr* Label? ('try' | 'unsafe' | ('async' 'move'?) | ('gen' 'move'?) | 'const' | 'action' 'endaction') StmtList
 
 PrefixExpr =
   Attr* op:('-' | '!' | '*' | '~') Expr
