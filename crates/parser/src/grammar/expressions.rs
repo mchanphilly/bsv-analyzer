@@ -694,7 +694,7 @@ fn cast_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 //     foo(bar+);
 //     foo(a, , b);
 // }
-fn arg_list(p: &mut Parser<'_>) {
+pub(crate) fn arg_list(p: &mut Parser<'_>) {
     assert!(p.at(T!['(']));
     let m = p.start();
     // test arg_with_attr

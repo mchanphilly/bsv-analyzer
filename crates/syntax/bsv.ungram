@@ -414,10 +414,13 @@ FieldList =
 | TupleFieldList
 
 Enum =
+(
   Attr* Visibility?
   'enum' Name GenericParamList? WhereClause?
   VariantList
-
+) | (
+  'typedef' 'enum' VariantList Name ('deriving' ArgList)?
+)
 VariantList =
  '{' (Variant (',' Variant)* ','?)? '}'
 

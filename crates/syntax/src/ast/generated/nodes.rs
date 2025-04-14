@@ -579,6 +579,7 @@ impl DynTraitType {
 pub struct Enum {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasArgList for Enum {}
 impl ast::HasAttrs for Enum {}
 impl ast::HasDocComments for Enum {}
 impl ast::HasGenericParams for Enum {}
@@ -588,7 +589,13 @@ impl Enum {
     #[inline]
     pub fn variant_list(&self) -> Option<VariantList> { support::child(&self.syntax) }
     #[inline]
+    pub fn deriving_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![deriving])
+    }
+    #[inline]
     pub fn enum_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![enum]) }
+    #[inline]
+    pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -5992,7 +5999,7 @@ impl AnyHasArgList {
 impl AstNode for AnyHasArgList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, CALL_EXPR | METHOD_CALL_EXPR | MODULE_CALL)
+        matches!(kind, CALL_EXPR | ENUM | METHOD_CALL_EXPR | MODULE_CALL)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -6004,6 +6011,10 @@ impl AstNode for AnyHasArgList {
 impl From<CallExpr> for AnyHasArgList {
     #[inline]
     fn from(node: CallExpr) -> AnyHasArgList { AnyHasArgList { syntax: node.syntax } }
+}
+impl From<Enum> for AnyHasArgList {
+    #[inline]
+    fn from(node: Enum) -> AnyHasArgList { AnyHasArgList { syntax: node.syntax } }
 }
 impl From<MethodCallExpr> for AnyHasArgList {
     #[inline]

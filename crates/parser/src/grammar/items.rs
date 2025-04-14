@@ -76,6 +76,7 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![typedef],
     T![macro],
     T![;],
+    T![deriving],
 ]);
 
 // May also accept a statement.
@@ -427,11 +428,9 @@ pub(crate) fn typedef_(p: &mut Parser<'_>, m: Marker) {
     match p.current() {
         T![struct] => adt::strukt_bsv(p, m),
         // T![struct] => adt::strukt(p, m)
-        // T![enum] => enum_decl(p),  // TODO
+        T![enum] => adt::enum_(p, m),
         _ => type_synonym_bsv(p, m),
     }
-
-    p.expect(T![;]);
 }
 
 // test type_synonym

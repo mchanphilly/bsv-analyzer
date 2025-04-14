@@ -1,3 +1,6 @@
+use generic_args::opt_generic_arg_list;
+use params::{param_list_bsv_function, param_list_fn_def};
+
 use crate::grammar::attributes::ATTRIBUTE_FIRST;
 
 use super::*;
@@ -74,14 +77,22 @@ fn struct_or_union(p: &mut Parser<'_>, m: Marker, is_struct: bool) {
 
 pub(super) fn enum_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![enum]);
-    name_r(p, ITEM_RECOVERY_SET);
-    generic_params::opt_generic_param_list(p);
-    generic_params::opt_where_clause(p);
+    // name_r(p, ITEM_RECOVERY_SET);
+    // generic_params::opt_generic_param_list(p);
+    // generic_params::opt_where_clause(p);
     if p.at(T!['{']) {
         variant_list(p);
     } else {
         p.error("expected `{`");
     }
+    name_r(p, ITEM_RECOVERY_SET);
+
+    if (p.eat(T![deriving])) {
+        if p.at(T!['(']) {
+            expressions::arg_list(p);
+        }
+    }
+    p.expect(T![;]);
     m.complete(p, ENUM);
 }
 
