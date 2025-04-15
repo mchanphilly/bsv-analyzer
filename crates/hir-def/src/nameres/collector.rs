@@ -309,6 +309,15 @@ impl DefCollector<'_> {
             }
         }
 
+        // Inserts every crate in the CrateGraph as a potential extern prelude.
+        for krate in crate_graph.iter() {
+            let crate_name = crate_graph[krate].display_name.as_ref().unwrap().crate_name();
+            let name = Name::new_text(crate_name);
+            crate_data
+                .extern_prelude
+                .insert(name, (CrateRootModuleId {krate}, None));
+        }
+
         for (name, dep) in &self.deps {
             if dep.is_prelude() {
                 // This is a bit confusing but the gist is that `no_core` and `no_std` remove the
@@ -841,7 +850,7 @@ impl DefCollector<'_> {
 
     fn record_resolved_import(&mut self, directive: &ImportDirective) {
         let _p = tracing::info_span!("record_resolved_import").entered();
-
+        dbg!(&directive);
         let module_id = directive.module_id;
         let import = &directive.import;
         let mut def = directive.status.namespaces();
