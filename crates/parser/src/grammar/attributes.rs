@@ -1,4 +1,4 @@
-use expressions::literal;
+use expressions::{arg_list, literal};
 
 use super::*;
 
@@ -60,13 +60,13 @@ fn attr(p: &mut Parser<'_>, inner: bool) {
     attr.complete(p, ATTR);
 }
 
-pub(super) fn deriving_attr(p: &mut Parser<'_>) {
-    let attr = p.start();
+// pub(super) fn deriving_attr(p: &mut Parser<'_>) {
+//     let attr = p.start();
 
-    meta(p);
+//     meta(p);
 
-    attr.complete(p, ATTR);
-}
+//     attr.complete(p, ATTR);
+// }
 
 // test meta_bsv
 // (* synthesize *)

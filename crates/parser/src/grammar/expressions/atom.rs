@@ -35,6 +35,7 @@ pub(crate) fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump_any();
+    p.eat(LIFETIME_IDENT);
     Some(m.complete(p, LITERAL))
 }
 

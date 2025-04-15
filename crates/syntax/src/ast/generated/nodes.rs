@@ -2035,6 +2035,7 @@ impl StmtList_bsv {
 pub struct Struct {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasArgList for Struct {}
 impl ast::HasAttrs for Struct {}
 impl ast::HasDocComments for Struct {}
 impl ast::HasGenericParams for Struct {}
@@ -2045,6 +2046,10 @@ impl Struct {
     pub fn field_list(&self) -> Option<FieldList> { support::child(&self.syntax) }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn deriving_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![deriving])
+    }
     #[inline]
     pub fn struct_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![struct]) }
     #[inline]
@@ -6005,7 +6010,7 @@ impl AnyHasArgList {
 impl AstNode for AnyHasArgList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, CALL_EXPR | ENUM | METHOD_CALL_EXPR | MODULE_CALL)
+        matches!(kind, CALL_EXPR | ENUM | METHOD_CALL_EXPR | MODULE_CALL | STRUCT)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -6029,6 +6034,10 @@ impl From<MethodCallExpr> for AnyHasArgList {
 impl From<ModuleCall> for AnyHasArgList {
     #[inline]
     fn from(node: ModuleCall) -> AnyHasArgList { AnyHasArgList { syntax: node.syntax } }
+}
+impl From<Struct> for AnyHasArgList {
+    #[inline]
+    fn from(node: Struct) -> AnyHasArgList { AnyHasArgList { syntax: node.syntax } }
 }
 impl AnyHasAttrs {
     #[inline]

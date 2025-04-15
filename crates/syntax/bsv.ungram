@@ -379,11 +379,10 @@ Struct =
   // Removed WhereClause
   // Removed struct declaration without definition
   // Simplified grouping
+  Attr*
   Visibility?
-  'typedef' 'struct' Name
-  // We moved the Attr to deriving, but we'll need to figure a solution
-  // if we actually must deal with more than one Attr type (e.g., head and tail)
-  RecordFieldList Attr*';'
+  'typedef' 'struct' RecordFieldList
+  Name  ('deriving' ArgList)? ';'
 )
 
 RecordFieldList =

@@ -1,9 +1,24 @@
+use expressions::arg_list;
 use generic_args::opt_generic_arg_list;
 use params::{param_list_bsv_function, param_list_fn_def};
 
 use crate::grammar::attributes::ATTRIBUTE_FIRST;
 
 use super::*;
+
+fn typedef_tail(p: &mut Parser<'_>) {
+    name_r(p, ITEM_RECOVERY_SET);
+
+    // This may be overkill for `deriving` since it's a hardset
+    // "macro" name. But it's sort of like Rust's derives attr
+    if p.eat(T![deriving]) {
+        if p.at(T!['(']) {
+            arg_list(p);
+        }
+    }
+
+    p.expect(T![;]);
+}
 
 // test struct_item
 // struct S {}
@@ -20,15 +35,7 @@ pub(super) fn strukt_bsv(p: &mut Parser<'_>, m: Marker) {
         _ => p.error( "expected `;` or `{`" ),
     }
 
-    name_r(p, ITEM_RECOVERY_SET);
-
-    // This may be overkill for `deriving` since it's a hardset
-    // "macro" name. But it's sort of like Rust's derives attr
-    if p.at(IDENT) {
-        attributes::deriving_attr(p);
-    }
-
-    p.expect(T![;]);
+    typedef_tail(p);
     m.complete(p, STRUCT);
 }
 
@@ -85,14 +92,8 @@ pub(super) fn enum_(p: &mut Parser<'_>, m: Marker) {
     } else {
         p.error("expected `{`");
     }
-    name_r(p, ITEM_RECOVERY_SET);
 
-    if (p.eat(T![deriving])) {
-        if p.at(T!['(']) {
-            expressions::arg_list(p);
-        }
-    }
-    p.expect(T![;]);
+    typedef_tail(p);
     m.complete(p, ENUM);
 }
 
