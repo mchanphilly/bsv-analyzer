@@ -1232,7 +1232,7 @@ impl ExprCollector<'_> {
                 } else {
                     statements.push(Statement::Item);  // For cases where
                     dbg!(item);
-                    unreachable!("All items should be Expr right now");
+                    // unreachable!("All items should be Expr right now");
                 }
             }
         }

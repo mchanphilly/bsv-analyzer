@@ -442,7 +442,7 @@ fn type_synonym_bsv(p: &mut Parser<'_>, m: Marker) {
 
     // Needs to recover because we often have other items coming up.
     name_r(p, ITEM_RECOVERY_SET);
-
+    p.expect(T![;]);
     m.complete(p, TYPE_ALIAS);
 }
 
