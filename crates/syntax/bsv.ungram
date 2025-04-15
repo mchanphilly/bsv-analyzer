@@ -319,7 +319,7 @@ Fn =
   // param list optional in Bluespec
   // TODO modify guard name to not just Match
   (
-    ('method' | 'function') RetType
+    ('method' | 'function') RetType?
   ) | (
     'rule'
   )
