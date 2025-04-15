@@ -190,7 +190,8 @@ impl<'a> Ctx<'a> {
     }
 
     fn lower_struct(&mut self, strukt: &ast::Struct) -> Option<FileItemTreeId<Struct>> {
-        let visibility = self.lower_visibility(strukt);
+        // let visibility = self.lower_visibility(strukt);
+        let visibility = RawVisibilityId::PUB;
         let name = strukt.name()?.as_name();
         let ast_id = self.source_ast_id_map.ast_id(strukt);
         let (fields, kind, attrs) = self.lower_fields(&strukt.kind());
@@ -252,7 +253,9 @@ impl<'a> Ctx<'a> {
             Some(name) => name.as_name(),
             None => Name::missing(),
         };
-        let visibility = self.lower_visibility(field);
+        // let visibility = self.lower_visibility(field);
+        let visibility = RawVisibilityId::PUB;
+
         let type_ref = self.lower_type_ref_opt(field.ty());
 
         Field { name, type_ref, visibility }
@@ -266,7 +269,8 @@ impl<'a> Ctx<'a> {
     }
 
     fn lower_union(&mut self, union: &ast::Union) -> Option<FileItemTreeId<Union>> {
-        let visibility = self.lower_visibility(union);
+        // let visibility = self.lower_visibility(union);
+        let visibility = RawVisibilityId::PUB;
         let name = union.name()?.as_name();
         let ast_id = self.source_ast_id_map.ast_id(union);
         let (fields, _, attrs) = match union.record_field_list() {
@@ -290,7 +294,8 @@ impl<'a> Ctx<'a> {
     }
 
     fn lower_enum(&mut self, enum_: &ast::Enum) -> Option<FileItemTreeId<Enum>> {
-        let visibility = self.lower_visibility(enum_);
+        // let visibility = self.lower_visibility(enum_);
+        let visibility = RawVisibilityId::PUB;
         let name = enum_.name()?.as_name();
         let ast_id = self.source_ast_id_map.ast_id(enum_);
         let variants = match &enum_.variant_list() {
@@ -341,7 +346,8 @@ impl<'a> Ctx<'a> {
     }
 
     fn lower_function(&mut self, func: &ast::Fn) -> Option<FileItemTreeId<Function>> {
-        let visibility = self.lower_visibility(func);
+        // let visibility = self.lower_visibility(func);
+        let visibility = RawVisibilityId::PUB;
         let name = func.name()?.as_name();
 
         let mut has_self_param = false;
@@ -469,7 +475,8 @@ impl<'a> Ctx<'a> {
     ) -> Option<FileItemTreeId<TypeAlias>> {
         let name = type_alias.name()?.as_name();
         let type_ref = type_alias.ty().map(|it| self.lower_type_ref(&it));
-        let visibility = self.lower_visibility(type_alias);
+        // let visibility = self.lower_visibility(type_alias);
+        let visibility = RawVisibilityId::PUB;
         let bounds = self.lower_type_bounds(type_alias);
         let ast_id = self.source_ast_id_map.ast_id(type_alias);
         let generic_params = self.lower_generic_params(HasImplicitSelf::No, type_alias);
@@ -521,7 +528,9 @@ impl<'a> Ctx<'a> {
 
     fn lower_trait(&mut self, trait_def: &ast::Trait) -> Option<FileItemTreeId<Trait>> {
         let name = trait_def.name()?.as_name();
-        let visibility = self.lower_visibility(trait_def);
+        // let visibility = self.lower_visibility(trait_def);
+        let visibility = RawVisibilityId::PUB;
+
         let ast_id = self.source_ast_id_map.ast_id(trait_def);
         let is_auto = trait_def.auto_token().is_some();
         let is_unsafe = trait_def.unsafe_token().is_some();
