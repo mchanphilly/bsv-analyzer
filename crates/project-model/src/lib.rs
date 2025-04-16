@@ -36,6 +36,7 @@ use std::{
 };
 
 use anyhow::{bail, format_err, Context};
+use itertools::Itertools;
 use paths::{AbsPath, AbsPathBuf, Utf8PathBuf};
 use rustc_hash::FxHashSet;
 
@@ -100,79 +101,65 @@ impl ProjectManifest {
     }
 
     pub fn discover(path: &AbsPath) -> io::Result<Vec<ProjectManifest>> {
+        const DEPTH: usize = 3;
         // TODO BSV add in a way to connect things together.
         // if let Some(project_json) = find_in_parent_dirs(path, "rust-project.json") {
         //     return Ok(vec![ProjectManifest::ProjectJson(project_json)]);
         // }
         dbg!(&path);
         let target_exts = &["bsv", "ms"];
-        if let Some(bluespec_file) = find_exts_in_parent_dirs(path, target_exts) {
-            return Ok(vec![ProjectManifest::BluespecFile(bluespec_file)]);
-        }
 
         // // Performs a traversal of the file system from the workspace root provided by LS client on launch
         // // or maybe other times too, e.g., if we add a dependency.
         return find_exts(path, target_exts)
             .map(|paths| paths.into_iter().map(ProjectManifest::BluespecFile).collect());
-        // return find_cargo_toml(path)
-        //     .map(|paths| paths.into_iter().map(ProjectManifest::CargoToml).collect());
 
         fn find_exts(path: &AbsPath, target_exts: &[&str]) -> io::Result<Vec<ManifestPath>> {
-            match find_exts_in_parent_dirs(path, target_exts) {
-                Some(it) => Ok(vec![it]),
-                None => Ok(find_exts_in_child_dir(read_dir(path)?, target_exts)),
+            let res =
+                Ok(find_exts_in_child_dir(read_dir(path)?, target_exts, DEPTH, 0));
+            dbg!(&res);
+            res
+        }
+
+        fn find_exts_in_child_dir(entities: ReadDir, target_exts: &[&str], max_depth: usize, current_depth: usize) -> Vec<ManifestPath> {
+            // Now multiple layers. May appear strange in cases of weird file structure (e.g., cyclic links)
+            // Populate the directories we're looking for first
+            if current_depth >= max_depth {
+                return Vec::new(); // Stop searching deeper if we have reached max depth
             }
-        }
+    
+            let mut result = Vec::new();
+    
+            for entry in entities.filter_map(Result::ok) {
+                let path = entry.path();
+                
+                if let Some(ext) = path.extension() {
+                    if target_exts.contains(&ext.to_str().unwrap_or("")) {
+                        let candidate: Vec<_> = std::iter::once(path)
+                            .map(Utf8PathBuf::from_path_buf)
+                            .filter_map(Result::ok)
+                            .map(AbsPathBuf::try_from)
+                            .filter_map(Result::ok)
+                            .map(ManifestPath::try_from)
+                            .filter_map(Result::ok)
+                            .collect();
+                        result.extend(candidate);
+                    }
+                }
 
-        // Note that this will latch onto the first BSV file discovered, so removed until we figure a
-        // project file format. TODO BSV
-        fn find_exts_in_parent_dirs(path: &AbsPath, target_exts: &[&str]) -> Option<ManifestPath> {
-            // let ext = path.extension().unwrap_or_default();
-
-            // // The path itself
-            // if target_exts.contains(&ext) {
-            //     if let Ok(manifest) = ManifestPath::try_from(path.to_path_buf()) {
-            //         return Some(manifest);
-            //     }
-            // }
-
-            // let mut curr = Some(path);
-            // // If the path is to a directory
-            // while let Some(path) = curr {
-            //     let candidate = path.join(target_file_name);
-            //     if fs::metadata(&candidate).is_ok() {
-            //         if let Ok(manifest) = ManifestPath::try_from(candidate) {
-            //             return Some(manifest);
-            //         }
-            //     }
-            //     curr = path.parent();
-            // }
-
-            None
-        }
-
-        fn find_exts_in_child_dir(entities: ReadDir, target_exts: &[&str]) -> Vec<ManifestPath> {
-            // Only one level down to avoid cycles the easy way and stop a runaway scan with large projects
-            entities
-                .filter_map(Result::ok)
-                .map(|it| it.path())
-                .filter(|path| {
-                    path.extension()
-                        .and_then(|ext| ext.to_str())
-                        .map(|ext| target_exts.contains(&ext))
-                        .unwrap_or(false)
-                })
-                .map(Utf8PathBuf::from_path_buf)
-                .filter_map(Result::ok)
-                .map(AbsPathBuf::try_from)
-                .filter_map(Result::ok)
-                .filter_map(|it| it.try_into().ok())
-                .collect()
+                // Recurse into subdirectories, increasing the depth
+                if entry.path().is_dir() {
+                    if let Ok(subdir) = read_dir(entry.path()) {
+                        result.extend(find_exts_in_child_dir(subdir, target_exts, max_depth, current_depth + 1));
+                    }
+                }
+            }
+    
+            result
         }
     }
 
     pub fn discover_all(paths: &[AbsPathBuf]) -> Vec<ProjectManifest> {
-        dbg!(&paths);
         let mut res = paths
             .iter()
             .filter_map(|it| ProjectManifest::discover(it.as_ref()).ok())
