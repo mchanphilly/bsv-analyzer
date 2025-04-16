@@ -225,7 +225,7 @@ pub(super) fn module_call_bsv(p: &mut Parser<'_>) {
 
 // Not everything has a bra and ket. Function bodies only have a ket (whole signature is "bra")
 // while `begin/end` and `beginaction` and `endaction`, etc., have both.
-pub(super) fn stmt_list_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, end: SyntaxKind, include_ket: bool) {
+pub(super) fn stmt_list_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, end: SyntaxKind, include_ket: bool, single: bool) {
     let m = p.start();
 
     if let Some(bra) = bra {
@@ -235,6 +235,9 @@ pub(super) fn stmt_list_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, end: Sy
 
     while !p.at(EOF) && !p.at(end) {
         stmt(p, Semicolon::Required);
+        if single {  // e.g., only one statement expected, like in BSV if.
+            break;
+        }
     }
 
     if include_ket{

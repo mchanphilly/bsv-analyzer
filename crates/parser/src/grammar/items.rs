@@ -671,7 +671,7 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker) {
             BsvType::Rule => T![endrule],
         };
         // TODO_BSV add body: also need to be resilient to nesting.
-        expressions::block_expr_bsv(p, None, ket, false);
+        expressions::block_expr_bsv(p, None, ket, false, false);
         p.expect(ket);
     }
 
