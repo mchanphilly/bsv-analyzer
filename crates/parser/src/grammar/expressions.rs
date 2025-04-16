@@ -290,6 +290,8 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
         T![|] if p.at(T![||])  => (3,  T![||],  Left),
         T![|] if p.at(T![|=])  => (1,  T![|=],  Right),
         T![|]                  => (6,  T![|],   Left),
+        T![?]                  => (2,  T![?],   Right),  // binds strongly
+        T![:]                  => (3,  T![:],   Right),  // binds strongly
         T![>] if p.at(T![>>=]) => (1,  T![>>=], Right),
         T![>] if p.at(T![>>])  => (9,  T![>>],  Left),
         T![>] if p.at(T![>=])  => (5,  T![>=],  Left),
@@ -514,7 +516,7 @@ fn postfix_expr(
                     break;
                 }
             },
-            T![?] => try_expr(p, lhs),
+            // T![?] => try_expr(p, lhs),
             _ => break,
         };
         allow_calls = true;
