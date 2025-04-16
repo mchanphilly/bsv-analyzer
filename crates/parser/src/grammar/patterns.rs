@@ -218,7 +218,11 @@ fn atom_pat(p: &mut Parser<'_>, recovery_set: TokenSet) -> Option<CompletedMarke
             T![:] if p.nth_at(1, T![::]) => path_or_macro_pat(p),
             _ => ident_pat(p, true),
         },
-
+        T!['{'] => {
+            let record_pat = p.start();
+            record_pat_field_list(p);
+            record_pat.complete(p, RECORD_PAT)
+        }
         // test type_path_in_pattern
         // fn main() { let <_>::Foo = (); }
         _ if paths::is_path_start(p) => path_or_macro_pat(p),
@@ -315,6 +319,7 @@ fn tuple_pat_fields(p: &mut Parser<'_>) {
 //     let S { #[cfg(any())] x: 1 } = ();
 // }
 fn record_pat_field(p: &mut Parser<'_>) {
+    p.expect(T![.]);
     match p.current() {
         IDENT | INT_NUMBER if p.nth(1) == T![:] => {
             name_ref_or_index(p);

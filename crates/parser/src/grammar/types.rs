@@ -22,6 +22,7 @@ pub(super) const TYPE_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![')'],
     T![>],
     T![,],
+    T!['{'],  // Specifically for BSV tuple destructuring
     // test_err struct_field_recover
     // struct S { f pub g: () }
     T![pub],

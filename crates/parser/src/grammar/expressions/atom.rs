@@ -745,10 +745,6 @@ pub(crate) fn match_arm_list(p: &mut Parser<'_>) {
     attributes::inner_attrs(p);
 
     while !p.at(EOF) && !p.at(T![endcase]) {
-        if p.at(T!['{']) {
-            error_block(p, "expected match arm");
-            continue;
-        }
         if p.at(T![;]) {
             p.err_and_bump("expected pattern");
             continue;
