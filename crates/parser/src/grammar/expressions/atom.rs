@@ -592,14 +592,34 @@ fn if_expr(p: &mut Parser<'_>) -> CompletedMarker {
     expr_no_struct(p);
 
     let (bra, ket) = (Some(T![begin]), T![end]);
-
-    block_expr_bsv(p, bra, ket, true, true);
+    if p.at(T![begin]) {
+        // if (cond) begin
+        //     ...
+        // end
+        block_expr_bsv(p, bra, ket, true, false);
+    } else {
+        // if (cond) stmt
+        block_expr_bsv(p, bra, ket, false, true);
+    }
 
     if p.eat(T![else]) {
         if p.at(T![if]) {
             if_expr(p);
         } else {
-            block_expr_bsv(p, bra, ket, true, true);
+            if p.at(T![begin]) {
+                // if (cond)
+                //      stmt
+                // else begin
+                //      ...
+                // end
+                block_expr_bsv(p, bra, ket, true, false);
+            } else {
+                // if (cond)
+                //    stmt
+                // else
+                //    stmt
+                block_expr_bsv(p, bra, ket, false, true);
+            }
         }
     }
     m.complete(p, IF_EXPR)
