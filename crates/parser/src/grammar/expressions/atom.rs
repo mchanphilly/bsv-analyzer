@@ -60,7 +60,7 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![if],
         T![let],
         T![loop],
-        T![match],
+        T![case],
         T![move],
         T![return],
         T![become],
@@ -109,6 +109,7 @@ pub(super) fn atom_expr(
         // fn foo() { try!(Ok(())); }
         T![try] => try_block_expr(p, None),
         T![match] => match_expr(p),
+        T![case] => case_expr(p),
         T![return] => return_expr(p),
         T![become] => become_expr(p),
         T![yield] => yield_expr(p),
@@ -710,6 +711,25 @@ fn match_expr(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, MATCH_EXPR)
 }
 
+fn case_expr(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(T![case]));
+    let m = p.start();
+    p.bump(T![case]);
+
+    p.expect(T!['(']);
+    expr_no_struct(p);
+    p.expect(T![')']);
+
+    if !p.at(T![endcase]) {
+        match_arm_list(p);
+    } else {
+        p.error("expected match arms");
+    }
+
+    p.expect(T![endcase]);
+    m.complete(p, MATCH_EXPR)
+}
+
 // test_err match_arms_recovery
 // fn foo() {
 //     match () {
@@ -723,9 +743,9 @@ fn match_expr(p: &mut Parser<'_>) -> CompletedMarker {
 //     }
 // }
 pub(crate) fn match_arm_list(p: &mut Parser<'_>) {
-    assert!(p.at(T!['{']));
+    // assert!(p.at(T!['{']));
     let m = p.start();
-    p.eat(T!['{']);
+    // p.eat(T!['{']);
 
     // test match_arms_inner_attribute
     // fn foo() {
@@ -738,18 +758,17 @@ pub(crate) fn match_arm_list(p: &mut Parser<'_>) {
     // }
     attributes::inner_attrs(p);
 
-    while !p.at(EOF) && !p.at(T!['}']) {
+    while !p.at(EOF) && !p.at(T![endcase]) {
         if p.at(T!['{']) {
             error_block(p, "expected match arm");
             continue;
         }
-        if p.at(T![,]) {
+        if p.at(T![;]) {
             p.err_and_bump("expected pattern");
             continue;
         }
         match_arm(p);
     }
-    p.expect(T!['}']);
     m.complete(p, MATCH_ARM_LIST);
 }
 
@@ -784,8 +803,8 @@ fn match_arm(p: &mut Parser<'_>) {
     if p.at(T![if]) {
         match_guard(p);
     }
-    p.expect(T![=>]);
-    if p.eat(T![,]) {
+    p.expect(T![:]);
+    if p.eat(T![;]) {
         p.error("expected expression");
     } else {
         let blocklike = match expr_stmt(p, None) {
@@ -801,8 +820,8 @@ fn match_arm(p: &mut Parser<'_>) {
         //         _ => ()
         //     }
         // }
-        if !p.eat(T![,]) && !blocklike.is_block() && !p.at(T!['}']) {
-            p.error("expected `,`");
+        if !p.eat(T![;]) && !blocklike.is_block() && !p.at(T![endcase]) {
+            p.error("expected `;`");
         }
     }
     m.complete(p, MATCH_ARM);

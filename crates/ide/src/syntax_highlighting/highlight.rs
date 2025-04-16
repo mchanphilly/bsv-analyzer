@@ -177,7 +177,7 @@ fn keyword(
         | T![if]
         | T![in]
         | T![loop]
-        | T![match]
+        | T![case]
         | T![return]
         | T![while]
         | T![yield] => h | HlMod::ControlFlow,

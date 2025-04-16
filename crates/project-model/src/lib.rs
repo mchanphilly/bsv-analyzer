@@ -104,6 +104,7 @@ impl ProjectManifest {
         // if let Some(project_json) = find_in_parent_dirs(path, "rust-project.json") {
         //     return Ok(vec![ProjectManifest::ProjectJson(project_json)]);
         // }
+        dbg!(&path);
         let target_exts = &["bsv", "ms"];
         if let Some(bluespec_file) = find_exts_in_parent_dirs(path, target_exts) {
             return Ok(vec![ProjectManifest::BluespecFile(bluespec_file)]);
@@ -171,6 +172,7 @@ impl ProjectManifest {
     }
 
     pub fn discover_all(paths: &[AbsPathBuf]) -> Vec<ProjectManifest> {
+        dbg!(&paths);
         let mut res = paths
             .iter()
             .filter_map(|it| ProjectManifest::discover(it.as_ref()).ok())

@@ -943,7 +943,7 @@ fn keyword_hints(
     edition: Edition,
 ) -> KeywordHint {
     match token.kind() {
-        T![await] | T![loop] | T![match] | T![unsafe] | T![as] | T![try] | T![if] | T![else] => {
+        T![await] | T![loop] | T![case] | T![unsafe] | T![as] | T![try] | T![if] | T![else] => {
             let keyword_mod = format!("{}_keyword", token.text());
 
             match ast::Expr::cast(parent).and_then(|site| sema.type_of_expr(&site)) {

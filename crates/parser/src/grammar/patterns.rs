@@ -224,7 +224,7 @@ fn atom_pat(p: &mut Parser<'_>, recovery_set: TokenSet) -> Option<CompletedMarke
         _ if paths::is_path_start(p) => path_or_macro_pat(p),
         _ if is_literal_pat_start(p) => literal_pat(p),
 
-        T![_] => wildcard_pat(p),
+        T![default] => wildcard_pat(p),
         T![&] => ref_pat(p),
         T!['('] => tuple_pat(p),
         T!['['] => slice_pat(p),

@@ -1272,7 +1272,13 @@ impl MatchArm {
     #[inline]
     pub fn comma_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![,]) }
     #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
     pub fn fat_arrow_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![=>]) }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![default]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1299,6 +1305,14 @@ impl MatchExpr {
     pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
     #[inline]
     pub fn match_arm_list(&self) -> Option<MatchArmList> { support::child(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn case_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![case]) }
+    #[inline]
+    pub fn endcase_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![endcase]) }
     #[inline]
     pub fn match_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![match]) }
 }

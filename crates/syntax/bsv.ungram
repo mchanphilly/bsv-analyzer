@@ -753,17 +753,28 @@ ContinueExpr =
 RangeExpr =
   Attr* start:Expr? op:('..' | '..=') end:Expr?
 
-MatchExpr =
+MatchExpr = (
   Attr* 'match' Expr MatchArmList
+) | (
+  'case' '(' Expr ')'
+  MatchArmList
+  'endcase'
+)
 
-MatchArmList =
+MatchArmList = (
   '{'
     Attr*
     arms:MatchArm*
   '}'
+) | (
+  arms: MatchArm*
+)
 
-MatchArm =
+MatchArm = (
   Attr* Pat guard:MatchGuard? '=>' Expr ','?
+) | (
+  (Pat | 'default') ':' Expr ';'
+)
 
 MatchGuard =
   'if' condition:Expr
