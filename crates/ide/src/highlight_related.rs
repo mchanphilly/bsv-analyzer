@@ -78,9 +78,9 @@ pub(crate) fn highlight_related(
         T![fn] | T![return] | T![->] if config.exit_points => {
             highlight_exit_points(sema, token).remove(&file_id)
         }
-        T![await] | T![async] if config.yield_points => {
-            highlight_yield_points(sema, token).remove(&file_id)
-        }
+        // T![await] | T![async] if config.yield_points => {
+        //     highlight_yield_points(sema, token).remove(&file_id)
+        // }
         T![for] if config.break_points && token.parent().and_then(ast::ForExpr::cast).is_some() => {
             highlight_break_points(sema, token).remove(&file_id)
         }
@@ -88,7 +88,6 @@ pub(crate) fn highlight_related(
             highlight_break_points(sema, token).remove(&file_id)
         }
         T![|] if config.closure_captures => highlight_closure_captures(sema, token, file_id),
-        T![move] if config.closure_captures => highlight_closure_captures(sema, token, file_id),
         _ if config.references => {
             highlight_references(sema, token, FilePosition { file_id, offset })
         }
@@ -469,68 +468,68 @@ pub(crate) fn highlight_break_points(
     res.into_iter().map(|(file_id, ranges)| (file_id, ranges.into_iter().collect())).collect()
 }
 
-pub(crate) fn highlight_yield_points(
-    sema: &Semantics<'_, RootDatabase>,
-    token: SyntaxToken,
-) -> FxHashMap<EditionedFileId, Vec<HighlightedRange>> {
-    fn hl(
-        sema: &Semantics<'_, RootDatabase>,
-        async_token: Option<SyntaxToken>,
-        body: Option<ast::Expr>,
-    ) -> Option<FxHashMap<EditionedFileId, FxHashSet<HighlightedRange>>> {
-        let mut highlights: FxHashMap<EditionedFileId, FxHashSet<_>> = FxHashMap::default();
+// pub(crate) fn highlight_yield_points(
+//     sema: &Semantics<'_, RootDatabase>,
+//     token: SyntaxToken,
+// ) -> FxHashMap<EditionedFileId, Vec<HighlightedRange>> {
+//     fn hl(
+//         sema: &Semantics<'_, RootDatabase>,
+//         async_token: Option<SyntaxToken>,
+//         body: Option<ast::Expr>,
+//     ) -> Option<FxHashMap<EditionedFileId, FxHashSet<HighlightedRange>>> {
+//         let mut highlights: FxHashMap<EditionedFileId, FxHashSet<_>> = FxHashMap::default();
 
-        let mut push_to_highlights = |file_id, range| {
-            if let Some(FileRange { file_id, range }) = original_frange(sema.db, file_id, range) {
-                let hrange = HighlightedRange { category: ReferenceCategory::empty(), range };
-                highlights.entry(file_id).or_default().insert(hrange);
-            }
-        };
+//         let mut push_to_highlights = |file_id, range| {
+//             if let Some(FileRange { file_id, range }) = original_frange(sema.db, file_id, range) {
+//                 let hrange = HighlightedRange { category: ReferenceCategory::empty(), range };
+//                 highlights.entry(file_id).or_default().insert(hrange);
+//             }
+//         };
 
-        let async_token = async_token?;
-        let async_tok_file_id = sema.hir_file_for(&async_token.parent()?);
-        push_to_highlights(async_tok_file_id, Some(async_token.text_range()));
+//         let async_token = async_token?;
+//         let async_tok_file_id = sema.hir_file_for(&async_token.parent()?);
+//         push_to_highlights(async_tok_file_id, Some(async_token.text_range()));
 
-        let Some(body) = body else {
-            return Some(highlights);
-        };
+//         let Some(body) = body else {
+//             return Some(highlights);
+//         };
 
-        WalkExpandedExprCtx::new(sema).walk(&body, &mut |_, expr| {
-            let file_id = sema.hir_file_for(expr.syntax());
+//         WalkExpandedExprCtx::new(sema).walk(&body, &mut |_, expr| {
+//             let file_id = sema.hir_file_for(expr.syntax());
 
-            let text_range = match expr {
-                ast::Expr::AwaitExpr(expr) => expr.await_token(),
-                ast::Expr::ReturnExpr(expr) => expr.return_token(),
-                _ => None,
-            }
-            .map(|it| it.text_range());
+//             let text_range = match expr {
+//                 ast::Expr::AwaitExpr(expr) => expr.await_token(),
+//                 ast::Expr::ReturnExpr(expr) => expr.return_token(),
+//                 _ => None,
+//             }
+//             .map(|it| it.text_range());
 
-            push_to_highlights(file_id, text_range);
-        });
+//             push_to_highlights(file_id, text_range);
+//         });
 
-        Some(highlights)
-    }
+//         Some(highlights)
+//     }
 
-    let mut res = FxHashMap::default();
-    for anc in goto_definition::find_fn_or_blocks(sema, &token) {
-        let new_map = match_ast! {
-            match anc {
-                ast::Fn(fn_) => hl(sema, fn_.async_token(), fn_.body().map(ast::Expr::BlockExpr)),
-                ast::BlockExpr(block_expr) => {
-                    if block_expr.async_token().is_none() {
-                        continue;
-                    }
-                    hl(sema, block_expr.async_token(), Some(block_expr.into()))
-                },
-                ast::ClosureExpr(closure) => hl(sema, closure.async_token(), closure.body()),
-                _ => continue,
-            }
-        };
-        merge_map(&mut res, new_map);
-    }
+//     let mut res = FxHashMap::default();
+//     for anc in goto_definition::find_fn_or_blocks(sema, &token) {
+//         let new_map = match_ast! {
+//             match anc {
+//                 ast::Fn(fn_) => hl(sema, fn_.async_token(), fn_.body().map(ast::Expr::BlockExpr)),
+//                 ast::BlockExpr(block_expr) => {
+//                     if block_expr.async_token().is_none() {
+//                         continue;
+//                     }
+//                     hl(sema, block_expr.async_token(), Some(block_expr.into()))
+//                 },
+//                 ast::ClosureExpr(closure) => hl(sema, closure.async_token(), closure.body()),
+//                 _ => continue,
+//             }
+//         };
+//         merge_map(&mut res, new_map);
+//     }
 
-    res.into_iter().map(|(file_id, ranges)| (file_id, ranges.into_iter().collect())).collect()
-}
+//     res.into_iter().map(|(file_id, ranges)| (file_id, ranges.into_iter().collect())).collect()
+// }
 
 fn cover_range(r0: Option<TextRange>, r1: Option<TextRange>) -> Option<TextRange> {
     match (r0, r1) {

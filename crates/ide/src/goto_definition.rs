@@ -302,11 +302,6 @@ fn nav_for_exit_points(
                     },
                     ast::BlockExpr(blk) => {
                         match blk.modifier() {
-                            Some(ast::BlockModifier::Async(_)) => {
-                                let async_tok = blk.async_token()?.text_range();
-                                let blk_in_file = InFile::new(file_id, blk.into());
-                                Some(expr_to_nav(db, blk_in_file, Some(async_tok)))
-                            },
                             Some(ast::BlockModifier::Try(_)) if token_kind != T![return] => {
                                 let try_tok = blk.try_token()?.text_range();
                                 let blk_in_file = InFile::new(file_id, blk.into());

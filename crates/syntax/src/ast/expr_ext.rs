@@ -360,19 +360,20 @@ pub enum BlockModifier {
 
 impl ast::BlockExpr {
     pub fn modifier(&self) -> Option<BlockModifier> {
-        self.gen_token()
-            .map(|v| {
-                if self.async_token().is_some() {
-                    BlockModifier::AsyncGen(v)
-                } else {
-                    BlockModifier::Gen(v)
-                }
-            })
-            .or_else(|| self.async_token().map(BlockModifier::Async))
-            .or_else(|| self.unsafe_token().map(BlockModifier::Unsafe))
-            .or_else(|| self.try_token().map(BlockModifier::Try))
-            .or_else(|| self.const_token().map(BlockModifier::Const))
-            .or_else(|| self.label().map(BlockModifier::Label))
+        None
+        // self.unsafe_token()
+        //     .map(|v| {
+        //         if self.async_token().is_some() {
+        //             BlockModifier::AsyncGen(v)
+        //         } else {
+        //             BlockModifier::Gen(v)
+        //         }
+        //     })
+        //     .or_else(|| self.async_token().map(BlockModifier::Async))
+        //     .or_else(|| self.unsafe_token().map(BlockModifier::Unsafe))
+        //     .or_else(|| self.try_token().map(BlockModifier::Try))
+        //     .or_else(|| self.const_token().map(BlockModifier::Const))
+        //     .or_else(|| self.label().map(BlockModifier::Label))
     }
     /// false if the block is an intrinsic part of the syntax and can't be
     /// replaced with arbitrary expression.

@@ -390,17 +390,11 @@ impl BlockExpr {
     #[inline]
     pub fn action_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![action]) }
     #[inline]
-    pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
-    #[inline]
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
     #[inline]
     pub fn endaction_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, T![endaction])
     }
-    #[inline]
-    pub fn gen_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![gen]) }
-    #[inline]
-    pub fn move_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![move]) }
     #[inline]
     pub fn try_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![try]) }
     #[inline]
@@ -481,13 +475,7 @@ impl ClosureExpr {
     #[inline]
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
     #[inline]
-    pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
-    #[inline]
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
-    #[inline]
-    pub fn gen_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![gen]) }
-    #[inline]
-    pub fn move_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![move]) }
     #[inline]
     pub fn static_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![static]) }
 }

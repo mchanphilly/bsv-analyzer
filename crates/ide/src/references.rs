@@ -312,7 +312,7 @@ fn handle_control_flow_keywords(
 
     let references = match token.kind() {
         T![fn] | T![return] | T![try] => highlight_related::highlight_exit_points(sema, token),
-        T![async] => highlight_related::highlight_yield_points(sema, token),
+        // T![async] => highlight_related::highlight_yield_points(sema, token),
         T![loop] | T![while] | T![break] | T![continue] => {
             highlight_related::highlight_break_points(sema, token)
         }

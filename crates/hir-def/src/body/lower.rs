@@ -562,11 +562,7 @@ impl ExprCollector<'_> {
                 let prev_is_lowering_coroutine = mem::take(&mut this.is_lowering_coroutine);
                 let prev_try_block_label = this.current_try_block_label.take();
 
-                let awaitable = if e.async_token().is_some() {
-                    Awaitable::Yes
-                } else {
-                    Awaitable::No("non-async closure")
-                };
+                let awaitable = Awaitable::No("non-async closure");
                 let body =
                     this.with_awaitable_block(awaitable, |this| this.collect_expr_opt(e.body()));
 
@@ -577,13 +573,10 @@ impl ExprCollector<'_> {
                         Movability::Movable
                     };
                     ClosureKind::Coroutine(movability)
-                } else if e.async_token().is_some() {
-                    ClosureKind::Async
                 } else {
                     ClosureKind::Closure
                 };
-                let capture_by =
-                    if e.move_token().is_some() { CaptureBy::Value } else { CaptureBy::Ref };
+                let capture_by = CaptureBy::Ref;
                 this.is_lowering_coroutine = prev_is_lowering_coroutine;
                 this.current_binding_owner = prev_binding_owner;
                 this.current_try_block_label = prev_try_block_label;

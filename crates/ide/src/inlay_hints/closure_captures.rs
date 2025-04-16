@@ -27,34 +27,34 @@ pub(super) fn hints(
         return None;
     }
 
-    let move_kw_range = match closure.move_token() {
-        Some(t) => t.text_range(),
-        None => {
-            let range = closure.syntax().first_token()?.prev_token()?.text_range();
-            let range = TextRange::new(range.end() - TextSize::from(1), range.end());
-            acc.push(InlayHint {
-                range,
-                kind: InlayKind::ClosureCapture,
-                label: InlayHintLabel::from("move"),
-                text_edit: None,
-                position: InlayHintPosition::After,
-                pad_left: false,
-                pad_right: false,
-                resolve_parent: Some(closure.syntax().text_range()),
-            });
-            range
-        }
-    };
-    acc.push(InlayHint {
-        range: move_kw_range,
-        kind: InlayKind::ClosureCapture,
-        label: InlayHintLabel::from("("),
-        text_edit: None,
-        position: InlayHintPosition::After,
-        pad_left: false,
-        pad_right: false,
-        resolve_parent: None,
-    });
+    // let move_kw_range = match closure.move_token() {
+    //     Some(t) => t.text_range(),
+    //     None => {
+    //         let range = closure.syntax().first_token()?.prev_token()?.text_range();
+    //         let range = TextRange::new(range.end() - TextSize::from(1), range.end());
+    //         acc.push(InlayHint {
+    //             range,
+    //             kind: InlayKind::ClosureCapture,
+    //             label: InlayHintLabel::from("move"),
+    //             text_edit: None,
+    //             position: InlayHintPosition::After,
+    //             pad_left: false,
+    //             pad_right: false,
+    //             resolve_parent: Some(closure.syntax().text_range()),
+    //         });
+    //         range
+    //     }
+    // };
+    // acc.push(InlayHint {
+    //     range: move_kw_range,
+    //     kind: InlayKind::ClosureCapture,
+    //     label: InlayHintLabel::from("("),
+    //     text_edit: None,
+    //     position: InlayHintPosition::After,
+    //     pad_left: false,
+    //     pad_right: false,
+    //     resolve_parent: None,
+    // });
     let last = captures.len() - 1;
     for (idx, capture) in captures.into_iter().enumerate() {
         let local = capture.local();
@@ -83,40 +83,40 @@ pub(super) fn hints(
                 name.syntax().original_file_range_opt(sema.db).map(TupleExt::head).map(Into::into)
             }),
         );
-        acc.push(InlayHint {
-            range: move_kw_range,
-            kind: InlayKind::ClosureCapture,
-            label,
-            text_edit: None,
-            position: InlayHintPosition::After,
-            pad_left: false,
-            pad_right: false,
-            resolve_parent: Some(closure.syntax().text_range()),
-        });
+        // acc.push(InlayHint {
+        //     range: move_kw_range,
+        //     kind: InlayKind::ClosureCapture,
+        //     label,
+        //     text_edit: None,
+        //     position: InlayHintPosition::After,
+        //     pad_left: false,
+        //     pad_right: false,
+        //     resolve_parent: Some(closure.syntax().text_range()),
+        // });
 
-        if idx != last {
-            acc.push(InlayHint {
-                range: move_kw_range,
-                kind: InlayKind::ClosureCapture,
-                label: InlayHintLabel::from(", "),
-                text_edit: None,
-                position: InlayHintPosition::After,
-                pad_left: false,
-                pad_right: false,
-                resolve_parent: None,
-            });
-        }
+        // if idx != last {
+        //     acc.push(InlayHint {
+        //         range: move_kw_range,
+        //         kind: InlayKind::ClosureCapture,
+        //         label: InlayHintLabel::from(", "),
+        //         text_edit: None,
+        //         position: InlayHintPosition::After,
+        //         pad_left: false,
+        //         pad_right: false,
+        //         resolve_parent: None,
+        //     });
+        // }
     }
-    acc.push(InlayHint {
-        range: move_kw_range,
-        kind: InlayKind::ClosureCapture,
-        label: InlayHintLabel::from(")"),
-        text_edit: None,
-        position: InlayHintPosition::After,
-        pad_left: false,
-        pad_right: true,
-        resolve_parent: None,
-    });
+    // acc.push(InlayHint {
+    //     range: move_kw_range,
+    //     kind: InlayKind::ClosureCapture,
+    //     label: InlayHintLabel::from(")"),
+    //     text_edit: None,
+    //     position: InlayHintPosition::After,
+    //     pad_left: false,
+    //     pad_right: true,
+    //     resolve_parent: None,
+    // });
 
     Some(())
 }

@@ -227,8 +227,8 @@ MacroStmts =
 Attr =
 (  // Rust
   '#' '!'? '[' Meta ']'
-) | (  // Bluespec
-  Meta  // only if containing `deriving`
+// ) | (  // Bluespec
+  // '(*' Meta (',' Meta)* '*)'
 )
 
 Meta =
@@ -659,7 +659,7 @@ TryExpr =
   Attr* Expr '?'
 
 BlockExpr =
-  Attr* Label? ('try' | 'unsafe' | ('async' 'move'?) | ('gen' 'move'?) | 'const' | 'action' 'endaction') StmtList
+  Attr* Label? ('try' | 'unsafe' | 'const' | 'action' 'endaction') StmtList
 
 PrefixExpr =
   Attr* op:('-' | '!' | '*' | '~') Expr
@@ -720,7 +720,7 @@ FieldExpr =
   Attr* Expr '.' NameRef
 
 ClosureExpr =
-  Attr* ClosureBinder? 'const'? 'static'? 'async'? 'gen'? 'move'?  ParamList RetType?
+  Attr* ClosureBinder? 'const'? 'static'? ParamList RetType?
   body:Expr
 
 ClosureBinder =

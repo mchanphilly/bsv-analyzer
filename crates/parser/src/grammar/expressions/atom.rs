@@ -61,7 +61,6 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![let],
         T![loop],
         T![case],
-        T![move],
         T![return],
         T![become],
         T![static],
@@ -167,21 +166,6 @@ pub(super) fn atom_expr(
             stmt_list(p);
             m.complete(p, BLOCK_EXPR)
         }
-        T![async] | T![gen] if la == T![move] && p.nth(2) == T!['{'] => {
-            let m = p.start();
-            p.bump_any();
-            p.bump(T![move]);
-            stmt_list(p);
-            m.complete(p, BLOCK_EXPR)
-        }
-        T![async] if la == T![gen] && p.nth(2) == T![move] && p.nth(3) == T!['{'] => {
-            let m = p.start();
-            p.bump(T![async]);
-            p.bump(T![gen]);
-            p.bump(T![move]);
-            stmt_list(p);
-            m.complete(p, BLOCK_EXPR)
-        }
         // T!['{'] => {  // Not present in Bluespec
         //     // test for_range_from
         //     // fn foo() {
@@ -210,7 +194,7 @@ pub(super) fn atom_expr(
             m.complete(p, BLOCK_EXPR)
         }
 
-        T![const] | T![static] | T![async] | T![move] | T![|] => closure_expr(p),
+        T![const] | T![static] | T![|] => closure_expr(p),
         T![for] if la == T![<] => closure_expr(p),
         T![for] => for_expr(p, None),
 
@@ -557,7 +541,7 @@ fn array_expr(p: &mut Parser<'_>, open: SyntaxKind, close: SyntaxKind) -> Comple
 // }
 fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(match p.current() {
-        T![const] | T![static] | T![async] | T![move] | T![|] => true,
+        T![const] | T![static] | T![async]| T![|] => true,
         T![for] => p.nth(1) == T![<],
         _ => false,
     });
@@ -573,7 +557,6 @@ fn closure_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(T![static]);
     p.eat(T![async]);
     p.eat(T![gen]);
-    p.eat(T![move]);
 
     if !p.at(T![|]) {
         p.error("expected `|`");

@@ -211,7 +211,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
     // test_err async_without_semicolon
     // fn foo() { let _ = async {} }
     if p.at(T![async])
-        && (!matches!(p.nth(1), T!['{'] | T![gen] | T![move] | T![|])
+        && (!matches!(p.nth(1), T!['{'] | T![|])
             || matches!((p.nth(1), p.nth(2)), (T![gen], T![fn])))
     {
         p.eat(T![async]);
