@@ -756,7 +756,7 @@ RangeExpr =
 MatchExpr = (
   Attr* 'match' Expr MatchArmList
 ) | (
-  'case' '(' Expr ')'
+  'case' '(' Expr ')' 'matches'?
   MatchArmList
   'endcase'
 )

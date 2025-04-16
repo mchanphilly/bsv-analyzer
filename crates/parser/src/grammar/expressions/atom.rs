@@ -90,7 +90,8 @@ pub(super) fn atom_expr(
     let la = p.nth(1);
     let done = match p.current() {
         T!['('] => tuple_expr(p),
-        T!['['] => array_expr(p),
+        T!['['] => array_expr(p, T!['['], T![']']),
+        T!['{'] => array_expr(p, T!['{'], T!['}']),
         T![if] => if_expr(p),
         T![let] => let_expr(p),
         T![_] => {
@@ -181,17 +182,17 @@ pub(super) fn atom_expr(
             stmt_list(p);
             m.complete(p, BLOCK_EXPR)
         }
-        T!['{'] => {
-            // test for_range_from
-            // fn foo() {
-            //    for x in 0 .. {
-            //        break;
-            //    }
-            // }
-            let m = p.start();
-            stmt_list(p);
-            m.complete(p, BLOCK_EXPR)
-        }
+        // T!['{'] => {  // Not present in Bluespec
+        //     // test for_range_from
+        //     // fn foo() {
+        //     //    for x in 0 .. {
+        //     //        break;
+        //     //    }
+        //     // }
+        //     let m = p.start();
+        //     stmt_list(p);
+        //     m.complete(p, BLOCK_EXPR)
+        // }
         T![begin] => {
             // test begin_end
             // method Action x();
@@ -507,15 +508,15 @@ fn parse_reg(p: &mut Parser<'_>) {
 //     [1, 2,];
 //     [1; 2];
 // }
-fn array_expr(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(T!['[']));
+fn array_expr(p: &mut Parser<'_>, open: SyntaxKind, close: SyntaxKind) -> CompletedMarker {
+    assert!(p.at(open));
     let m = p.start();
 
     let mut n_exprs = 0u32;
     let mut has_semi = false;
 
-    p.bump(T!['[']);
-    while !p.at(EOF) && !p.at(T![']']) {
+    p.bump(open);
+    while !p.at(EOF) && !p.at(close) {
         n_exprs += 1;
 
         // test array_attrs
@@ -529,11 +530,11 @@ fn array_expr(p: &mut Parser<'_>) -> CompletedMarker {
             continue;
         }
 
-        if has_semi || !p.at(T![']']) && !p.expect(T![,]) {
+        if has_semi || !p.at(close) && !p.expect(T![,]) {
             break;
         }
     }
-    p.expect(T![']']);
+    p.expect(close);
 
     m.complete(p, ARRAY_EXPR)
 }
@@ -719,6 +720,8 @@ fn case_expr(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(T!['(']);
     expr_no_struct(p);
     p.expect(T![')']);
+
+    p.eat(T![matches]);
 
     if !p.at(T![endcase]) {
         match_arm_list(p);

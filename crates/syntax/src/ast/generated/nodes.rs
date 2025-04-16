@@ -1315,6 +1315,8 @@ impl MatchExpr {
     pub fn endcase_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![endcase]) }
     #[inline]
     pub fn match_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![match]) }
+    #[inline]
+    pub fn matches_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![matches]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
