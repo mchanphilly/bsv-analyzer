@@ -94,14 +94,14 @@ pub(super) fn atom_expr(
         T!['{'] => array_expr(p, T!['{'], T!['}']),
         T![if] => if_expr(p),
         T![let] => let_expr(p),
-        T![_] => {
-            // test destructuring_assignment_wildcard_pat
+        T![?] => {
+            // _test destructuring_assignment_wildcard_pat
             // fn foo() {
             //     _ = 1;
             //     Some(_) = None;
             // }
             let m = p.start();
-            p.bump(T![_]);
+            p.bump(T![?]);
             m.complete(p, UNDERSCORE_EXPR)
         }
         T![loop] => loop_expr(p, None),

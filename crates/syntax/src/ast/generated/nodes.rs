@@ -2315,7 +2315,7 @@ pub struct UnderscoreExpr {
 impl ast::HasAttrs for UnderscoreExpr {}
 impl UnderscoreExpr {
     #[inline]
-    pub fn underscore_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![_]) }
+    pub fn question_mark_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![?]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

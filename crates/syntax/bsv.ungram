@@ -796,7 +796,7 @@ LetExpr =
   Attr* 'let' Pat '=' Expr
 
 UnderscoreExpr =
-  Attr* '_'
+  Attr* '?'
 
 AwaitExpr =
   Attr* Expr '.' 'await'
