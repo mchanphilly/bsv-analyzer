@@ -406,6 +406,8 @@ fn type_synonym_bsv(p: &mut Parser<'_>, m: Marker) {
 
     // Needs to recover because we often have other items coming up.
     name_r(p, ITEM_RECOVERY_SET);
+    generic_params::opt_generic_param_list(p);
+
     p.expect(T![;]);
     m.complete(p, TYPE_ALIAS);
 }
