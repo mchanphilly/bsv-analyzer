@@ -305,7 +305,7 @@ Whether to omit deprecated items from autocompletion. By default they are marked
 --
 Maximum number of completions to return. If `None`, the limit is infinite.
 --
-[[bsv_analyzer.completion.postfix.enable]]bsv_analyzer.completion.postfix.enable (default: `false`)::
+[[bsv_analyzer.completion.postfix.enable]]bsv_analyzer.completion.postfix.enable (default: `true`)::
 +
 --
 Whether to show postfix snippets like `dbg`, `if`, `not`, etc.
@@ -359,10 +359,10 @@ Term search fuel in "units of work" for autocompletion (Defaults to 1000).
 --
 List of rust-analyzer diagnostics to disable.
 --
-[[bsv_analyzer.diagnostics.enable]]bsv_analyzer.diagnostics.enable (default: `false`)::
+[[bsv_analyzer.diagnostics.enable]]bsv_analyzer.diagnostics.enable (default: `true`)::
 +
 --
-Whether to show native rust-analyzer diagnostics.  // TODO BSV
+Whether to show native rust-analyzer diagnostics.
 --
 [[bsv_analyzer.diagnostics.experimental.enable]]bsv_analyzer.diagnostics.experimental.enable (default: `false`)::
 +
@@ -409,7 +409,7 @@ also need to add the folders to Code's `files.watcherExclude`.
 --
 Controls file watching implementation.
 --
-[[bsv_analyzer.highlightRelated.breakPoints.enable]]bsv_analyzer.highlightRelated.breakPoints.enable (default: `false`)::
+[[bsv_analyzer.highlightRelated.breakPoints.enable]]bsv_analyzer.highlightRelated.breakPoints.enable (default: `true`)::
 +
 --
 Enables highlighting of related references while the cursor is on `break`, `loop`, `while`, or `for` keywords.
@@ -419,12 +419,12 @@ Enables highlighting of related references while the cursor is on `break`, `loop
 --
 Enables highlighting of all captures of a closure while the cursor is on the `|` or move keyword of a closure.
 --
-[[bsv_analyzer.highlightRelated.exitPoints.enable]]bsv_analyzer.highlightRelated.exitPoints.enable (default: `false`)::
+[[bsv_analyzer.highlightRelated.exitPoints.enable]]bsv_analyzer.highlightRelated.exitPoints.enable (default: `true`)::
 +
 --
 Enables highlighting of all exit points while the cursor is on any `return`, `?`, `fn`, or return type arrow (`->`).
 --
-[[bsv_analyzer.highlightRelated.references.enable]]bsv_analyzer.highlightRelated.references.enable (default: `false`)::
+[[bsv_analyzer.highlightRelated.references.enable]]bsv_analyzer.highlightRelated.references.enable (default: `true`)::
 +
 --
 Enables highlighting of related references while the cursor is on any identifier.
@@ -469,18 +469,18 @@ Whether to show `References` action. Only applies when
 Whether to show `Run` action. Only applies when
 `#rust-analyzer.hover.actions.enable#` is set.
 --
-[[bsv_analyzer.hover.documentation.enable]]bsv_analyzer.hover.documentation.enable (default: `false`)::
+[[bsv_analyzer.hover.documentation.enable]]bsv_analyzer.hover.documentation.enable (default: `true`)::
 +
 --
 Whether to show documentation on hover.
 --
-[[bsv_analyzer.hover.documentation.keywords.enable]]bsv_analyzer.hover.documentation.keywords.enable (default: `false`)::
+[[bsv_analyzer.hover.documentation.keywords.enable]]bsv_analyzer.hover.documentation.keywords.enable (default: `true`)::
 +
 --
 Whether to show keyword hover popups. Only applies when
 `#rust-analyzer.hover.documentation.enable#` is set.
 --
-[[bsv_analyzer.hover.links.enable]]bsv_analyzer.hover.links.enable (default: `false`)::
+[[bsv_analyzer.hover.links.enable]]bsv_analyzer.hover.links.enable (default: `true`)::
 +
 --
 Use markdown syntax for links on hover.
@@ -490,12 +490,12 @@ Use markdown syntax for links on hover.
 --
 How to render the align information in a memory layout hover.
 --
-[[bsv_analyzer.hover.memoryLayout.enable]]bsv_analyzer.hover.memoryLayout.enable (default: `false`)::
+[[bsv_analyzer.hover.memoryLayout.enable]]bsv_analyzer.hover.memoryLayout.enable (default: `true`)::
 +
 --
 Whether to show memory layout data on hover.
 --
-[[bsv_analyzer.hover.memoryLayout.niches]]bsv_analyzer.hover.memoryLayout.niches (default: `false`)::
+[[bsv_analyzer.hover.memoryLayout.niches]]bsv_analyzer.hover.memoryLayout.niches (default: `true`)::
 +
 --
 How to render the niche information in a memory layout hover.
@@ -960,7 +960,7 @@ their contents.
 --
 Show full signature of the callable. Only shows parameters if disabled.
 --
-[[bsv_analyzer.signatureInfo.documentation.enable]]bsv_analyzer.signatureInfo.documentation.enable (default: `false`)::
+[[bsv_analyzer.signatureInfo.documentation.enable]]bsv_analyzer.signatureInfo.documentation.enable (default: `true`)::
 +
 --
 Show documentation.

@@ -87,13 +87,13 @@ config_data! {
 
 
         /// Enables highlighting of related references while the cursor is on `break`, `loop`, `while`, or `for` keywords.
-        highlightRelated_breakPoints_enable: bool = false,
+        highlightRelated_breakPoints_enable: bool = true,
         /// Enables highlighting of all captures of a closure while the cursor is on the `|` or move keyword of a closure.
         highlightRelated_closureCaptures_enable: bool = false,
         /// Enables highlighting of all exit points while the cursor is on any `return`, `?`, `fn`, or return type arrow (`->`).
-        highlightRelated_exitPoints_enable: bool = false,
+        highlightRelated_exitPoints_enable: bool = true,
         /// Enables highlighting of related references while the cursor is on any identifier.
-        highlightRelated_references_enable: bool = false,
+        highlightRelated_references_enable: bool = true,
         /// Enables highlighting of all break points for a loop or block context while the cursor is on any `async` or `await` keywords.
         highlightRelated_yieldPoints_enable: bool = false,
 
@@ -116,18 +116,18 @@ config_data! {
         hover_actions_run_enable: bool             = false,
 
         /// Whether to show documentation on hover.
-        hover_documentation_enable: bool           = false,
+        hover_documentation_enable: bool           = true,
         /// Whether to show keyword hover popups. Only applies when
         /// `#rust-analyzer.hover.documentation.enable#` is set.
-        hover_documentation_keywords_enable: bool  = false,
+        hover_documentation_keywords_enable: bool  = true,
         /// Use markdown syntax for links on hover.
-        hover_links_enable: bool = false,
+        hover_links_enable: bool = true,
         /// How to render the align information in a memory layout hover.
         hover_memoryLayout_alignment: Option<MemoryLayoutHoverRenderKindDef> = Some(MemoryLayoutHoverRenderKindDef::Hexadecimal),
         /// Whether to show memory layout data on hover.
-        hover_memoryLayout_enable: bool = false,
+        hover_memoryLayout_enable: bool = true,
         /// How to render the niche information in a memory layout hover.
-        hover_memoryLayout_niches: Option<bool> = Some(false),
+        hover_memoryLayout_niches: Option<bool> = Some(true),
         /// How to render the offset information in a memory layout hover.
         hover_memoryLayout_offset: Option<MemoryLayoutHoverRenderKindDef> = Some(MemoryLayoutHoverRenderKindDef::Hexadecimal),
         /// How to render the size information in a memory layout hover.
@@ -305,7 +305,7 @@ config_data! {
         /// Show full signature of the callable. Only shows parameters if disabled.
         signatureInfo_detail: SignatureDetail                           = SignatureDetail::Full,
         /// Show documentation.
-        signatureInfo_documentation_enable: bool                       = false,
+        signatureInfo_documentation_enable: bool                       = true,
 
         /// Whether to insert closing angle brackets when typing an opening angle bracket of a generic argument list.
         typing_autoClosingAngleBrackets_enable: bool = false,
@@ -441,7 +441,7 @@ config_data! {
         /// Maximum number of completions to return. If `None`, the limit is infinite.
         completion_limit: Option<usize> = None,
         /// Whether to show postfix snippets like `dbg`, `if`, `not`, etc.
-        completion_postfix_enable: bool         = false,
+        completion_postfix_enable: bool         = true,
         /// Enables completions of private items and fields that are defined in the current workspace even if they are not visible at the current position.
         completion_privateEditable_enable: bool = false,
         /// Whether to enable term search based snippets like `Some(foo.bar().baz())`.

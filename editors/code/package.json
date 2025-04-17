@@ -646,7 +646,7 @@
                 "properties": {
                     "bsv_analyzer.cargo.autoreload": {
                         "markdownDescription": "Automatically refresh project info via `cargo metadata` on\n`Cargo.toml` or `.cargo/config.toml` changes.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1124,7 +1124,7 @@
                 "properties": {
                     "bsv_analyzer.completion.postfix.enable": {
                         "markdownDescription": "Whether to show postfix snippets like `dbg`, `if`, `not`, etc.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1145,43 +1145,22 @@
                     "bsv_analyzer.completion.snippets.custom": {
                         "markdownDescription": "Custom completion snippets.",
                         "default": {
-                            "Arc::new": {
-                                "postfix": "arc",
-                                "body": "Arc::new(${receiver})",
-                                "requires": "std::sync::Arc",
-                                "description": "Put the expression into an `Arc`",
-                                "scope": "expr"
-                            },
-                            "Rc::new": {
-                                "postfix": "rc",
-                                "body": "Rc::new(${receiver})",
-                                "requires": "std::rc::Rc",
-                                "description": "Put the expression into an `Rc`",
-                                "scope": "expr"
-                            },
-                            "Box::pin": {
-                                "postfix": "pinbox",
-                                "body": "Box::pin(${receiver})",
-                                "requires": "std::boxed::Box",
-                                "description": "Put the expression into a pinned `Box`",
-                                "scope": "expr"
-                            },
                             "Err": {
                                 "postfix": "err",
                                 "body": "Err(${receiver})",
                                 "description": "Wrap the expression in a `Result::Err`",
                                 "scope": "expr"
                             },
-                            "Some": {
-                                "postfix": "some",
-                                "body": "Some(${receiver})",
-                                "description": "Wrap the expression in an `Option::Some`",
-                                "scope": "expr"
-                            },
                             "Ok": {
                                 "postfix": "ok",
                                 "body": "Ok(${receiver})",
                                 "description": "Wrap the expression in a `Result::Ok`",
+                                "scope": "expr"
+                            },
+                            "Some": {
+                                "postfix": "some",
+                                "body": "Some(${receiver})",
+                                "description": "Wrap the expression in an `Option::Some`",
                                 "scope": "expr"
                             }
                         },
@@ -1326,7 +1305,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.breakPoints.enable": {
                         "markdownDescription": "Enables highlighting of related references while the cursor is on `break`, `loop`, `while`, or `for` keywords.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1346,7 +1325,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.exitPoints.enable": {
                         "markdownDescription": "Enables highlighting of all exit points while the cursor is on any `return`, `?`, `fn`, or return type arrow (`->`).",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1356,7 +1335,7 @@
                 "properties": {
                     "bsv_analyzer.highlightRelated.references.enable": {
                         "markdownDescription": "Enables highlighting of related references while the cursor is on any identifier.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1386,7 +1365,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.enable": {
                         "markdownDescription": "Whether to show HoverActions in Rust files.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1396,7 +1375,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.gotoTypeDef.enable": {
                         "markdownDescription": "Whether to show `Go to Type Definition` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1406,7 +1385,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.implementations.enable": {
                         "markdownDescription": "Whether to show `Implementations` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1416,7 +1395,7 @@
                 "properties": {
                     "bsv_analyzer.hover.actions.references.enable": {
                         "markdownDescription": "Whether to show `References` action. Only applies when\n`#rust-analyzer.hover.actions.enable#` is set.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1436,7 +1415,7 @@
                 "properties": {
                     "bsv_analyzer.hover.documentation.enable": {
                         "markdownDescription": "Whether to show documentation on hover.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1446,7 +1425,7 @@
                 "properties": {
                     "bsv_analyzer.hover.documentation.keywords.enable": {
                         "markdownDescription": "Whether to show keyword hover popups. Only applies when\n`#rust-analyzer.hover.documentation.enable#` is set.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1456,7 +1435,7 @@
                 "properties": {
                     "bsv_analyzer.hover.links.enable": {
                         "markdownDescription": "Use markdown syntax for links on hover.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1493,7 +1472,7 @@
                 "properties": {
                     "bsv_analyzer.hover.memoryLayout.enable": {
                         "markdownDescription": "Whether to show memory layout data on hover.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -1503,7 +1482,7 @@
                 "properties": {
                     "bsv_analyzer.hover.memoryLayout.niches": {
                         "markdownDescription": "How to render the niche information in a memory layout hover.",
-                        "default": false,
+                        "default": true,
                         "type": [
                             "null",
                             "boolean"
@@ -1901,7 +1880,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.genericParameterHints.type.enable": {
                         "markdownDescription": "Whether to show generic type parameter name inlay hints.",
-                        "default": true,
+                        "default": false,
                         "type": "boolean"
                     }
                 }
@@ -2035,7 +2014,7 @@
                 "properties": {
                     "bsv_analyzer.inlayHints.typeHints.hideNamedConstructor": {
                         "markdownDescription": "Whether to hide inlay type hints for constructors.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
@@ -2528,7 +2507,7 @@
                 "properties": {
                     "bsv_analyzer.signatureInfo.documentation.enable": {
                         "markdownDescription": "Show documentation.",
-                        "default": false,
+                        "default": true,
                         "type": "boolean"
                     }
                 }
