@@ -87,7 +87,7 @@ fn add_keywords(acc: &mut Completions, ctx: &CompletionContext<'_>, kind: Option
         ctx.qualifier_ctx.async_tok.is_none().then_some(("async", "async $0")),
     ];
 
-    if !in_trait_impl {
+    if true {
         // handle qualifier tokens
         if missing_qualifiers.iter().any(Option::is_none) {
             // only complete missing qualifiers
@@ -109,39 +109,41 @@ fn add_keywords(acc: &mut Completions, ctx: &CompletionContext<'_>, kind: Option
             return;
         }
 
+        if in_trait {
+            add_keyword("method", "method $1 $2($3);$0");
+        }
+
+        add_keyword("(*", "(* $0 *)");
         if in_item_list {
-            add_keyword("enum", "enum $1 {\n    $0\n}");
-            add_keyword("mod", "mod $0");
-            add_keyword("static", "static $0");
-            add_keyword("struct", "struct $0");
-            add_keyword("trait", "trait $1 {\n    $0\n}");
-            add_keyword("union", "union $1 {\n    $0\n}");
-            add_keyword("use", "use $0");
-            if no_vis_qualifiers {
-                add_keyword("impl", "impl $1 {\n    $0\n}");
+            add_keyword("begin", "begin\n    $0\nend");
+            add_keyword("action", "action\n    $0\nendaction");
+            add_keyword("actionvalue", "actionvalue\n    $0\nendactionvalue");
+
+            add_keyword("interface", "interface $1;\n    $0\nendinterface");
+            add_keyword("module", "module $1($2);\n    $0\nendmodule");
+            add_keyword("function", "function $1($3);\n    $0\nendfunction");
+
+            if !in_trait {
+                add_keyword("method", "method $1 $2($3);\n    $0\nendmethod");
             }
+            add_keyword("import", "import $0::*;");
+            add_keyword("typedef enum", "typedef enum {\n    \n}");
         }
 
-        if !in_trait && !in_block && no_vis_qualifiers {
-            add_keyword("pub(crate)", "pub(crate) $0");
-            add_keyword("pub(super)", "pub(super) $0");
-            add_keyword("pub", "pub $0");
-        }
+        // if in_extern_block {
+        //     add_keyword("fn", "fn $1($2);");
+        // } else {
+        //     if !in_inherent_impl {
+        //         if !in_trait {
+        //             add_keyword("extern", "extern $0");
+        //         }
+        //         add_keyword("type", "type $0");
+        //     }
 
-        if in_extern_block {
-            add_keyword("fn", "fn $1($2);");
-        } else {
-            if !in_inherent_impl {
-                if !in_trait {
-                    add_keyword("extern", "extern $0");
-                }
-                add_keyword("type", "type $0");
-            }
-
-            add_keyword("fn", "fn $1($2) {\n    $0\n}");
-            add_keyword("unsafe", "unsafe $0");
-            add_keyword("const", "const $0");
-            add_keyword("async", "async $0");
-        }
+        //     add_keyword("fn", "fn $1($2) {\n    $0\n}");
+        //     add_keyword("unsafe", "unsafe $0");
+        //     add_keyword("const", "const $0");
+        //     add_keyword("async", "async $0");
+        // }
     }
 }

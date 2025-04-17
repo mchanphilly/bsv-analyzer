@@ -91,19 +91,19 @@ impl Completions {
     }
 
     pub(crate) fn add_nameref_keywords_with_colon(&mut self, ctx: &CompletionContext<'_>) {
-        ["self::", "crate::"].into_iter().for_each(|kw| self.add_keyword(ctx, kw));
+        // ["self::", "crate::"].into_iter().for_each(|kw| self.add_keyword(ctx, kw));
 
-        if ctx.depth_from_crate_root > 0 {
-            self.add_keyword(ctx, "super::");
-        }
+        // if ctx.depth_from_crate_root > 0 {
+        //     self.add_keyword(ctx, "super::");
+        // }
     }
 
     pub(crate) fn add_nameref_keywords(&mut self, ctx: &CompletionContext<'_>) {
-        ["self", "crate"].into_iter().for_each(|kw| self.add_keyword(ctx, kw));
+        // ["self", "crate"].into_iter().for_each(|kw| self.add_keyword(ctx, kw));
 
-        if ctx.depth_from_crate_root > 0 {
-            self.add_keyword(ctx, "super");
-        }
+        // if ctx.depth_from_crate_root > 0 {
+        //     self.add_keyword(ctx, "super");
+        // }
     }
 
     pub(crate) fn add_super_keyword(
@@ -111,11 +111,11 @@ impl Completions {
         ctx: &CompletionContext<'_>,
         super_chain_len: Option<usize>,
     ) {
-        if let Some(len) = super_chain_len {
-            if len > 0 && len < ctx.depth_from_crate_root {
-                self.add_keyword(ctx, "super::");
-            }
-        }
+        // if let Some(len) = super_chain_len {
+        //     if len > 0 && len < ctx.depth_from_crate_root {
+        //         self.add_keyword(ctx, "super::");
+        //     }
+        // }
     }
 
     pub(crate) fn add_keyword_snippet_expr(

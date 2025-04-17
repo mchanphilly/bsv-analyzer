@@ -850,7 +850,7 @@ impl DefCollector<'_> {
 
     fn record_resolved_import(&mut self, directive: &ImportDirective) {
         let _p = tracing::info_span!("record_resolved_import").entered();
-        dbg!(&directive);
+        // dbg!(&directive);
         let module_id = directive.module_id;
         let import = &directive.import;
         let mut def = directive.status.namespaces();

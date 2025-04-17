@@ -176,7 +176,6 @@ pub fn completions(
 ) -> Option<Vec<CompletionItem>> {
     let (ctx, analysis) = &CompletionContext::new(db, position, config)?;
     let mut completions = Completions::default();
-
     // prevent `(` from triggering unwanted completion noise
     if trigger_character == Some('(') {
         if let CompletionAnalysis::NameRef(NameRefContext {
