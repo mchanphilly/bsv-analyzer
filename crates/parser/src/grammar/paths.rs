@@ -10,7 +10,7 @@ pub(super) fn is_path_start(p: &Parser<'_>) -> bool {
 pub(super) fn is_use_path_start(p: &Parser<'_>) -> bool {
     match p.current() {
         // TODO BSV check if $ captures too much
-        IDENT | T![self] | T![super] | T![crate] | T![$] => true,
+        IDENT | T![self] | T![super] | T![crate] | T![$] | T!['`']=> true,
         T![:] if p.at(T![::]) => true,
         _ => false,
     }

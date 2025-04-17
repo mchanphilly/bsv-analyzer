@@ -309,6 +309,8 @@ impl Attr {
     #[inline]
     pub fn meta(&self) -> Option<Meta> { support::child(&self.syntax) }
     #[inline]
+    pub fn path(&self) -> Option<Path> { support::child(&self.syntax) }
+    #[inline]
     pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
     #[inline]
     pub fn pound_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![#]) }
@@ -316,6 +318,14 @@ impl Attr {
     pub fn l_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['[']) }
     #[inline]
     pub fn r_brack_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![']']) }
+    #[inline]
+    pub fn grave_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['`']) }
+    #[inline]
+    pub fn else_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![else]) }
+    #[inline]
+    pub fn endif_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![endif]) }
+    #[inline]
+    pub fn ifdef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![ifdef]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

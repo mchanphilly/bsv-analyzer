@@ -201,10 +201,6 @@ impl ast::Attr {
         }
     }
 
-    pub fn path(&self) -> Option<ast::Path> {
-        self.meta()?.path()
-    }
-
     pub fn expr(&self) -> Option<ast::Expr> {
         self.meta()?.expr()
     }

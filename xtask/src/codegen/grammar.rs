@@ -387,7 +387,7 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
         .unzip();
 
     let punctuation_values = grammar.punct.iter().map(|(token, _name)| {
-        if "{}[]()".contains(token) {
+        if "{}[]()`".contains(token) {
             let c = token.chars().next().unwrap();
             quote! { #c }
         } else {
@@ -641,6 +641,7 @@ impl Field {
             Field::Token(name) => {
                 let name = match name.as_str() {
                     ";" => "semicolon",
+                    "'`'" => "grave",
                     "->" => "thin_arrow",
                     "<-" => "l_thin_arrow",
                     "'{'" => "l_curly",
@@ -782,7 +783,7 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         Rule::Token(token) => {
             assert!(label.is_none());
             let mut name = clean_token_name(&grammar[*token].name);
-            if "[]{}()".contains(&name) {
+            if "[]{}()`".contains(&name) {
                 name = format!("'{name}'");
             }
             let field = Field::Token(name);

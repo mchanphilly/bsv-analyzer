@@ -664,11 +664,15 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 
 fn macro_call(p: &mut Parser<'_>, m: Marker) {
     assert!(paths::is_use_path_start(p));
-    paths::use_path(p);
-    match macro_call_after_excl(p) {
-        BlockLike::Block => (),
-        BlockLike::NotBlock => {
-            p.expect(T![;]);
+    if p.at(T!['`']) {
+        expressions::bsv_macro_call(p)
+    } else {
+        paths::use_path(p);
+        match macro_call_after_excl(p) {
+            BlockLike::Block => (),
+            BlockLike::NotBlock => {
+                p.expect(T![;]);
+            }
         }
     }
     m.complete(p, MACRO_CALL);

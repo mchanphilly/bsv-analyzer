@@ -127,6 +127,8 @@ pub enum TokenKind {
     Comma,
     /// "."
     Dot,
+    /// "`"
+    Grave,
     /// "("
     OpenParen,
     /// ")"
@@ -430,6 +432,7 @@ impl Cursor<'_> {
             ';' => Semi,
             ',' => Comma,
             '.' => Dot,
+            '`' => Grave,
             '(' => OpenParen,
             ')' => CloseParen,
             '{' => OpenBrace,

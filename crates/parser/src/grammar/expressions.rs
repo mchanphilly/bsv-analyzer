@@ -413,7 +413,7 @@ fn expr_bp(
 }
 
 const LHS_FIRST: TokenSet =
-    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![~], T![_], T![?]]));
+    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![~], T![_], T![?], T!['`']]));
 
 fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLike)> {
     let m;
@@ -719,6 +719,26 @@ pub(crate) fn arg_list(p: &mut Parser<'_>) {
     m.complete(p, ARG_LIST);
 }
 
+// `idfef
+// notice how this has two call sites. In reality,
+// there shouldn't be a difference between when we use
+// this as an "item" vs when we use this as an "expr"
+// and in fact we're not really supposed to use it as an
+// expr. It's similar to C preprocessing.
+pub(crate) fn bsv_macro_call(p: &mut Parser<'_>) {
+    assert!(p.at(T!['`']));
+    p.bump(T!['`']);
+    match p.current() {
+        T![else] => p.bump(T![else]),
+        T![endif] => p.bump(T![endif]),
+        T![ifdef] => {
+            p.bump(T![ifdef]);
+            paths::expr_path(p);
+        }
+        _ => p.err_and_bump("Macro call not recognized"),
+    }
+}
+
 // test path_expr
 // fn foo() {
 //     let _ = a;
@@ -729,6 +749,10 @@ pub(crate) fn arg_list(p: &mut Parser<'_>) {
 fn path_expr(p: &mut Parser<'_>, r: Restrictions) -> (CompletedMarker, BlockLike) {
     assert!(paths::is_path_start(p));
     let m = p.start();
+    if p.at(T!['`']) {
+        bsv_macro_call(p);
+        return (m.complete(p, MACRO_CALL).precede(p).complete(p, MACRO_EXPR), BlockLike::NotBlock);
+    }
     paths::expr_path(p);
     match p.current() {
         T!['{'] if !r.forbid_structs => {

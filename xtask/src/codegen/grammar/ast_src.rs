@@ -49,6 +49,7 @@ const PUNCT: &[(&str, &str)] = &[
     ("$", "DOLLAR"),
     (";", "SEMICOLON"),
     (",", "COMMA"),
+    ("`", "GRAVE"),
     ("(", "L_PAREN"),
     (")", "R_PAREN"),
     ("{", "L_CURLY"),

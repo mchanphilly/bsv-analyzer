@@ -207,6 +207,7 @@ impl<'a> Converter<'a> {
                 bsv_lexer::TokenKind::Semi => T![;],
                 bsv_lexer::TokenKind::Comma => T![,],
                 bsv_lexer::TokenKind::Dot => T![.],
+                bsv_lexer::TokenKind::Grave => T!['`'],
                 bsv_lexer::TokenKind::OpenParen => T!['('],
                 bsv_lexer::TokenKind::CloseParen => T![')'],
                 bsv_lexer::TokenKind::OpenBrace => T!['{'],

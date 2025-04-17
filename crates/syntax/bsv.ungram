@@ -227,8 +227,14 @@ MacroStmts =
 Attr =
 (  // Rust
   '#' '!'? '[' Meta ']'
-// ) | (  // Bluespec
-  // '(*' Meta (',' Meta)* '*)'
+// // ) | (  // Bluespec
+//   // '(*' Meta (',' Meta)* '*)'
+) | (
+  '`' (
+    'ifdef' Path
+  | 'endif'
+  | 'else'
+  )
 )
 
 Meta =
