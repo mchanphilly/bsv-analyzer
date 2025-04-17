@@ -266,35 +266,34 @@ pub(crate) fn complete_expr_path(
                         acc.add_keyword_snippet_expr(ctx, incomplete_let, kw, snippet)
                     };
 
-                    if !in_block_expr {
-                        add_keyword("unsafe", "unsafe {\n    $0\n}");
-                    }
-                    add_keyword("match", "match $1 {\n    $0\n}");
-                    add_keyword("while", "while $1 {\n    $0\n}");
-                    add_keyword("while let", "while let $1 = $2 {\n    $0\n}");
-                    add_keyword("loop", "loop {\n    $0\n}");
+                    // if !in_block_expr {
+                    //     add_keyword("unsafe", "unsafe {\n    $0\n}");
+                    // }
+                    add_keyword("case", "case ($1)\n    $0\nendcase");
+                    add_keyword("while", "while ($1) begin\n    $0\nend");
+
                     if in_match_guard {
                         add_keyword("if", "if $0");
                     } else {
-                        add_keyword("if", "if $1 {\n    $0\n}");
+                        add_keyword("if", "if ($1) begin\n    $0\nend");
                     }
-                    add_keyword("if let", "if let $1 = $2 {\n    $0\n}");
-                    add_keyword("for", "for $1 in $2 {\n    $0\n}");
-                    add_keyword("true", "true");
-                    add_keyword("false", "false");
+                    // add_keyword("if let", "if let $1 = $2 {\n    $0\n}");
+                    add_keyword("for", "for ($1; $2; $3) begin\n    $0\nend");
+                    add_keyword("True", "True");
+                    add_keyword("False", "False");
 
                     if in_condition || in_block_expr {
                         add_keyword("let", "let");
                     }
 
                     if after_if_expr {
-                        add_keyword("else", "else {\n    $0\n}");
-                        add_keyword("else if", "else if $1 {\n    $0\n}");
+                        add_keyword("else", "else begin\n    $0\nend");
+                        add_keyword("else if", "else if ($1) begin\n    $0\nend");
                     }
 
-                    if wants_mut_token {
-                        add_keyword("mut", "mut ");
-                    }
+                    // if wants_mut_token {
+                    //     add_keyword("mut", "mut ");
+                    // }
 
                     if in_breakable != BreakableKind::None {
                         if in_block_expr {
