@@ -1009,12 +1009,12 @@ pub(crate) fn handle_completion(
     let completion_config = &snap.config.completion(Some(source_root));
     // FIXME: We should fix up the position when retrying the cancelled request instead
     position.offset = position.offset.min(line_index.index.len());
-    let comp = snap.analysis.completions(
-        completion_config,
-        position,
-        completion_trigger_character,
-    );
-    dbg!(comp);
+    // let comp = snap.analysis.completions(
+    //     completion_config,
+    //     position,
+    //     completion_trigger_character,
+    // );
+    // dbg!(comp);
     let items = match snap.analysis.completions(
         completion_config,
         position,

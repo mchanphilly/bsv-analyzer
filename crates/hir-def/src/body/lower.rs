@@ -57,7 +57,7 @@ pub(super) fn lower(
     krate: CrateId,
     is_async_fn: bool,
 ) -> (Body, BodySourceMap) {
-    dbg!(&body);
+    // dbg!(&body);
     ExprCollector {
         db,
         owner,

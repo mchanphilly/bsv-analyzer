@@ -490,7 +490,7 @@ Use markdown syntax for links on hover.
 --
 How to render the align information in a memory layout hover.
 --
-[[bsv_analyzer.hover.memoryLayout.enable]]bsv_analyzer.hover.memoryLayout.enable (default: `true`)::
+[[bsv_analyzer.hover.memoryLayout.enable]]bsv_analyzer.hover.memoryLayout.enable (default: `false`)::
 +
 --
 Whether to show memory layout data on hover.
