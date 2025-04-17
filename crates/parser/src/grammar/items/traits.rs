@@ -104,7 +104,7 @@ pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
 
     name_r(p, ITEM_RECOVERY_SET);
 
-    // TODO_BSV Add parametrization
+    generic_params::opt_generic_param_list(p);
 
     p.expect(T!['(']);
     impl_type(p);
