@@ -117,7 +117,6 @@ impl ProjectManifest {
         fn find_exts(path: &AbsPath, target_exts: &[&str]) -> io::Result<Vec<ManifestPath>> {
             let res =
                 Ok(find_exts_in_child_dir(read_dir(path)?, target_exts, DEPTH, 0));
-            dbg!(&res);
             res
         }
 

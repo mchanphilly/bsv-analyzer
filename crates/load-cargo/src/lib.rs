@@ -91,6 +91,8 @@ pub fn load_workspace(
         }
     }
 
+    dbg!("load_workspace");
+
     let (crate_graph, proc_macros) = ws.to_crate_graph(
         &mut |path: &AbsPath| {
             let contents = loader.load_sync(path);
@@ -226,7 +228,8 @@ impl ProjectFolders {
 
             let entry = {
                 let mut dirs = vfs::loader::Directories::default();
-                dirs.extensions.push("rs".into());
+                dirs.extensions.push("bsv".into());
+                dirs.extensions.push("ms".into());
                 dirs.extensions.push("toml".into());
                 dirs.include.extend(root.include);
                 dirs.exclude.extend(root.exclude);

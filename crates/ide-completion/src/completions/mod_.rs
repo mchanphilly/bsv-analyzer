@@ -72,7 +72,7 @@ pub(crate) fn complete_mod(
             let submodule_path = source_root.path_for_file(&submodule_file)?;
             let directory_with_submodule = submodule_path.parent()?;
             let (name, ext) = submodule_path.name_and_extension()?;
-            if ext != Some("rs") {
+            if ext != Some("bsv") && ext != Some("ms") {
                 return None;
             }
             match name {
@@ -114,7 +114,7 @@ fn directory_to_look_for_submodules(
 ) -> Option<VfsPath> {
     let directory_with_module_path = module_file_path.parent()?;
     let (name, ext) = module_file_path.name_and_extension()?;
-    if ext != Some("rs") {
+    if ext != Some("bsv") && ext != Some("ms") {
         return None;
     }
     let base_directory = match name {

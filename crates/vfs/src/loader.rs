@@ -201,14 +201,14 @@ impl Directories {
 /// Returns :
 /// ```text
 /// Directories {
-///     extensions: ["rs"],
+///     extensions: ["bsv", "ms"],
 ///     include: [base],
 ///     exclude: [base/<exclude>],
 /// }
 /// ```
 fn dirs(base: AbsPathBuf, exclude: &[&str]) -> Directories {
     let exclude = exclude.iter().map(|it| base.join(it)).collect::<Vec<_>>();
-    Directories { extensions: vec!["rs".to_owned()], include: vec![base], exclude }
+    Directories { extensions: vec!["bsv".to_owned(), "ms".to_owned()], include: vec![base], exclude }
 }
 
 impl fmt::Debug for Message {
