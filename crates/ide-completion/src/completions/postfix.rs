@@ -149,25 +149,25 @@ pub(crate) fn complete_postfix(
         }
     }
 
-    postfix_snippet("ref", "&expr", &format!("&{receiver_text}")).add_to(acc, ctx.db);
-    postfix_snippet("refm", "&mut expr", &format!("&mut {receiver_text}")).add_to(acc, ctx.db);
-    postfix_snippet("deref", "*expr", &format!("*{receiver_text}")).add_to(acc, ctx.db);
+    // postfix_snippet("ref", "&expr", &format!("&{receiver_text}")).add_to(acc, ctx.db);
+    // postfix_snippet("refm", "&mut expr", &format!("&mut {receiver_text}")).add_to(acc, ctx.db);
+    // postfix_snippet("deref", "*expr", &format!("*{receiver_text}")).add_to(acc, ctx.db);
 
-    let mut unsafe_should_be_wrapped = true;
-    if dot_receiver.syntax().kind() == BLOCK_EXPR {
-        unsafe_should_be_wrapped = false;
-        if let Some(parent) = dot_receiver.syntax().parent() {
-            if matches!(parent.kind(), IF_EXPR | WHILE_EXPR | LOOP_EXPR | FOR_EXPR) {
-                unsafe_should_be_wrapped = true;
-            }
-        }
-    };
-    let unsafe_completion_string = if unsafe_should_be_wrapped {
-        format!("unsafe {{ {receiver_text} }}")
-    } else {
-        format!("unsafe {receiver_text}")
-    };
-    postfix_snippet("unsafe", "unsafe {}", &unsafe_completion_string).add_to(acc, ctx.db);
+    // let mut unsafe_should_be_wrapped = true;
+    // if dot_receiver.syntax().kind() == BLOCK_EXPR {
+    //     unsafe_should_be_wrapped = false;
+    //     if let Some(parent) = dot_receiver.syntax().parent() {
+    //         if matches!(parent.kind(), IF_EXPR | WHILE_EXPR | LOOP_EXPR | FOR_EXPR) {
+    //             unsafe_should_be_wrapped = true;
+    //         }
+    //     }
+    // };
+    // let unsafe_completion_string = if unsafe_should_be_wrapped {
+    //     format!("unsafe {{ {receiver_text} }}")
+    // } else {
+    //     format!("unsafe {receiver_text}")
+    // };
+    // postfix_snippet("unsafe", "unsafe {}", &unsafe_completion_string).add_to(acc, ctx.db);
 
     // The rest of the postfix completions create an expression that moves an argument,
     // so it's better to consider references now to avoid breaking the compilation
@@ -215,10 +215,12 @@ pub(crate) fn complete_postfix(
         }
     }
 
-    postfix_snippet("box", "Box::new(expr)", &format!("Box::new({receiver_text})"))
-        .add_to(acc, ctx.db);
-    postfix_snippet("dbg", "dbg!(expr)", &format!("dbg!({receiver_text})")).add_to(acc, ctx.db); // fixme
-    postfix_snippet("dbgr", "dbg!(&expr)", &format!("dbg!(&{receiver_text})")).add_to(acc, ctx.db);
+    // postfix_snippet("box", "Box::new(expr)", &format!("Box::new({receiver_text})"))
+    //     .add_to(acc, ctx.db);
+    postfix_snippet("fshow", "fshow(expr)", &format!("fshow({receiver_text})")).add_to(acc, ctx.db);
+    postfix_snippet("$display", "$display(expr);", &format!("\\$display({receiver_text};")).add_to(acc, ctx.db);
+    // postfix_snippet("$display", "$display(expr);", &format!("\\$display({receiver_text}${{1}});")).add_to(acc, ctx.db);
+    // postfix_snippet("dbgr", "dbg!(&expr)", &format!("dbg!(&{receiver_text})")).add_to(acc, ctx.db);
     postfix_snippet("call", "function(expr)", &format!("${{1}}({receiver_text})"))
         .add_to(acc, ctx.db);
 

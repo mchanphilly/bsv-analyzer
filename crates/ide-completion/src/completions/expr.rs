@@ -282,6 +282,13 @@ pub(crate) fn complete_expr_path(
                     add_keyword("True", "True");
                     add_keyword("False", "False");
 
+                    // imported from `item_list`
+                    add_keyword("interface", "interface $1;\n    $0\nendinterface");
+                    add_keyword("module", "module $1($2);\n    $0\nendmodule");
+                    add_keyword("function", "function $1($3);\n    $0\nendfunction");
+                    add_keyword("typedef enum", "typedef enum {\n    \n} $0;");
+                    add_keyword("typedef struct", "typedef struct {\n    \n} $0;");
+        
                     if in_condition || in_block_expr {
                         add_keyword("let", "let");
                     }

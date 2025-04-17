@@ -128,7 +128,8 @@ fn add_keywords(acc: &mut Completions, ctx: &CompletionContext<'_>, kind: Option
                 add_keyword("method", "method $1 $2($3);\n    $0\nendmethod");
             }
             add_keyword("import", "import $0::*;");
-            add_keyword("typedef enum", "typedef enum {\n    \n}");
+            add_keyword("typedef enum", "typedef enum {\n    \n} $0;");
+            add_keyword("typedef struct", "typedef struct {\n    \n} $0;");
         }
 
         // if in_extern_block {
