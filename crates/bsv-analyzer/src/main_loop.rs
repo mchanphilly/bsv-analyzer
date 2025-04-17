@@ -1062,9 +1062,9 @@ impl GlobalState {
             // Request handlers which are related to the user typing
             // are run on the main thread to reduce latency:
             // .on_sync::<lsp_ext::JoinLines>(handlers::handle_join_lines)
-            // .on_sync::<lsp_ext::OnEnter>(handlers::handle_on_enter)
-            // .on_sync::<lsp_request::SelectionRangeRequest>(handlers::handle_selection_range)
-            // .on_sync::<lsp_ext::MatchingBrace>(handlers::handle_matching_brace)
+            .on_sync::<lsp_ext::OnEnter>(handlers::handle_on_enter)
+            .on_sync::<lsp_request::SelectionRangeRequest>(handlers::handle_selection_range)
+            .on_sync::<lsp_ext::MatchingBrace>(handlers::handle_matching_brace)
             // .on_sync::<lsp_ext::OnTypeFormatting>(handlers::handle_on_type_formatting)
             // Formatting should be done immediately as the editor might wait on it, but we can't
             // put it on the main thread as we do not want the main thread to block on rustfmt.
@@ -1077,17 +1077,17 @@ impl GlobalState {
             // requests. Instead, we run these request handlers on higher priority
             // threads in the threadpool.
             // FIXME: Retrying can make the result of this stale?
-            // .on_latency_sensitive::<RETRY, lsp_request::Completion>(handlers::handle_completion)
+            .on_latency_sensitive::<RETRY, lsp_request::Completion>(handlers::handle_completion)
             // FIXME: Retrying can make the result of this stale
-            // .on_latency_sensitive::<RETRY, lsp_request::ResolveCompletionItem>(handlers::handle_completion_resolve)
+            .on_latency_sensitive::<RETRY, lsp_request::ResolveCompletionItem>(handlers::handle_completion_resolve)
             // .on_latency_sensitive::<RETRY, lsp_request::SemanticTokensFullRequest>(handlers::handle_semantic_tokens_full)
             // .on_latency_sensitive::<RETRY, lsp_request::SemanticTokensFullDeltaRequest>(handlers::handle_semantic_tokens_full_delta)
             // .on_latency_sensitive::<NO_RETRY, lsp_request::SemanticTokensRangeRequest>(handlers::handle_semantic_tokens_range)
             // FIXME: Some of these NO_RETRY could be retries if the file they are interested didn't change.
             // All other request handlers
             // .on::<RETRY, lsp_request::DocumentSymbolRequest>(handlers::handle_document_symbol)
-            // .on::<RETRY, lsp_request::FoldingRangeRequest>(handlers::handle_folding_range)
-            // .on::<NO_RETRY, lsp_request::SignatureHelpRequest>(handlers::handle_signature_help)
+            .on::<RETRY, lsp_request::FoldingRangeRequest>(handlers::handle_folding_range)
+            .on::<NO_RETRY, lsp_request::SignatureHelpRequest>(handlers::handle_signature_help)
             // .on::<RETRY, lsp_request::WillRenameFiles>(handlers::handle_will_rename_files)
             .on::<NO_RETRY, lsp_request::GotoDefinition>(handlers::handle_goto_definition)  // TODO BSV
             .on::<NO_RETRY, lsp_request::GotoDeclaration>(handlers::handle_goto_declaration)
@@ -1097,8 +1097,8 @@ impl GlobalState {
             .on_identity::<NO_RETRY, lsp_request::InlayHintResolveRequest, _>(handlers::handle_inlay_hints_resolve)
             // .on::<NO_RETRY, lsp_request::CodeLensRequest>(handlers::handle_code_lens)
             // .on_identity::<NO_RETRY, lsp_request::CodeLensResolve, _>(handlers::handle_code_lens_resolve)
-            // .on::<NO_RETRY, lsp_request::PrepareRenameRequest>(handlers::handle_prepare_rename)
-            // .on::<NO_RETRY, lsp_request::Rename>(handlers::handle_rename)
+            .on::<NO_RETRY, lsp_request::PrepareRenameRequest>(handlers::handle_prepare_rename)
+            .on::<NO_RETRY, lsp_request::Rename>(handlers::handle_rename)
             .on::<NO_RETRY, lsp_request::References>(handlers::handle_references)
             // .on::<NO_RETRY, lsp_request::DocumentHighlightRequest>(handlers::handle_document_highlight)
             // .on::<NO_RETRY, lsp_request::CallHierarchyPrepare>(handlers::handle_call_hierarchy_prepare)
@@ -1111,7 +1111,7 @@ impl GlobalState {
             .on::<RETRY, lsp_ext::ViewCrateGraph>(handlers::handle_view_crate_graph)
             .on::<RETRY, lsp_ext::ViewItemTree>(handlers::handle_view_item_tree)
             // .on::<RETRY, lsp_ext::DiscoverTest>(handlers::handle_discover_test)
-            // .on::<RETRY, lsp_ext::WorkspaceSymbol>(handlers::handle_workspace_symbol)
+            .on::<RETRY, lsp_ext::WorkspaceSymbol>(handlers::handle_workspace_symbol)
             // .on::<NO_RETRY, lsp_ext::Ssr>(handlers::handle_ssr)
             .on::<NO_RETRY, lsp_ext::ViewRecursiveMemoryLayout>(handlers::handle_view_recursive_memory_layout)
             .on::<NO_RETRY, lsp_ext::SyntaxTree>(handlers::handle_syntax_tree)
