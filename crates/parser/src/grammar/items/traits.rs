@@ -166,7 +166,31 @@ pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind) {
         //     error_block(p, "expected an item");
         //     continue;
         // }
-        item_or_macro(p, true);
+        let item_m = p.start();
+        attributes::outer_attrs_bsv(p);  // TODO BSV truly add support for outer_attrs
+
+        let item_m = match opt_item(p, item_m, true) {
+            Ok(()) => {
+                if p.at(T![;]) {
+                    p.err_and_bump(
+                        "expected item, found `;`\n\
+                         consider removing this semicolon",
+                    );
+                }
+                continue;
+            }
+            Err(m) => m,
+        };
+        if paths::is_use_path_start(p) {
+            // Not really the appropriate thing to use here, 
+            // since there are no macros like this in Bluespec,
+            // but I'm having trouble getting completion hints
+            // otherwise.
+            macro_call(p, item_m);
+            continue;
+        }
+        item_m.abandon(p);
+        p.error("expected item");
     }
     m.complete(p, ASSOC_ITEM_LIST);
 }
@@ -182,6 +206,7 @@ pub(crate) fn assoc_item_list(p: &mut Parser<'_>) {
     // TODO_BSV hypothesis: Reparser still relies on this for Trait and Impl
     // SyntaxNodes, but if they were derived from Bluespec-style parsing
     // then they will panic upon entering this. Check if that's true.
+    panic!("assoc_item_list deprecated");
     assert!(p.at(T!['{']));
 
     let m = p.start();

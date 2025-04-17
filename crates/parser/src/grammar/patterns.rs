@@ -36,7 +36,7 @@ pub(crate) fn pattern_single(p: &mut Parser<'_>) {
 /// Parses a pattern list separated by pipes `|`
 /// using the given `recovery_set`.
 pub(super) fn pattern_top_r(p: &mut Parser<'_>, recovery_set: TokenSet) {
-    p.eat(T![|]);
+    p.eat(T![,]);
     pattern_r(p, recovery_set);
 }
 
@@ -56,11 +56,11 @@ fn pattern_r(p: &mut Parser<'_>, recovery_set: TokenSet) {
     let m = p.start();
     pattern_single_r(p, recovery_set);
 
-    if !p.at(T![|]) {
+    if !p.at(T![,]) {
         m.abandon(p);
         return;
     }
-    while p.eat(T![|]) {
+    while p.eat(T![,]) {
         pattern_single_r(p, recovery_set);
     }
     m.complete(p, OR_PAT);

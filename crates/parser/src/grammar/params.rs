@@ -122,6 +122,7 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
 
         // test fn_def_param
         // fn foo(..., (x, y): (i32, i32)) {}
+        // old
         Flavor::FnDef => {
             patterns::pattern(p);
             if !variadic_param(p) {
@@ -172,7 +173,7 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
 
         Flavor::BsvMethod | Flavor::BsvFunction => {
             types::type_(p);
-            patterns::pattern(p);
+            patterns::pattern_single(p);
         }
     }
     m.complete(p, PARAM);

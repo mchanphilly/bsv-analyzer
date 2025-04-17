@@ -3,7 +3,7 @@ mod consts;
 mod traits;
 mod use_item;
 
-use entry::prefix::expr;
+use entry::prefix::{expr, stmt};
 
 pub(crate) use self::{
     adt::{record_field_list, variant_list},
@@ -27,7 +27,7 @@ pub(super) fn package_contents_bsv(p: &mut Parser<'_>) {
     }
 
     while !(p.at(EOF) || (expect_end && p.eat(T![endpackage]))) {
-        item_or_stmt_bsv(p, None);
+        item_or_stmt_bsv(p, None, false);
     }
 
     if !p.at(EOF) && !p.at(T![package]) {
@@ -80,11 +80,11 @@ pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
 ]);
 
 // May also accept a statement.
-pub(super) fn item_or_stmt_bsv(p: &mut Parser<'_>, end: Option<SyntaxKind>) {
+pub(super) fn item_or_stmt_bsv(p: &mut Parser<'_>, end: Option<SyntaxKind>, sig_only: bool) {
     let m = p.start();
     attributes::outer_attrs_bsv(p);  // TODO BSV truly add support for outer_attrs
 
-    let m = match opt_item(p, m) {
+    let m = match opt_item(p, m, sig_only) {
         Ok(()) => {
             if p.at(T![;]) {
                 p.err_and_bump(
@@ -96,65 +96,29 @@ pub(super) fn item_or_stmt_bsv(p: &mut Parser<'_>, end: Option<SyntaxKind>) {
         }
         Err(m) => m,
     };
-
-    // test import
-    // import FIFOF::*;
-    // import BRAM   ::   *   ;
-
-    // test_err import
-    // import FIFOF::*;
-    // import BRAM::*
-    // import BRAM2::*
-    if p.eat(IMPORT_KW) {
-        name_ref(p);
-        p.expect(T![::]);
-        p.expect(T![*]);
-        m.complete(p, IMPORT);
-        return;
-    }
-
     m.abandon(p);
-
-    if let Some(end_token) = end {
-        if p.current() == end_token {
-            let e = p.start();
-            p.error("Unmatched end token");
-            p.bump_any(); // Consume the token
-            e.complete(p, ERROR);
-            return;
-        }
-    }
-
-    match p.current() {
-        // T!['{'] => error_block(p, "expected an item"),
-        // T!['}'] if !stop_on_r_curly => {
-        //     let e = p.start();
-        //     p.error("unmatched `}`");
-        //     p.bump(T!['}']);
-        //     e.complete(p, ERROR);
-        // }
-        EOF | T!['}'] => p.error("expected an item"),
-        T![let] => error_let_stmt(p, "expected an item"),
-        _ => p.err_and_bump("expected an item"),
-    }
+    stmt(p);
+    return;
 }
 
 pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
+    dbg!("Deprecated item_or_macro");
+    return;
     let m = p.start();
     attributes::outer_attrs(p);
 
-    let m = match opt_item(p, m) {
-        Ok(()) => {
-            if p.at(T![;]) {
-                p.err_and_bump(
-                    "expected item, found `;`\n\
-                     consider removing this semicolon",
-                );
-            }
-            return;
-        }
-        Err(m) => m,
-    };
+    // let m = match opt_item(p, m) {
+    //     Ok(()) => {
+    //         if p.at(T![;]) {
+    //             p.err_and_bump(
+    //                 "expected item, found `;`\n\
+    //                  consider removing this semicolon",
+    //             );
+    //         }
+    //         return;
+    //     }
+    //     Err(m) => m,
+    // };
 
     // test macro_rules_as_macro_name
     // macro_rules! {}
@@ -189,7 +153,7 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
 }
 
 /// Try to parse an item, completing `m` in case of success.
-pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
+pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, sig_only: bool) -> Result<(), Marker> {
     // test_err pub_expr
     // fn foo() { pub 92; }
     let has_visibility = opt_visibility(p, false);
@@ -294,7 +258,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker) -> Result<(), Marker> {
         T![type] => type_alias(p, m),
         T![typedef] => typedef_(p, m),  // handles synonyms, structs, enums
 
-        T![function] | T![method] | T![rule] => bsv_assoc(p, m),
+        T![function] | T![method] | T![rule] => bsv_assoc(p, m, sig_only),
         T![interface] => traits::interface_(p, m),
         T![module] => traits::module_(p, m),
         // T![module] => traits::module_(p, m),  // TODO_BSV
@@ -547,7 +511,7 @@ enum BsvType {
 
 // // test fn_
 // // fn foo() {}
-fn bsv_assoc(p: &mut Parser<'_>, m: Marker) {
+fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
     fn inner_guard(p: &mut Parser<'_>, has_if: bool) {
         let guard_m = p.start();
         if has_if {
@@ -643,38 +607,26 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker) {
         }
     }
 
-    // test function_or_method_no_semi
-    // method Action get() = a.get();
-    if !p.eat(T![;]) {
-        p.expect(T![=]);
-        p.error("Language server doesn't yet implement shorthand assignment");
-        // TODO_BSV: should be a function or method call here.
+    if sig_only {
         p.expect(T![;]);
+    } else {
+        // test function_or_method_no_semi
+        // method Action get() = a.get();
+        if p.eat(T![=]) {
+            p.error("Language server doesn't yet implement shorthand assignment");
+            expr(p);
+            p.expect(T![;]);
+        } else {
+            let ket = match item_type {
+                BsvType::Function => T![endfunction],
+                BsvType::Method => T![endmethod],
+                BsvType::Rule => T![endrule],
+            };
+            // TODO_BSV add body: also need to be resilient to nesting.
+            expressions::block_expr_bsv(p, None, ket, false, false);
+            p.expect(ket);
+        }
     }
-
-    // Use context to judge whether we expect a body, e.g.,
-    // method Action foo;  // no body
-    // method Action baz;
-    // Later we will want a carveout for the `method Action get() = a.get();`
-    // shorthand type of declaration, with `=`
-    const NO_BODY_TOKENS: TokenSet = TokenSet::new(
-        &[T![method], T![interface], T![endinterface]]
-    );
-    let at_no_body_token = p.at_ts(NO_BODY_TOKENS);
-
-    let expect_body = /*has_self ||*/ !at_no_body_token;
-
-    if expect_body {
-        let ket = match item_type {
-            BsvType::Function => T![endfunction],
-            BsvType::Method => T![endmethod],
-            BsvType::Rule => T![endrule],
-        };
-        // TODO_BSV add body: also need to be resilient to nesting.
-        expressions::block_expr_bsv(p, None, ket, false, false);
-        p.expect(ket);
-    }
-
     m.complete(p, FN);
 }
 

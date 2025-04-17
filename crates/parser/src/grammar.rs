@@ -80,7 +80,7 @@ pub(crate) mod entry {
             paths::type_path(p);
         }
         pub(crate) fn item(p: &mut Parser<'_>) {
-            items::item_or_macro(p, true);
+            items::item_or_stmt_bsv(p, None, false);
         }
         // Parse a meta item , which excluded [], e.g : #[ MetaItem ]
         pub(crate) fn meta_item(p: &mut Parser<'_>) {
