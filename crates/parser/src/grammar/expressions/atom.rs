@@ -668,15 +668,19 @@ fn while_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
 
 // test for_expr
 // fn foo() {
-//     for x in [] {};
+//     for (Integer i = 0; i < valueOf(n); i = i + 1)
 // }
 fn for_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     assert!(p.at(T![for]));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(T![for]);
-    patterns::pattern(p);
-    p.expect(T![in]);
-    expr_no_struct(p);
+
+    p.expect(T!['(']);
+    // let_stmt(p, Semicolon::Required);
+    stmt(p, Semicolon::Required);
+    stmt(p, Semicolon::Required);
+    stmt(p, Semicolon::Required);
+    p.expect(T![')']);
     block_expr(p);
     m.complete(p, FOR_EXPR)
 }
