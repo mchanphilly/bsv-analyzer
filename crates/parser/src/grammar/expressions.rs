@@ -61,7 +61,12 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
     // Bluespec requires a little heuristic for explicit type variable declarations.
     let let_heuristic =
         p.at(IDENT) &&
-        (p.nth_at(1, IDENT) | p.nth_at(1, T![#]));
+        (
+            (p.nth_at(1, IDENT) &&
+            (p.nth_at(2, T![<-]) || p.nth_at(2, T![=])))
+        |
+            p.nth_at(1, T![#])
+        );
 
     if p.at(T![let]) || let_heuristic {
         let_stmt(p, semicolon);
