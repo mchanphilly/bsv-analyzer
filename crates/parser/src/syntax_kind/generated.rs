@@ -252,7 +252,6 @@ pub enum SyntaxKind {
     IMPORT,
     INDEX_EXPR,
     INFER_TYPE,
-    INTERFACE,
     ITEM,
     ITEM_LIST,
     LABEL,

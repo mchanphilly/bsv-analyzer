@@ -57,7 +57,7 @@ pub(super) fn lower(
     krate: CrateId,
     is_async_fn: bool,
 ) -> (Body, BodySourceMap) {
-    // dbg!(&body);
+    dbg!(&body);
     ExprCollector {
         db,
         owner,
@@ -660,8 +660,18 @@ impl ExprCollector<'_> {
                 //     capture_by,
                 // };
                 // result_expr_id
-
-                self.collect_block(f.body().unwrap())
+                if f.body().is_some() {
+                    return Some(self.collect_block(f.body().unwrap()))
+                }
+                return None;
+            }
+            ast::Expr::Trait(t) => {
+                // Traits currently don't have bodies.
+                // TODO maybe something more intensive needs to be done here.
+                // if t.body().is_some() {
+                //     return Some(self.collect_block(t.body().unwrap()))
+                // }
+                return None;
             }
             ast::Expr::BinExpr(e) => {
                 let op = e.op_kind();

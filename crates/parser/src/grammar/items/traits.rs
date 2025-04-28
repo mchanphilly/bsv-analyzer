@@ -2,7 +2,7 @@ use super::*;
 
 // test interface_item
 // interface Ifc; endinterface : Ifc
-pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
+pub(crate) fn interface_(p: &mut Parser<'_>, m: Marker, sig_only: bool) -> CompletedMarker {
     p.bump(T![interface]);
 
     // Interface name
@@ -13,7 +13,7 @@ pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
     generic_params::opt_generic_param_list(p);
 
     if p.eat(T![;]) {
-        borderless_assoc_item_list(p, T![endinterface]);
+        borderless_assoc_item_list(p, T![endinterface], sig_only);
     } else {
         p.error("expected `;`");
     }
@@ -23,7 +23,7 @@ pub(super) fn interface_(p: &mut Parser<'_>, m: Marker) {
         name_ref_r(p, ITEM_RECOVERY_SET);
     }
 
-    m.complete(p, TRAIT);
+    m.complete(p, TRAIT)
 }
 
 // test trait_item
@@ -154,7 +154,7 @@ pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
 // interface F {
 //     method Action foo();
 // endinterface
-pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind) {
+pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind, sig_only: bool) {
     let m = p.start();
 
     // // test borderless_assoc_item_list_inner_attrs
@@ -169,7 +169,7 @@ pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind) {
         let item_m = p.start();
         attributes::outer_attrs_bsv(p);  // TODO BSV truly add support for outer_attrs
 
-        let item_m = match opt_item(p, item_m, true) {
+        let item_m = match opt_item(p, item_m, sig_only) {
             Ok(()) => {
                 if p.at(T![;]) {
                     p.err_and_bump(

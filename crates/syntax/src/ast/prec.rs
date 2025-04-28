@@ -139,7 +139,7 @@ impl Expr {
             ContinueExpr(_) => (0, 0),
 
             ClosureExpr(_) | ReturnExpr(_) | BecomeExpr(_) | YieldExpr(_) | YeetExpr(_)
-            | BreakExpr(_) | OffsetOfExpr(_) | FormatArgsExpr(_) | AsmExpr(_) | Fn(_)=> (0, 1),
+            | BreakExpr(_) | OffsetOfExpr(_) | FormatArgsExpr(_) | AsmExpr(_) | Fn(_) | Trait(_)=> (0, 1),
 
             RangeExpr(_) => (5, 5),
 
@@ -305,6 +305,7 @@ impl Expr {
                 FormatArgsExpr(e) => e.builtin_token(),
                 AsmExpr(e) => e.builtin_token(),
                 Fn(f) => f.fn_token(),
+                Trait(t) => t.interface_token(),  // Uses an interface token when inline module definition.
                 ArrayExpr(_) | TupleExpr(_) | Literal(_) | PathExpr(_) | ParenExpr(_)
                 | IfExpr(_) | WhileExpr(_) | ForExpr(_) | LoopExpr(_) | MatchExpr(_)
                 | BlockExpr(_) | RecordExpr(_) | UnderscoreExpr(_) | MacroExpr(_) => None,
@@ -337,6 +338,7 @@ impl Expr {
             ForExpr(_) | IfExpr(_) | MatchExpr(_) | WhileExpr(_) => true,
 
             Fn(f) => f.body().is_some(),
+            Trait(t) => false,  // Currently not supported
         }
     }
 }

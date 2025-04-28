@@ -998,33 +998,6 @@ impl InferType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Interface {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ast::HasAttrs for Interface {}
-impl ast::HasGenericParams for Interface {}
-impl ast::HasName for Interface {}
-impl ast::HasVisibility for Interface {}
-impl Interface {
-    #[inline]
-    pub fn assoc_item_list(&self) -> Option<AssocItemList> { support::child(&self.syntax) }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
-    #[inline]
-    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
-    #[inline]
-    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
-    #[inline]
-    pub fn endinterface_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![endinterface])
-    }
-    #[inline]
-    pub fn interface_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, T![interface])
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ItemList {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2103,7 +2076,19 @@ impl Trait {
     #[inline]
     pub fn assoc_item_list(&self) -> Option<AssocItemList> { support::child(&self.syntax) }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
     pub fn auto_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![auto]) }
+    #[inline]
+    pub fn endinterface_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![endinterface])
+    }
+    #[inline]
+    pub fn interface_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![interface])
+    }
     #[inline]
     pub fn trait_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![trait]) }
     #[inline]
@@ -2568,6 +2553,7 @@ pub enum Expr {
     RecordExpr(RecordExpr),
     RefExpr(RefExpr),
     ReturnExpr(ReturnExpr),
+    Trait(Trait),
     TryExpr(TryExpr),
     TupleExpr(TupleExpr),
     UnderscoreExpr(UnderscoreExpr),
@@ -3578,20 +3564,6 @@ impl AstNode for IndexExpr {
 impl AstNode for InferType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == INFER_TYPE }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode { &self.syntax }
-}
-impl AstNode for Interface {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool { kind == INTERFACE }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -5313,6 +5285,10 @@ impl From<ReturnExpr> for Expr {
     #[inline]
     fn from(node: ReturnExpr) -> Expr { Expr::ReturnExpr(node) }
 }
+impl From<Trait> for Expr {
+    #[inline]
+    fn from(node: Trait) -> Expr { Expr::Trait(node) }
+}
 impl From<TryExpr> for Expr {
     #[inline]
     fn from(node: TryExpr) -> Expr { Expr::TryExpr(node) }
@@ -5373,6 +5349,7 @@ impl AstNode for Expr {
                 | RECORD_EXPR
                 | REF_EXPR
                 | RETURN_EXPR
+                | TRAIT
                 | TRY_EXPR
                 | TUPLE_EXPR
                 | UNDERSCORE_EXPR
@@ -5415,6 +5392,7 @@ impl AstNode for Expr {
             RECORD_EXPR => Expr::RecordExpr(RecordExpr { syntax }),
             REF_EXPR => Expr::RefExpr(RefExpr { syntax }),
             RETURN_EXPR => Expr::ReturnExpr(ReturnExpr { syntax }),
+            TRAIT => Expr::Trait(Trait { syntax }),
             TRY_EXPR => Expr::TryExpr(TryExpr { syntax }),
             TUPLE_EXPR => Expr::TupleExpr(TupleExpr { syntax }),
             UNDERSCORE_EXPR => Expr::UnderscoreExpr(UnderscoreExpr { syntax }),
@@ -5459,6 +5437,7 @@ impl AstNode for Expr {
             Expr::RecordExpr(it) => &it.syntax,
             Expr::RefExpr(it) => &it.syntax,
             Expr::ReturnExpr(it) => &it.syntax,
+            Expr::Trait(it) => &it.syntax,
             Expr::TryExpr(it) => &it.syntax,
             Expr::TupleExpr(it) => &it.syntax,
             Expr::UnderscoreExpr(it) => &it.syntax,
@@ -6090,7 +6069,6 @@ impl AstNode for AnyHasAttrs {
                 | IF_EXPR
                 | IMPL
                 | INDEX_EXPR
-                | INTERFACE
                 | ITEM_LIST
                 | LET_EXPR
                 | LET_STMT
@@ -6250,10 +6228,6 @@ impl From<Impl> for AnyHasAttrs {
 impl From<IndexExpr> for AnyHasAttrs {
     #[inline]
     fn from(node: IndexExpr) -> AnyHasAttrs { AnyHasAttrs { syntax: node.syntax } }
-}
-impl From<Interface> for AnyHasAttrs {
-    #[inline]
-    fn from(node: Interface) -> AnyHasAttrs { AnyHasAttrs { syntax: node.syntax } }
 }
 impl From<ItemList> for AnyHasAttrs {
     #[inline]
@@ -6607,10 +6581,7 @@ impl AnyHasGenericParams {
 impl AstNode for AnyHasGenericParams {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(
-            kind,
-            ENUM | FN | IMPL | INTERFACE | STRUCT | TRAIT | TRAIT_ALIAS | TYPE_ALIAS | UNION
-        )
+        matches!(kind, ENUM | FN | IMPL | STRUCT | TRAIT | TRAIT_ALIAS | TYPE_ALIAS | UNION)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -6630,10 +6601,6 @@ impl From<Fn> for AnyHasGenericParams {
 impl From<Impl> for AnyHasGenericParams {
     #[inline]
     fn from(node: Impl) -> AnyHasGenericParams { AnyHasGenericParams { syntax: node.syntax } }
-}
-impl From<Interface> for AnyHasGenericParams {
-    #[inline]
-    fn from(node: Interface) -> AnyHasGenericParams { AnyHasGenericParams { syntax: node.syntax } }
 }
 impl From<Struct> for AnyHasGenericParams {
     #[inline]
@@ -6730,7 +6697,6 @@ impl AstNode for AnyHasName {
                 | FORMAT_ARGS_ARG
                 | IDENT_PAT
                 | IMPL
-                | INTERFACE
                 | MACRO_DEF
                 | MACRO_RULES
                 | MODULE
@@ -6788,10 +6754,6 @@ impl From<IdentPat> for AnyHasName {
 impl From<Impl> for AnyHasName {
     #[inline]
     fn from(node: Impl) -> AnyHasName { AnyHasName { syntax: node.syntax } }
-}
-impl From<Interface> for AnyHasName {
-    #[inline]
-    fn from(node: Interface) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<MacroDef> for AnyHasName {
     #[inline]
@@ -6922,7 +6884,6 @@ impl AstNode for AnyHasVisibility {
                 | EXTERN_CRATE
                 | FN
                 | IMPL
-                | INTERFACE
                 | MACRO_DEF
                 | MACRO_RULES
                 | MODULE
@@ -6964,10 +6925,6 @@ impl From<Fn> for AnyHasVisibility {
 impl From<Impl> for AnyHasVisibility {
     #[inline]
     fn from(node: Impl) -> AnyHasVisibility { AnyHasVisibility { syntax: node.syntax } }
-}
-impl From<Interface> for AnyHasVisibility {
-    #[inline]
-    fn from(node: Interface) -> AnyHasVisibility { AnyHasVisibility { syntax: node.syntax } }
 }
 impl From<MacroDef> for AnyHasVisibility {
     #[inline]
@@ -7387,11 +7344,6 @@ impl std::fmt::Display for IndexExpr {
     }
 }
 impl std::fmt::Display for InferType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        std::fmt::Display::fmt(self.syntax(), f)
-    }
-}
-impl std::fmt::Display for Interface {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

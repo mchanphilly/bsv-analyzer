@@ -458,20 +458,18 @@ Static =
   'static' 'mut'? Name ':' Type
   ('=' body:Expr)? ';'
 
-// TODO_BSV clean (items require Attr, Vis, (Where, Generic))
-Interface =  // Actually classed in the Parser as a Trait.
-  Attr* Visibility? WhereClause?
-  'interface' Name GenericParamList? ';'
-  AssocItemList
-  'endinterface' (':' NameRef)?
-
 // TODO_BSV Eventually phase out in favor of Interface
 Trait =
+(
   Attr* Visibility?
   'unsafe'? 'auto'?
   'trait' Name GenericParamList?
   (':' TypeBoundList?)? WhereClause? AssocItemList
-
+) | (
+  'interface' Name GenericParamList? ';'
+  AssocItemList
+  'endinterface' (':' NameRef)?
+)
 TraitAlias =
   Attr* Visibility?
   'trait' Name GenericParamList? '=' TypeBoundList? WhereClause? ';'
@@ -565,6 +563,7 @@ Expr =
 | ContinueExpr
 | FieldExpr
 | Fn
+| Trait  // inline module implementation
 | ForExpr
 | FormatArgsExpr
 | IfExpr

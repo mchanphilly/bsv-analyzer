@@ -1,6 +1,7 @@
 use crate::grammar::types::type_;
 
 use super::*;
+use crate::grammar::items::traits;
 
 // test expr_literals
 // fn foo() {
@@ -68,6 +69,7 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![unsafe],
         T![while],
         T![yield],
+        T![interface],  // Inline module expression for BSV
         LIFETIME_IDENT,
     ]));
 
@@ -192,6 +194,10 @@ pub(super) fn atom_expr(
             let m = p.start();
             stmt_list_bsv(p, Some(T![action]), T![endaction], true, false);
             m.complete(p, BLOCK_EXPR)
+        }
+        T![interface] => {
+            let m = p.start();
+            traits::interface_(p, m, false)
         }
 
         T![const] | T![static] | T![|] => closure_expr(p),
