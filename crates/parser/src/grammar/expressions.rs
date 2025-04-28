@@ -343,6 +343,13 @@ fn expr_bp(
     r: Restrictions,
     bp: u8,
 ) -> Option<(CompletedMarker, BlockLike)> {
+    // Bluespec allows arbitrary macro calls anywhere. We just take them here.
+    while p.at(T!['`']) {
+        let m = p.start();
+        expressions::bsv_macro_call(p);
+        m.complete(p, MACRO_CALL);
+    }
+
     let m = m.unwrap_or_else(|| {
         let m = p.start();
         attributes::outer_attrs(p);
@@ -418,7 +425,7 @@ fn expr_bp(
 }
 
 const LHS_FIRST: TokenSet =
-    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![~], T![_], T![?], T!['`']]));
+    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![~], T![_], T![?]]));
 
 fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLike)> {
     let m;
@@ -754,10 +761,6 @@ pub(crate) fn bsv_macro_call(p: &mut Parser<'_>) {
 fn path_expr(p: &mut Parser<'_>, r: Restrictions) -> (CompletedMarker, BlockLike) {
     assert!(paths::is_path_start(p));
     let m = p.start();
-    if p.at(T!['`']) {
-        bsv_macro_call(p);
-        return (m.complete(p, MACRO_CALL).precede(p).complete(p, MACRO_EXPR), BlockLike::NotBlock);
-    }
     paths::expr_path(p);
     match p.current() {
         T!['{'] if !r.forbid_structs => {
