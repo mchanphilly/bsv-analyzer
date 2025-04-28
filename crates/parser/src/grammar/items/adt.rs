@@ -1,6 +1,4 @@
 use expressions::arg_list;
-use generic_args::opt_generic_arg_list;
-use params::{param_list_bsv_function, param_list_fn_def};
 
 use crate::grammar::attributes::ATTRIBUTE_FIRST;
 
@@ -9,6 +7,7 @@ use super::*;
 fn typedef_tail(p: &mut Parser<'_>) {
     name_r(p, ITEM_RECOVERY_SET);
 
+    generic_params::opt_generic_param_list(p);
     // This may be overkill for `deriving` since it's a hardset
     // "macro" name. But it's sort of like Rust's derives attr
     if p.eat(T![deriving]) {
