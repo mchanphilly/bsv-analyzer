@@ -939,9 +939,13 @@ impl Impl {
     #[inline]
     pub fn assoc_item_list(&self) -> Option<AssocItemList> { support::child(&self.syntax) }
     #[inline]
+    pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
+    #[inline]
     pub fn provisos(&self) -> Option<Provisos> { support::child(&self.syntax) }
     #[inline]
     pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
+    #[inline]
+    pub fn pound_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![#]) }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
     #[inline]

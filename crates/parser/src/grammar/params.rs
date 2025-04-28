@@ -1,3 +1,5 @@
+use types::fn_ptr_type;
+
 use crate::grammar::attributes::ATTRIBUTE_FIRST;
 
 use super::*;
@@ -172,8 +174,12 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
         }
 
         Flavor::BsvMethod | Flavor::BsvFunction => {
+            let was_fn = p.at(T![function]);
             types::type_(p);
-            patterns::pattern_single(p);
+
+            if !was_fn {
+                patterns::pattern_single(p);
+            }
         }
     }
     m.complete(p, PARAM);

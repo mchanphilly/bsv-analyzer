@@ -113,7 +113,9 @@ pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
 
     name_r(p, ITEM_RECOVERY_SET);
 
-    generic_params::opt_generic_param_list(p);
+    if p.eat(T![#]) {
+        params::param_list_bsv_function(p);
+    }
 
     p.expect(T!['(']);
     impl_type(p);

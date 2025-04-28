@@ -285,6 +285,19 @@ fn abi(p: &mut Parser<'_>) {
     abi.complete(p, ABI);
 }
 
+
+pub(super) fn opt_ret_type_bsv(p: &mut Parser<'_>) -> bool {
+    if p.at(IDENT) && !p.nth_at(1, T!['(']) {
+        let ret_m = p.start();
+        types::type_(p);  // Not sure the difference. It used to be below.
+        // types::type_no_bounds(p);
+        ret_m.complete(p, RET_TYPE);
+        true
+    } else {
+        false
+    }
+}
+
 fn opt_ret_type(p: &mut Parser<'_>) -> bool {
     if p.at(T![->]) {
         let m = p.start();

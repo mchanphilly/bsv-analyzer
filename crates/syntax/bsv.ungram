@@ -509,7 +509,7 @@ Impl =
   'impl' GenericParamList? ('const'? '!'? trait:Type 'for')? self_ty:Type WhereClause?
   AssocItemList
 ) | (  // Bluespec TODO add and test parameters i.e., # for both types and values
-  'module' Name '(' trait:Type ')' Provisos? ';'
+  'module' Name '#' ParamList? '(' trait:Type ')' Provisos? ';'
   body:BlockExpr
   'endmodule' // (':' ? 
 )
@@ -866,7 +866,11 @@ InferType =
   '_'
 
 FnPtrType =
+(
   'const'? 'async'? 'unsafe'? Abi? 'fn' ParamList RetType?
+) | (
+  'function' RetType? Name ParamList?
+)
 
 ForType =
   'for' GenericParamList Type

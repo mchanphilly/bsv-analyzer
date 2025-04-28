@@ -564,12 +564,7 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
         BsvType::Function | BsvType::Method => {
             // Going to assume we *always* have a return type
             // even if Action. Actual language may be more permissive
-            if p.at(IDENT) && !p.nth_at(1, T!['(']) {
-                let ret_m = p.start();
-                types::type_(p);  // Not sure the difference. It used to be below.
-                // types::type_no_bounds(p);
-                ret_m.complete(p, RET_TYPE);
-            }
+            opt_ret_type_bsv(p);
         }
         BsvType::Rule => {},
     }

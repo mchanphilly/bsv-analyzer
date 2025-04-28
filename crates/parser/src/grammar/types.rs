@@ -9,6 +9,7 @@ pub(super) const TYPE_FIRST: TokenSet = paths::PATH_FIRST.union(TokenSet::new(&[
     T![&],
     T![_],
     T![fn],
+    T![function],
     T![unsafe],
     T![extern],
     T![for],
@@ -102,7 +103,7 @@ fn type_with_bounds_cond(p: &mut Parser<'_>, allow_bounds: bool) {
         T!['['] => array_or_slice_type(p),
         T![&] => ref_type(p),
         T![_] => infer_type(p),
-        T![fn] | T![unsafe] | T![extern] => fn_ptr_type(p),
+        T![function] => fn_ptr_type(p),
         T![for] => for_type(p, allow_bounds),
         T![impl] => impl_trait_type(p),
         T![dyn] => dyn_trait_type(p),
@@ -281,27 +282,28 @@ fn infer_type(p: &mut Parser<'_>) {
 // type B = unsafe fn();
 // type C = unsafe extern "C" fn();
 // type D = extern "C" fn ( u8 , ... ) -> u8;
-fn fn_ptr_type(p: &mut Parser<'_>) {
+pub(super) fn fn_ptr_type(p: &mut Parser<'_>) {
     let m = p.start();
-    p.eat(T![unsafe]);
-    if p.at(T![extern]) {
-        abi(p);
-    }
+
     // test_err fn_pointer_type_missing_fn
     // type F = unsafe ();
-    if !p.eat(T![fn]) {
+    if !p.eat(T![function]) {
         m.abandon(p);
-        p.error("expected `fn`");
+        p.error("expected `function`");
         return;
     }
+
+    opt_ret_type_bsv(p);
+
+    name_r(p, TYPE_RECOVERY_SET);
+
     if p.at(T!['(']) {
-        params::param_list_fn_ptr(p);
+        params::param_list_bsv_function(p);
     } else {
         p.error("expected parameters");
     }
     // test fn_pointer_type_with_ret
     // type F = fn() -> ();
-    opt_ret_type(p);
     m.complete(p, FN_PTR_TYPE);
 }
 
