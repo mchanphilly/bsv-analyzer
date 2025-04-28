@@ -68,7 +68,7 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
             p.nth_at(1, T![#])
         );
 
-    if p.at(T![let]) || let_heuristic {
+    if p.at(T![let]) || p.at(T![match]) || let_heuristic {
         let_stmt(p, semicolon);
         m.complete(p, LET_STMT);
         return;
@@ -126,7 +126,7 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 // fn f() { let x: i32 = 92; }
 pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
     // Either have a `let` at the beginning or a type.
-    if !p.eat(T![let]) {
+    if !p.eat(T![let]) && !p.eat(T![match]) {
         types::ascription(p);
     }
 

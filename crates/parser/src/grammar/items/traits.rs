@@ -203,7 +203,7 @@ pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind, si
             continue;
         }
         item_m.abandon(p);
-        p.error("expected item");
+        p.err_and_bump("expected item");
     }
     m.complete(p, ASSOC_ITEM_LIST);
 }

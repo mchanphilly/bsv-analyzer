@@ -156,6 +156,8 @@ fn pattern_single_r(p: &mut Parser<'_>, recovery_set: TokenSet) {
         return;
     }
 
+    p.eat(T![.]);
+
     if let Some(lhs) = atom_pat(p, recovery_set) {
         for range_op in [T![...], T![..=], T![..]] {
             if p.at(range_op) {
@@ -218,6 +220,7 @@ fn atom_pat(p: &mut Parser<'_>, recovery_set: TokenSet) -> Option<CompletedMarke
             T![:] if p.nth_at(1, T![::]) => path_or_macro_pat(p),
             _ => ident_pat(p, true),
         },
+        T!['{'] if p.nth_at(1, T![.]) => tuple_pat(p),
         T!['{'] => {
             let record_pat = p.start();
             record_pat_field_list(p);
@@ -419,9 +422,14 @@ fn ref_pat(p: &mut Parser<'_>) -> CompletedMarker {
 //     let (| a | a, | b) = ((),());
 // }
 fn tuple_pat(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(T!['(']));
+    // assert!(p.at(T!['(']));
+    let (bra, ket) = match p.current() {
+        T!['('] => (T!['('], T![')']),
+        T!['{'] => (T!['{'], T!['}']),
+        _ => unreachable!()
+    };
     let m = p.start();
-    p.bump(T!['(']);
+    p.bump(bra);
     let mut has_comma = false;
     let mut has_pat = false;
     let mut has_rest = false;
@@ -435,7 +443,7 @@ fn tuple_pat(p: &mut Parser<'_>) -> CompletedMarker {
         has_comma = true;
     }
 
-    while !p.at(EOF) && !p.at(T![')']) {
+    while !p.at(EOF) && !p.at(ket) {
         has_pat = true;
         if !p.at_ts(PAT_TOP_FIRST) {
             p.error("expected a pattern");
@@ -443,13 +451,13 @@ fn tuple_pat(p: &mut Parser<'_>) -> CompletedMarker {
         }
         has_rest |= p.at(T![..]);
 
-        pattern_top(p);
-        if !p.at(T![')']) {
+        pattern_single(p);
+        if !p.at(ket) {
             has_comma = true;
             p.expect(T![,]);
         }
     }
-    p.expect(T![')']);
+    p.expect(ket);
 
     m.complete(p, if !has_comma && !has_rest && has_pat { PAREN_PAT } else { TUPLE_PAT })
 }

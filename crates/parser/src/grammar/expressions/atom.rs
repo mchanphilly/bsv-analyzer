@@ -66,6 +66,7 @@ pub(super) const ATOM_EXPR_FIRST: TokenSet =
         T![become],
         T![static],
         T![try],
+        T![match],
         T![unsafe],
         T![while],
         T![yield],
