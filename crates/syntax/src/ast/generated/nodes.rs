@@ -599,11 +599,7 @@ impl Enum {
     #[inline]
     pub fn enum_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![enum]) }
     #[inline]
-    pub fn tagged_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tagged]) }
-    #[inline]
     pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
-    #[inline]
-    pub fn union_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![union]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -715,13 +711,19 @@ impl Fn {
     #[inline]
     pub fn abi(&self) -> Option<Abi> { support::child(&self.syntax) }
     #[inline]
+    pub fn expr(&self) -> Option<Expr> { support::child(&self.syntax) }
+    #[inline]
     pub fn guard(&self) -> Option<MatchGuard> { support::child(&self.syntax) }
     #[inline]
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     #[inline]
+    pub fn provisos(&self) -> Option<Provisos> { support::child(&self.syntax) }
+    #[inline]
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![=]) }
     #[inline]
     pub fn async_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![async]) }
     #[inline]
@@ -846,6 +848,12 @@ impl GenericArgList {
     #[inline]
     pub fn generic_args(&self) -> AstChildren<GenericArg> { support::children(&self.syntax) }
     #[inline]
+    pub fn pound_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![#]) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
     pub fn coloncolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![::]) }
     #[inline]
     pub fn l_angle_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![<]) }
@@ -926,6 +934,8 @@ impl ast::HasVisibility for Impl {}
 impl Impl {
     #[inline]
     pub fn assoc_item_list(&self) -> Option<AssocItemList> { support::child(&self.syntax) }
+    #[inline]
+    pub fn provisos(&self) -> Option<Provisos> { support::child(&self.syntax) }
     #[inline]
     pub fn excl_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![!]) }
     #[inline]
@@ -1637,6 +1647,18 @@ impl PrefixExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Provisos {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ast::HasGenericArgs for Provisos {}
+impl Provisos {
+    #[inline]
+    pub fn provisos_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![provisos])
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PtrType {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2317,6 +2339,10 @@ impl ast::HasVisibility for Union {}
 impl Union {
     #[inline]
     pub fn record_field_list(&self) -> Option<RecordFieldList> { support::child(&self.syntax) }
+    #[inline]
+    pub fn tagged_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tagged]) }
+    #[inline]
+    pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
     #[inline]
     pub fn union_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![union]) }
 }
@@ -4198,6 +4224,20 @@ impl AstNode for PathType {
 impl AstNode for PrefixExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == PREFIX_EXPR }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Provisos {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == PROVISOS }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -6555,7 +6595,7 @@ impl AnyHasGenericArgs {
 impl AstNode for AnyHasGenericArgs {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, ASSOC_TYPE_ARG | METHOD_CALL_EXPR | PATH_SEGMENT)
+        matches!(kind, ASSOC_TYPE_ARG | METHOD_CALL_EXPR | PATH_SEGMENT | PROVISOS)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -6575,6 +6615,10 @@ impl From<MethodCallExpr> for AnyHasGenericArgs {
 impl From<PathSegment> for AnyHasGenericArgs {
     #[inline]
     fn from(node: PathSegment) -> AnyHasGenericArgs { AnyHasGenericArgs { syntax: node.syntax } }
+}
+impl From<Provisos> for AnyHasGenericArgs {
+    #[inline]
+    fn from(node: Provisos) -> AnyHasGenericArgs { AnyHasGenericArgs { syntax: node.syntax } }
 }
 impl AnyHasGenericParams {
     #[inline]
@@ -7573,6 +7617,11 @@ impl std::fmt::Display for PathType {
     }
 }
 impl std::fmt::Display for PrefixExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Provisos {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

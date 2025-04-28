@@ -99,6 +99,15 @@ pub(super) fn impl_(p: &mut Parser<'_>, m: Marker) {
     m.complete(p, IMPL);
 }
 
+pub(super) fn provisos(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.bump(T![provisos]);
+
+    generic_args::bsv_generic_arg_list(p);
+
+    m.complete(p, PROVISOS);
+}
+
 pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![module]);
 
@@ -109,6 +118,10 @@ pub(super) fn module_(p: &mut Parser<'_>, m: Marker) {
     p.expect(T!['(']);
     impl_type(p);
     p.expect(T![')']);
+
+    if p.at(T![provisos]) {
+        provisos(p);
+    }
     p.expect(T![;]);
 
     expressions::block_expr_bsv(p, None, T![endmodule], false, false);

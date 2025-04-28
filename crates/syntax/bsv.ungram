@@ -155,7 +155,11 @@ ReturnTypeSyntax =
 //*************************//
 
 GenericArgList =
+(
   '::'? '<' (GenericArg (',' GenericArg)* ','?)? '>'
+) | (
+  '#'? '('  (GenericArg (',' GenericArg)*)? ')'
+)
 
 GenericArg =
   TypeArg
@@ -329,8 +333,8 @@ Fn =
   ) | (
     'rule'
   )
-  Name ParamList? guard:MatchGuard?
-  (body:BlockExpr | ';')
+  Name ParamList? guard:MatchGuard? Provisos? ';'
+  (body:BlockExpr | '=' Expr)
   ('endmethod' | 'endfunction' | 'endrule')
 )
 
@@ -433,11 +437,13 @@ Variant =
   Attr* Visibility?
   Name FieldList? ('=' Expr)?
 
-Union =
+Union = (
   Attr* Visibility?
   'union' Name GenericParamList? WhereClause?
   RecordFieldList
-
+) | (
+  'typedef' 'union' 'tagged' Name RecordFieldList
+)
 // A Data Type.
 //
 // Not used directly in the grammar, but handy to have anyway.
@@ -493,6 +499,9 @@ AssocItem =
 //   'fn' Name GenericParamList? ParamList RetType? WhereClause?
 //   (body:BlockExpr | ';')
 
+Provisos =
+  'provisos' GenericArgList
+
 Impl =
 (  // Rust
   Attr* Visibility?
@@ -500,7 +509,7 @@ Impl =
   'impl' GenericParamList? ('const'? '!'? trait:Type 'for')? self_ty:Type WhereClause?
   AssocItemList
 ) | (  // Bluespec TODO add and test parameters i.e., # for both types and values
-  'module' Name '(' trait:Type ')' ';'
+  'module' Name '(' trait:Type ')' Provisos? ';'
   body:BlockExpr
   'endmodule' // (':' ? 
 )

@@ -4,6 +4,7 @@ pub(crate) mod traits;
 mod use_item;
 
 use entry::prefix::{expr, stmt};
+use traits::provisos;
 
 pub(crate) use self::{
     adt::{record_field_list, variant_list},
@@ -599,6 +600,10 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
         param_list_m.complete(p, PARAM_LIST);
     }
 
+    if p.at(T![provisos]) {
+        provisos(p);
+    }
+
     // TODO add guard here
     if p.at(T![if]) {
         if did_guard {
@@ -615,7 +620,7 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
         // test function_or_method_no_semi
         // method Action get() = a.get();
         if p.eat(T![=]) {
-            p.error("Language server doesn't yet implement shorthand assignment");
+            p.error("Language server doesn't yet fully implement shorthand assignment");
             expr(p);
             p.expect(T![;]);
         } else {

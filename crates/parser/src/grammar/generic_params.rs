@@ -40,10 +40,9 @@ fn generic_param_list(p: &mut Parser<'_>) {
 
 // test_err generic_param_list_recover_bsv
 // interface Ifc#(type U,,type V)
-fn generic_param_list_bsv(p: &mut Parser<'_>) {
-    assert!(p.at(T![#]));
+pub(crate) fn generic_param_list_bsv(p: &mut Parser<'_>) {
     let m = p.start();
-    p.bump(T![#]);
+    p.eat(T![#]);         // module generic list
     delimited(
         p,
         T!['('],

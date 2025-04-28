@@ -35,6 +35,23 @@ pub(super) fn opt_generic_arg_list(p: &mut Parser<'_>, colon_colon_required: boo
     m.complete(p, GENERIC_ARG_LIST);
 }
 
+pub(super) fn bsv_generic_arg_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    // To accommodate both Bluespec and Rust
+    let (bra, ket) = (T!['('], T![')']);
+
+    delimited(
+        p,
+        bra,
+        ket,
+        T![,],
+        || "expected generic argument".into(),
+        GENERIC_ARG_FIRST,
+        generic_arg,
+    );
+    m.complete(p, GENERIC_ARG_LIST);
+}
+
 const GENERIC_ARG_FIRST: TokenSet = TokenSet::new(&[
     LIFETIME_IDENT,
     IDENT,
