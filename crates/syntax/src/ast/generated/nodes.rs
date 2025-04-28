@@ -715,11 +715,15 @@ impl Fn {
     #[inline]
     pub fn guard(&self) -> Option<MatchGuard> { support::child(&self.syntax) }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> { support::child(&self.syntax) }
+    #[inline]
     pub fn param_list(&self) -> Option<ParamList> { support::child(&self.syntax) }
     #[inline]
     pub fn provisos(&self) -> Option<Provisos> { support::child(&self.syntax) }
     #[inline]
     pub fn ret_type(&self) -> Option<RetType> { support::child(&self.syntax) }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![:]) }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![;]) }
     #[inline]

@@ -335,7 +335,7 @@ Fn =
   )
   Name ParamList? guard:MatchGuard? Provisos? ';'
   (body:BlockExpr | '=' Expr)
-  ('endmethod' | 'endfunction' | 'endrule')
+  ('endmethod' | 'endfunction' | 'endrule') (':' NameRef)  // to itself
 )
 
 Abi =

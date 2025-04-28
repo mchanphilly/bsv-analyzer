@@ -634,6 +634,13 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
             p.expect(ket);
         }
     }
+
+    // function Action foo();
+    //     // stuff
+    // endfunction: foo // <--
+    if p.eat(T![:]) {
+        name_ref_r(p, ITEM_RECOVERY_SET);
+    }
     m.complete(p, FN);
 }
 
