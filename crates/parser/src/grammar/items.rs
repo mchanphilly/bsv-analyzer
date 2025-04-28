@@ -391,7 +391,7 @@ pub(crate) fn typedef_(p: &mut Parser<'_>, m: Marker) {
     // m should really be consumed inside here
     match p.current() {
         T![struct] => adt::strukt_bsv(p, m),
-        // T![struct] => adt::strukt(p, m)
+        IDENT if p.at_contextual_kw(T![union]) => adt::union_(p, m),  // vestigial
         T![enum] => adt::enum_(p, m),
         _ => type_synonym_bsv(p, m),
     }

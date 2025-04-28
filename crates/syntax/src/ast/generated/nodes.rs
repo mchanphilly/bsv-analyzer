@@ -599,7 +599,11 @@ impl Enum {
     #[inline]
     pub fn enum_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![enum]) }
     #[inline]
+    pub fn tagged_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![tagged]) }
+    #[inline]
     pub fn typedef_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![typedef]) }
+    #[inline]
+    pub fn union_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![union]) }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -82,6 +82,22 @@ fn struct_or_union(p: &mut Parser<'_>, m: Marker, is_struct: bool) {
     m.complete(p, if is_struct { STRUCT } else { UNION });
 }
 
+pub(super) fn union_(p: &mut Parser<'_>, m: Marker) {
+    assert!(p.at_contextual_kw(T![union]));
+    p.bump_remap(T![union]);
+    p.expect(T![tagged]);
+    // name_r(p, ITEM_RECOVERY_SET);
+    // generic_params::opt_generic_param_list(p);
+    // generic_params::opt_where_clause(p);
+    match p.current() {
+        T!['{'] => record_field_list_bsv(p),
+        _ => p.error( "expected `;` or `{`" ),
+    }
+
+    typedef_tail(p);
+    m.complete(p, UNION);
+}
+
 pub(super) fn enum_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![enum]);
     // name_r(p, ITEM_RECOVERY_SET);
