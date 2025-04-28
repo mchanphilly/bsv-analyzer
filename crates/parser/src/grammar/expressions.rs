@@ -239,6 +239,10 @@ pub(super) fn stmt_list_bsv(p: &mut Parser<'_>, bra: Option<SyntaxKind>, end: Sy
     // attributes::inner_attrs(p);
 
     while !p.at(EOF) && !p.at(end) {
+        // Little bit of fault recovery.
+        if p.at(T![endmodule]) {
+            break;
+        }
         stmt(p, Semicolon::Required);
         if single {  // e.g., only one statement expected, like in BSV if.
             break;

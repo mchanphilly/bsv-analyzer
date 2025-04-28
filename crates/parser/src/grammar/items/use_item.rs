@@ -4,9 +4,23 @@ use super::*;
 // import FIFO::*;
 pub(super) fn import_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![import]);
-    if use_tree(p, true) {
+
+    if p.eat(STRING) {  // import "BVI" ASSIGN1 =
+        entry::prefix::pat(p);
+        p.eat(T![=]);
+
+        let mo = p.start();
+        if let Err(mo) = opt_item(p, mo, true) {
+            mo.abandon(p);
+        }
+
+        m.complete(p, USE);
+    } else if use_tree(p, true) {  // import FIFO::*;
         p.expect(T![;]);
         m.complete(p, USE);
+    } else {
+        p.err_and_bump("expected import");
+        m.abandon(p);
     }
 
     // if p.current() == T![:] && p.at(T![::]) && p.nth(2) == T![*] {
