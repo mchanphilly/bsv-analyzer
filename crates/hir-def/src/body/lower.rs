@@ -57,7 +57,6 @@ pub(super) fn lower(
     krate: CrateId,
     is_async_fn: bool,
 ) -> (Body, BodySourceMap) {
-    dbg!(&body);
     ExprCollector {
         db,
         owner,
@@ -604,20 +603,20 @@ impl ExprCollector<'_> {
                 // let (result_expr_id, prev_binding_owner) =
                 // self.initialize_binding_owner(syntax_ptr);
 
-                // let mut args = Vec::new();
-                // let mut arg_types = Vec::new();
-                // if let Some(pl) = f.param_list() {
-                //     let num_params = pl.params().count();
-                //     args.reserve_exact(num_params);
-                //     arg_types.reserve_exact(num_params);
-                //     for param in pl.params() {
-                //         let pat = self.collect_pat_top(param.pat());
-                //         let type_ref =
-                //             param.ty().map(|it| Interned::new(TypeRef::from_ast(&self.ctx(), it)));
-                //         args.push(pat);
-                //         arg_types.push(type_ref);
-                //     }
-                // }
+                let mut args = Vec::new();
+                let mut arg_types = Vec::new();
+                if let Some(pl) = f.param_list() {
+                    let num_params = pl.params().count();
+                    args.reserve_exact(num_params);
+                    arg_types.reserve_exact(num_params);
+                    for param in pl.params() {
+                        let pat = self.collect_pat_top(param.pat());
+                        let type_ref =
+                            param.ty().map(|it| Interned::new(TypeRef::from_ast(&self.ctx(), it)));
+                        args.push(pat);
+                        arg_types.push(type_ref);
+                    }
+                }
                 let ret_type = f
                     .ret_type()
                     .and_then(|r| r.ty())
@@ -631,8 +630,6 @@ impl ExprCollector<'_> {
                 // } else {
                 //     Awaitable::No("non-async closure")
                 // };
-                // let body =
-                //     self.with_awaitable_block(awaitable, |this| this.collect_expr_opt(f.body()));
 
                 // let closure_kind = if self.is_lowering_coroutine {
                 //     let movability = if f.static_token().is_some() {

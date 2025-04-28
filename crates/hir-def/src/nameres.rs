@@ -376,8 +376,8 @@ impl DefMap {
             }),
         );
 
-        // let def_map =
-        //     collector::collect_defs(db, def_map, TreeId::new(ast_id.file_id, Some(block_id)));
+        let def_map =
+            collector::collect_defs(db, def_map, TreeId::new(ast_id.file_id, Some(block_id)));
         Arc::new(def_map)
     }
 
