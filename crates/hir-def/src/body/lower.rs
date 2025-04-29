@@ -1190,8 +1190,14 @@ impl ExprCollector<'_> {
                     return;
                 }
                 let pat = self.collect_pat_top(stmt.pat());
-                let type_ref =
-                    stmt.ty().map(|it| Interned::new(TypeRef::from_ast(&self.ctx(), it)));
+                // We basically are disabling explicit type annotation, and forcing type inference using
+                // only the right hand side. Notice that this must change if implementing full type support
+                // e.g., FIFO#(Bool) x <- mkFIFO() would require information from the left to know the generic
+                // arguments of the FIFO. But in the meantime, this allows us to associate methods with the module
+                // on the right instead of the interface on the left.
+                let type_ref = None;
+                // let type_ref =
+                //     stmt.ty().map(|it| Interned::new(TypeRef::from_ast(&self.ctx(), it)));
                 let initializer = stmt.initializer().map(|e| self.collect_expr(e));
                 let else_branch = stmt
                     .let_else()
