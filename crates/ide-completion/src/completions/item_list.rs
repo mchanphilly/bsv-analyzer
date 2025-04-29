@@ -125,7 +125,7 @@ fn add_keywords(acc: &mut Completions, ctx: &CompletionContext<'_>, kind: Option
             add_keyword("function", "function $1($3);\n    $0\nendfunction");
 
             if !in_trait {
-                add_keyword("method", "method $1 $2($3);\n    $0\nendmethod");
+                add_keyword("method", "method $1($2);\n    $0\nendmethod");
             }
             add_keyword("import", "import $0::*;");
             add_keyword("typedef enum", "typedef enum {\n    \n} $0;");
