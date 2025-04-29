@@ -591,6 +591,19 @@ impl SourceToDefCtx<'_, '_> {
                     VariantId::from(def).into()
                 }
                 ast::Item::Fn(it) => {
+                    // Fn can only be a container if not contained by an Impl somewhere.
+                    // Note this will not allow a Fn to capture local variables introduced in the top-level scope,
+                    // e.g., non-item variable declarations. If you do that, you'll probably need to remove this
+                    // container entirely and make the module have a body, or at least be treated as a body.
+                    // You can ignore most items if they don't have bodies because they'll still be captured by the
+                    // DefMap if they're top-level.
+                    // But I don't imagine it's a super common use-case.
+                    let ancestors = container.value.clone().ancestors();
+                    for ancestor in ancestors {
+                        if let Some(_) = ast::Impl::cast(ancestor) {
+                            return None;
+                        }
+                    }
                     let def = self.fn_to_def(container.with_value(it))?;
                     DefWithBodyId::from(def).into()
                 }
