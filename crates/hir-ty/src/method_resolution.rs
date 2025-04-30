@@ -180,7 +180,7 @@ impl TraitImpls {
         let crate_graph = db.crate_graph();
 
         Arc::from_iter(
-            crate_graph.transitive_deps(krate).map(|krate| db.trait_impls_in_crate(krate)),
+            crate_graph.iter().map(|krate| db.trait_impls_in_crate(krate)),
         )
     }
 
@@ -1148,7 +1148,6 @@ fn iterate_trait_method_candidates(
     callback: &mut dyn FnMut(ReceiverAdjustments, AssocItemId, bool) -> ControlFlow<()>,
 ) -> ControlFlow<()> {
     let db = table.db;
-
     let canonical_self_ty = table.canonicalize(self_ty.clone());
     let TraitEnvironment { krate, block, .. } = *table.trait_env;
 
