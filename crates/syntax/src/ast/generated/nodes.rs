@@ -764,6 +764,7 @@ impl Fn {
 pub struct FnPtrType {
     pub(crate) syntax: SyntaxNode,
 }
+impl ast::HasName for FnPtrType {}
 impl FnPtrType {
     #[inline]
     pub fn abi(&self) -> Option<Abi> { support::child(&self.syntax) }
@@ -777,6 +778,10 @@ impl FnPtrType {
     pub fn const_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![const]) }
     #[inline]
     pub fn fn_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![fn]) }
+    #[inline]
+    pub fn function_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, T![function])
+    }
     #[inline]
     pub fn unsafe_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![unsafe]) }
 }
@@ -6750,6 +6755,7 @@ impl AstNode for AnyHasName {
                 | CONST_PARAM
                 | ENUM
                 | FN
+                | FN_PTR_TYPE
                 | FORMAT_ARGS_ARG
                 | IDENT_PAT
                 | IMPL
@@ -6798,6 +6804,10 @@ impl From<Enum> for AnyHasName {
 impl From<Fn> for AnyHasName {
     #[inline]
     fn from(node: Fn) -> AnyHasName { AnyHasName { syntax: node.syntax } }
+}
+impl From<FnPtrType> for AnyHasName {
+    #[inline]
+    fn from(node: FnPtrType) -> AnyHasName { AnyHasName { syntax: node.syntax } }
 }
 impl From<FormatArgsArg> for AnyHasName {
     #[inline]
