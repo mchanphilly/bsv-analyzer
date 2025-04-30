@@ -123,6 +123,7 @@ fn add_keywords(acc: &mut Completions, ctx: &CompletionContext<'_>, kind: Option
             add_keyword("interface", "interface $1;\n    $0\nendinterface");
             add_keyword("module", "module $1($2);\n    $0\nendmodule");
             add_keyword("function", "function $1($3);\n    $0\nendfunction");
+            add_keyword("rule", "rule $1;\n    $0\nendrule");
 
             if !in_trait {
                 add_keyword("method", "method $1($2);\n    $0\nendmethod");
