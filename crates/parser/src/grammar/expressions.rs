@@ -76,6 +76,17 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
 
     // test block_items
     // fn a() { fn b() {} }
+    // This is a stopgap to prevent infinite loops, because we don't just terminate at `}`
+    // anymore (Bluespec blocks aren't necessarily delimited by curly braces, so we may have)
+    // a half open with no way to close. Note that a clean design might require figuring out
+    // a better invariant.
+    if p.at(T!['}']) {
+        // notice p.err_and_bump() actually won't take `{}` tokens.
+        p.error("not expected '}'");
+        p.bump_any();
+        m.abandon(p);
+        return;
+    }
     let m = match items::opt_item(p, m, false) {
         Ok(()) => return,
         Err(m) => m,
