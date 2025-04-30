@@ -591,6 +591,9 @@ impl ExprCollector<'_> {
                 result_expr_id
             }),
             ast::Expr::Fn(f) => {
+                let (result_expr_id, prev_binding_owner) =
+                self.initialize_binding_owner(syntax_ptr);
+
                 let assoc_item_kind: AssocItemKind = match () {
                     _ if f.rule_token().is_some() => AssocItemKind::Rule,
                     _ if f.method_token().is_some() => AssocItemKind::Method,
@@ -600,8 +603,6 @@ impl ExprCollector<'_> {
                         return None;
                     },
                 };
-                // let (result_expr_id, prev_binding_owner) =
-                // self.initialize_binding_owner(syntax_ptr);
 
                 let mut args = Vec::new();
                 let mut arg_types = Vec::new();
@@ -622,45 +623,27 @@ impl ExprCollector<'_> {
                     .and_then(|r| r.ty())
                     .map(|it| Interned::new(TypeRef::from_ast(&self.ctx(), it)));
 
-                // let prev_is_lowering_coroutine = mem::take(&mut self.is_lowering_coroutine);
-                // let prev_try_block_label = self.current_try_block_label.take();
+                let body = if let Some(body) = f.body() {
+                    self.collect_block(body)
+                } else {
+                    self.missing_expr()
+                };
 
-                // let awaitable = if f.async_token().is_some() {
-                //     Awaitable::Yes
-                // } else {
-                //     Awaitable::No("non-async closure")
-                // };
+                let guard: Option<la_arena::Idx<Expr>> = f.guard().map_or(None, |g| {
+                    let guard = self.collect_expr_opt(g.condition());
+                    Some(guard)
+                });
 
-                // let closure_kind = if self.is_lowering_coroutine {
-                //     let movability = if f.static_token().is_some() {
-                //         Movability::Static
-                //     } else {
-                //         Movability::Movable
-                //     };
-                //     ClosureKind::Coroutine(movability)
-                // } else if f.async_token().is_some() {
-                //     ClosureKind::Async
-                // } else {
-                //     ClosureKind::Closure
-                // };
-                // let capture_by =
-                //     if f.move_token().is_some() { CaptureBy::Value } else { CaptureBy::Ref };
-                // self.is_lowering_coroutine = prev_is_lowering_coroutine;
-                // self.current_binding_owner = prev_binding_owner;
-                // self.current_try_block_label = prev_try_block_label;
-                // self.body.exprs[result_expr_id] = Expr::Closure {
-                //     args: args.into(),
-                //     arg_types: arg_types.into(),
-                //     ret_type,
-                //     body,
-                //     closure_kind,
-                //     capture_by,
-                // };
-                // result_expr_id
-                if f.body().is_some() {
-                    return Some(self.collect_block(f.body().unwrap()))
-                }
-                return None;
+                self.current_binding_owner = prev_binding_owner;
+                self.body.exprs[result_expr_id] = Expr::Fn {
+                    args: args.into(),
+                    arg_types: arg_types.into(),
+                    ret_type,
+                    body,
+                    assoc_item_kind,
+                    guard
+                };
+                result_expr_id
             }
             ast::Expr::Trait(t) => {
                 // Traits currently don't have bodies.

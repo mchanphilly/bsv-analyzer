@@ -861,6 +861,12 @@ impl InferenceContext<'_> {
                 }));
                 self.current_captures = cc;
             }
+            Expr::Fn {guard, ..} => {
+                if let &Some(expr) = guard {
+                    self.consume_expr(expr);
+                }
+                // Ignore body? The closure doesn't seem to do anything with the body, except capture the upvars.
+            }
             Expr::Array(Array::ElementList { elements: exprs, is_assignee_expr: _ })
             | Expr::Tuple { exprs, is_assignee_expr: _ } => {
                 self.consume_exprs(exprs.iter().copied())

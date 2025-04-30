@@ -228,6 +228,12 @@ impl InferenceContext<'_> {
             Expr::Closure { body, .. } => {
                 self.infer_mut_expr(*body, Mutability::Not);
             }
+            Expr::Fn {body, guard, ..} => {
+                if let Some(guard) = guard {
+                    self.infer_mut_expr(*guard, Mutability::Not);
+                }
+                self.infer_mut_expr(*body, Mutability::Not);
+            }
             Expr::Tuple { exprs, is_assignee_expr: _ }
             | Expr::Array(Array::ElementList { elements: exprs, is_assignee_expr: _ }) => {
                 self.infer_mut_not_expr_iter(exprs.iter().copied());

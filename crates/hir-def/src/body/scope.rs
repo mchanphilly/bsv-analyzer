@@ -257,6 +257,15 @@ fn compute_expr_scopes(
             scopes.add_params_bindings(body, scope, args);
             compute_expr_scopes(scopes, *body_expr, &mut scope);
         }
+        Expr::Fn { args, body: body_expr, guard, ..} => {
+            // let mut guard_scope = scopes.new_scope(*scope);
+            let mut scope = scopes.new_scope(*scope);
+            if let &Some(expr) = guard {
+                compute_expr_scopes(scopes, expr, &mut scope);
+            }
+            scopes.add_params_bindings(body, scope, args);
+            compute_expr_scopes(scopes, *body_expr, &mut scope);
+        }
         Expr::Match { expr, arms } => {
             compute_expr_scopes(scopes, *expr, scope);
             for arm in arms.iter() {

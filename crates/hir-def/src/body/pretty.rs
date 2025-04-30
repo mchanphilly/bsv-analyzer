@@ -479,6 +479,9 @@ impl Printer<'_> {
                 self.print_expr(*index);
                 w!(self, "]");
             }
+            Expr::Fn { .. } => {
+                w!(self, "TODO pretty.rs for Expr::Fn");
+            }
             Expr::Closure { args, arg_types, ret_type, body, closure_kind, capture_by } => {
                 match closure_kind {
                     ClosureKind::Coroutine(Movability::Static) => {

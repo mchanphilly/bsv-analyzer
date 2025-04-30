@@ -297,14 +297,14 @@ pub enum Expr {
     Underscore,
     OffsetOf(OffsetOf),
     InlineAsm(InlineAsm),
-    // AssocItem {
-    //     args: Box<[PatId]>,
-    //     arg_types: Box<[Option<Interned<TypeRef>>]>,
-    //     ret_type: Option<Interned<TypeRef>>,
-    //     body: ExprId,
-    //     assoc_item_kind: AssocItemKind,
-    //     guard: Option<ExprId>,
-    // }
+    Fn {
+        args: Box<[PatId]>,
+        arg_types: Box<[Option<Interned<TypeRef>>]>,
+        ret_type: Option<Interned<TypeRef>>,
+        body: ExprId,
+        assoc_item_kind: AssocItemKind,
+        guard: Option<ExprId>,
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -620,6 +620,12 @@ impl Expr {
             },
             Expr::Literal(_) => {}
             Expr::Underscore => {}
+            Expr::Fn { body, guard, .. } => {
+                if let &Some(expr) = guard {
+                    f(expr);
+                }
+                f(*body);
+            }
         }
     }
 }
