@@ -50,7 +50,9 @@ fn eval_goal(ra_fixture: &str, minicore: &str) -> Result<Arc<Layout>, LayoutErro
                         hir_def::AdtId::EnumId(x) => {
                             db.enum_data(x).name.display_no_db(file_id.edition()).to_smolstr()
                         }
-                        hir_def::AdtId::ImplId(_) => unreachable!(),
+                        hir_def::AdtId::ImplId(i) => {
+                            db.impl_data(i).name.display_no_db(file_id.edition()).to_smolstr()
+                        }
                     };
                     (name == "Goal").then_some(Either::Left(x))
                 }
