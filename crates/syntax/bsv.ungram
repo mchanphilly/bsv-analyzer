@@ -259,7 +259,7 @@ SourceFile =
   'endpackage'? (':' NameRef)?
 
 Item =
-  Const
+  Const  // top-level variable statements
 | Enum
 | ExternBlock
 | ExternCrate
@@ -455,11 +455,14 @@ Adt =
 | Union
 | Impl
 
-Const =
+Const = (
   Attr* Visibility?
   'default'?
   'const' (Name | '_') ':' Type
   ('=' body:Expr)? ';'
+) | (
+  Type Name '=' body:Expr ';'
+)
 
 Static =
   Attr* Visibility?

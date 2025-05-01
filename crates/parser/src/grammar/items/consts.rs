@@ -7,6 +7,14 @@ pub(super) fn konst(p: &mut Parser<'_>, m: Marker) {
     const_or_static(p, m, true);
 }
 
+pub(super) fn bsv_const(p: &mut Parser<'_>, m: Marker) {
+    types::type_(p);
+    name_r(p, ITEM_RECOVERY_SET);
+    p.expect(T![=]);
+    expr(p);
+    m.complete(p, CONST);
+}
+
 pub(super) fn static_(p: &mut Parser<'_>, m: Marker) {
     p.bump(T![static]);
     const_or_static(p, m, false);

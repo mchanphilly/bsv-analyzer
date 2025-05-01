@@ -348,12 +348,9 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
         T![type] => type_alias(p, m),
         T![struct] => adt::strukt(p, m),
         T![enum] => adt::enum_(p, m),
-        IDENT if p.at_contextual_kw(T![union]) && p.nth(1) == IDENT => adt::union(p, m),
-
-        T![macro] => macro_def(p, m),
-        // check if current token is "macro_rules" followed by "!" followed by an identifier
-        IDENT if p.at_contextual_kw(T![macro_rules]) && p.nth_at(1, BANG) && p.nth_at(2, IDENT) => {
-            macro_rules(p, m)
+        // Bit#(4) x = 15;  // e.g., top-level variable declarations
+        IDENT if (la == T![#] || la == IDENT) => {
+            consts::bsv_const(p, m)
         }
 
         T![const] if (la == IDENT || la == T![_] || la == T![mut]) => consts::konst(p, m),
