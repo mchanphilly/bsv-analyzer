@@ -26,6 +26,16 @@ pub(crate) fn interface_(p: &mut Parser<'_>, m: Marker, sig_only: bool) -> Compl
     m.complete(p, TRAIT)
 }
 
+// This should really be done more formally. The current hack is to present this as a Let
+// statement
+pub(crate) fn subinterface_(p: &mut Parser<'_>, m: Marker) -> CompletedMarker {
+    p.bump(T![interface]);
+
+    expressions::let_stmt(p, expressions::Semicolon::Required);
+
+    m.complete(p, TRAIT)
+}
+
 // test trait_item
 // trait T { fn new() -> Self; }
 pub(super) fn trait_(p: &mut Parser<'_>, m: Marker) {

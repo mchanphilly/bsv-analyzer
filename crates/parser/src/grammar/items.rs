@@ -260,6 +260,7 @@ pub(super) fn opt_item(p: &mut Parser<'_>, m: Marker, sig_only: bool) -> Result<
         T![typedef] => typedef_(p, m),  // handles synonyms, structs, enums
 
         T![function] | T![method] | T![rule] => bsv_assoc(p, m, sig_only),
+        T![interface] if sig_only => {traits::subinterface_(p, m);}
         T![interface] => {traits::interface_(p, m, true);},
         T![module] => traits::module_(p, m),
         // T![module] => traits::module_(p, m),  // TODO_BSV

@@ -366,12 +366,15 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
     }
 }
 
-fn opt_bsv_macro_calls(p: &mut Parser<'_>) {
+fn opt_bsv_macro_calls(p: &mut Parser<'_>) -> bool {
+    let mut any = false;
     while p.at(T!['`']) {
         let m = p.start();
         expressions::bsv_macro_call(p);
         m.complete(p, MACRO_CALL);
+        any = true;
     }
+    any
 }
 
 // Parses expression with binding power of at least bp.
@@ -382,13 +385,27 @@ fn expr_bp(
     bp: u8,
 ) -> Option<(CompletedMarker, BlockLike)> {
     // Bluespec allows arbitrary macro calls anywhere. We just take them here.
-    opt_bsv_macro_calls(p);
+    let any_directive = opt_bsv_macro_calls(p);
 
     let m = m.unwrap_or_else(|| {
         let m = p.start();
         attributes::outer_attrs(p);
         m
     });
+
+    // Usually we want to ditch if e.g., we have
+    // interface Foo;
+    //     interface Subone one;
+    // `ifdef TWO_DEFINED
+    //     interface Subtwo two;
+    // `endif
+    // but this may be incorrect in some cases where we have a benign
+    // compiler directive and then immediately after, an inline interface
+    // statement, e.g., in Ehr.
+    if any_directive && p.at_ts(items::ITEM_RECOVERY_SET) {
+        m.abandon(p);
+        return None;
+    }
 
     if !p.at_ts(EXPR_FIRST) {
         p.err_recover("expected expression", atom::EXPR_RECOVERY_SET);
