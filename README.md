@@ -4,7 +4,7 @@ My master's thesis is on adapting Rust Analyzer to work with Bluespec SystemVeri
 
 Because it's still in-progress, I haven't yet packaged this up nicely as a VS Code extension.
 
-To install from source, clone this repo and run `cargo xtask install`, installing whatever dependencies you need. Then to use, make sure you have VS Code[^editors] installed, and open any workspace with `.bsv` files. The project discovery works by searhing for `.bsv` files within a limited number of layers (but more than you probably need) downstream of your workspace, and dumping them all into a pool. This approach precludes some project layouts, but works for the common case.
+To install from source, clone this repo and run `cargo xtask install`, installing whatever dependencies you need. Then to use, make sure you have VS Code[^editors] installed, and open any workspace with `.bsv` files. The project discovery works by searching for `.bsv` files within a limited number of layers (but more than you probably need) downstream of your workspace, and dumping them all into a pool. This approach precludes some project layouts, but works for the common case.
 
 Feel free to reach out with any issues to martinch@mit.edu. I'll publish more details when I'm closer to finishing, since I'm actively writing my thesis.
 
