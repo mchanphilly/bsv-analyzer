@@ -570,9 +570,20 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
 
     match item_type {
         BsvType::Function | BsvType::Method => {
-            // Going to assume we *always* have a return type
-            // even if Action. Actual language may be more permissive
-            opt_ret_type_bsv(p);
+            // The language can be permissive. We must permit all:
+            //     method flush1 = noAction;
+            //     method Action flush2 = noAction;
+            //     method Action flush3() = noAction;
+            //     method Action flush4();
+            //         noAction;
+            //     endmethod
+
+            let la = p.nth(1);
+            let no_ret = p.at(IDENT) && (la == T![=] || la == T!['(']);
+
+            if !no_ret {
+                opt_ret_type_bsv(p);
+            }
         }
         BsvType::Rule => {},
     }
@@ -628,6 +639,7 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
         if p.eat(T![=]) {
             p.error("Language server doesn't yet fully implement shorthand assignment");
             expr(p);
+            // expressions::expect_call(p);  // Doesn't support paren-less method calls yet.
             p.expect(T![;]);
         } else {
             let ket = match item_type {

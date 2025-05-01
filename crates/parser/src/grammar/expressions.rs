@@ -133,6 +133,23 @@ pub(super) fn stmt(p: &mut Parser<'_>, semicolon: Semicolon) {
     }
 }
 
+pub(super) fn expect_call(p: &mut Parser<'_>) {
+    if let Some((lhs, _)) = expressions::lhs(p, Restrictions { forbid_structs: false, prefer_stmt: false }) {
+        match lhs.kind() {
+            PATH_EXPR => {expressions::call_expr(p, lhs);}
+            FIELD_EXPR => {
+                // TODO this should really be named METHOD_CALL_EXPR for proper type
+                // resolution later; otherwise it'll seem like we're accessing the
+                // method pointer, not making a method call. Either way, it gets resolved.
+            }
+            CALL_EXPR | METHOD_CALL_EXPR => {}
+            _ => {p.error("expected function or method call");}
+        }
+    } else {
+        p.err_and_bump("expected call");
+    }
+}
+
 // test let_stmt
 // fn f() { let x: i32 = 92; }
 pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
@@ -148,20 +165,7 @@ pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
         // fn f() { let x = 92; }
         expressions::expr(p);
     } else if p.eat(T![<-]) {
-        if let Some((lhs, _)) = expressions::lhs(p, Restrictions { forbid_structs: false, prefer_stmt: false }) {
-            match lhs.kind() {
-                PATH_EXPR => {expressions::call_expr(p, lhs);}
-                FIELD_EXPR => {
-                    // TODO this should really be named METHOD_CALL_EXPR for proper type
-                    // resolution later; otherwise it'll seem like we're accessing the
-                    // method pointer, not making a method call. Either way, it gets resolved.
-                }
-                CALL_EXPR | METHOD_CALL_EXPR => {}
-                _ => {p.error("expected function or method call");}
-            }
-        } else {
-            p.err_and_bump("expected call");
-        }
+        expect_call(p);
     }
 
     // Not supported in Bluespec
