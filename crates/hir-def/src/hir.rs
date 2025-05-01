@@ -302,6 +302,7 @@ pub enum Expr {
         arg_types: Box<[Option<Interned<TypeRef>>]>,
         ret_type: Option<Interned<TypeRef>>,
         body: ExprId,
+        shorthand: Option<ExprId>,
         assoc_item_kind: AssocItemKind,
         guard: Option<ExprId>,
     }

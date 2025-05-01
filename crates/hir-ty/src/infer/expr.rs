@@ -312,11 +312,9 @@ impl InferenceContext<'_> {
 
                 ty
             }
-            Expr::Fn { args, arg_types, ret_type, body, assoc_item_kind, guard } => {
+            Expr::Fn { args, arg_types, ret_type, body, assoc_item_kind, guard, shorthand } => {
                 assert_eq!(args.len(), arg_types.len());
-
                 let mut sig_tys = Vec::with_capacity(arg_types.len() + 1);
-
                 // collect explicitly written argument types
                 for arg_type in arg_types.iter() {
                     let arg_ty = match arg_type {
@@ -331,6 +329,14 @@ impl InferenceContext<'_> {
                     Some(type_ref) => self.make_ty(type_ref),
                     None => self.table.new_type_var(),
                 };
+
+                // // For some reason, this bricks inference (uninferred pattern?)
+                // // TODO shorthand expression type should equal ret_type.
+                // // If we have a shorthand, we expect it to match the ret_type.
+                // if let Some(expr) = shorthand {
+                //     self.infer_expr(*expr, &Expectation::None);
+                //     // self.infer_expr(*expr, &Expectation::has_type(ret_ty.clone()));
+                // }
 
                 sig_tys.push(ret_ty.clone());
 

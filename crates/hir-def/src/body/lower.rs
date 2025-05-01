@@ -629,6 +629,12 @@ impl ExprCollector<'_> {
                     self.missing_expr()
                 };
 
+                let shorthand = if f.body().is_none() && f.eq_token().is_some() {
+                    f.expr().map(|expr| self.collect_expr(expr))
+                } else {
+                    None
+                };
+
                 let guard: Option<la_arena::Idx<Expr>> = f.guard().map_or(None, |g| {
                     let guard = self.collect_expr_opt(g.condition());
                     Some(guard)
@@ -641,7 +647,8 @@ impl ExprCollector<'_> {
                     ret_type,
                     body,
                     assoc_item_kind,
-                    guard
+                    guard,
+                    shorthand
                 };
                 result_expr_id
             }
