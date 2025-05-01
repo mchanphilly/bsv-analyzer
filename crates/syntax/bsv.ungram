@@ -236,6 +236,8 @@ Attr =
 ) | (
   '`' (
     'ifdef' Path
+  | 'elsif' Path
+  | 'define'  // Could take arbitrarily anything including whitespace, so we just take it and run for now.
   | 'endif'
   | 'else'
   )

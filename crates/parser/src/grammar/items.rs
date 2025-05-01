@@ -590,6 +590,9 @@ fn bsv_assoc(p: &mut Parser<'_>, m: Marker, sig_only: bool) {
         // as "no parameters" and not "missing parameters"
         let param_list_m = p.start();
         if let BsvType::Method = item_type {
+            // This is really tech debt. During trait solving checks for
+            // self param, we should return true if it's a method, instead of
+            // this parser-level hack.
             p.start().complete(p, SELF_PARAM);
         }
         param_list_m.complete(p, PARAM_LIST);
@@ -673,15 +676,11 @@ fn fn_(p: &mut Parser<'_>, m: Marker) {
 
 fn macro_call(p: &mut Parser<'_>, m: Marker) {
     assert!(paths::is_use_path_start(p));
-    if p.at(T!['`']) {
-        expressions::bsv_macro_call(p)
-    } else {
-        paths::use_path(p);
-        match macro_call_after_excl(p) {
-            BlockLike::Block => (),
-            BlockLike::NotBlock => {
-                p.expect(T![;]);
-            }
+    paths::use_path(p);
+    match macro_call_after_excl(p) {
+        BlockLike::Block => (),
+        BlockLike::NotBlock => {
+            p.expect(T![;]);
         }
     }
     m.complete(p, MACRO_CALL);

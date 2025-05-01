@@ -100,8 +100,12 @@ fn path_segment(p: &mut Parser<'_>, mode: Mode, first: bool) {
         } else {
             true
         };
+
+        // May need to put better handling later
+        p.eat(T![$]);
+
         match p.current() {
-            IDENT | T![$] => {
+            IDENT => {
                 name_ref(p);
                 opt_path_type_args(p, mode);
             }

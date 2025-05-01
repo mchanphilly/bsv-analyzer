@@ -143,10 +143,25 @@ pub(super) fn let_stmt(p: &mut Parser<'_>, with_semi: Semicolon) {
 
     patterns::pattern(p);
 
-    if p.eat(T![=]) || p.eat(T![<-]) {
+    if p.eat(T![=]) {
         // test let_stmt_init
         // fn f() { let x = 92; }
         expressions::expr(p);
+    } else if p.eat(T![<-]) {
+        if let Some((lhs, _)) = expressions::lhs(p, Restrictions { forbid_structs: false, prefer_stmt: false }) {
+            match lhs.kind() {
+                PATH_EXPR => {expressions::call_expr(p, lhs);}
+                FIELD_EXPR => {
+                    // TODO this should really be named METHOD_CALL_EXPR for proper type
+                    // resolution later; otherwise it'll seem like we're accessing the
+                    // method pointer, not making a method call. Either way, it gets resolved.
+                }
+                CALL_EXPR | METHOD_CALL_EXPR => {}
+                _ => {p.error("expected function or method call");}
+            }
+        } else {
+            p.err_and_bump("expected call");
+        }
     }
 
     // Not supported in Bluespec
@@ -351,6 +366,14 @@ fn current_op(p: &Parser<'_>) -> (u8, SyntaxKind, Associativity) {
     }
 }
 
+fn opt_bsv_macro_calls(p: &mut Parser<'_>) {
+    while p.at(T!['`']) {
+        let m = p.start();
+        expressions::bsv_macro_call(p);
+        m.complete(p, MACRO_CALL);
+    }
+}
+
 // Parses expression with binding power of at least bp.
 fn expr_bp(
     p: &mut Parser<'_>,
@@ -359,11 +382,7 @@ fn expr_bp(
     bp: u8,
 ) -> Option<(CompletedMarker, BlockLike)> {
     // Bluespec allows arbitrary macro calls anywhere. We just take them here.
-    while p.at(T!['`']) {
-        let m = p.start();
-        expressions::bsv_macro_call(p);
-        m.complete(p, MACRO_CALL);
-    }
+    opt_bsv_macro_calls(p);
 
     let m = m.unwrap_or_else(|| {
         let m = p.start();
@@ -440,7 +459,7 @@ fn expr_bp(
 }
 
 const LHS_FIRST: TokenSet =
-    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![~], T![_], T![?]]));
+    atom::ATOM_EXPR_FIRST.union(TokenSet::new(&[T![&], T![*], T![!], T![.], T![-], T![~], T![_], T![?], T!['`']]));
 
 fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, BlockLike)> {
     let m;
@@ -601,7 +620,7 @@ fn postfix_dot_expr<const FLOAT_RECOVERY: bool>(
 //     f(<Foo as Trait>::func());
 // }
 fn call_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
-    assert!(p.at(T!['(']));
+    // assert!(p.at(T!['(']));
     let m = lhs.precede(p);
     arg_list(p);
     m.complete(p, CALL_EXPR)
@@ -642,18 +661,7 @@ fn method_call_expr<const FLOAT_RECOVERY: bool>(
     }
     name_ref(p);
     generic_args::opt_generic_arg_list(p, true);
-    if p.at(T!['(']) {
-        arg_list(p);
-    } else {
-        // emit an error when argument list is missing
-
-        // test_err method_call_missing_argument_list
-        // fn func() {
-        //     foo.bar::<>
-        //     foo.bar::<i32>;
-        // }
-        p.error("expected argument list");
-    }
+    arg_list(p);
     m.complete(p, METHOD_CALL_EXPR)
 }
 
@@ -728,8 +736,12 @@ fn cast_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 //     foo(a, , b);
 // }
 pub(crate) fn arg_list(p: &mut Parser<'_>) {
-    assert!(p.at(T!['(']));
     let m = p.start();
+    if !p.at(T!['(']) {
+        p.error("parentheses strongly encouraged for arg-less calls");
+        m.complete(p, ARG_LIST);  // empty args
+        return;
+    }
     // test arg_with_attr
     // fn main() {
     //     foo(#[attr] 92)
@@ -756,10 +768,9 @@ pub(crate) fn bsv_macro_call(p: &mut Parser<'_>) {
     assert!(p.at(T!['`']));
     p.bump(T!['`']);
     match p.current() {
-        T![else] => p.bump(T![else]),
-        T![endif] => p.bump(T![endif]),
-        T![ifdef] => {
-            p.bump(T![ifdef]);
+        T![else] | T![endif] | T![define]=> p.bump_any(),
+        T![ifdef] | T![elsif]=> {
+            p.bump_any();
             paths::expr_path(p);
         }
         _ => p.err_and_bump("Macro call not recognized"),

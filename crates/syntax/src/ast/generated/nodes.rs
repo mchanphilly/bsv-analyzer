@@ -321,7 +321,11 @@ impl Attr {
     #[inline]
     pub fn grave_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['`']) }
     #[inline]
+    pub fn define_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![define]) }
+    #[inline]
     pub fn else_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![else]) }
+    #[inline]
+    pub fn elsif_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![elsif]) }
     #[inline]
     pub fn endif_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![endif]) }
     #[inline]
