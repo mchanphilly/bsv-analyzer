@@ -51,6 +51,15 @@ pub(super) fn mod_contents(p: &mut Parser<'_>, stop_on_r_curly: bool) {
     }
 }
 
+pub(super) const ENDING_RECOVERY_SET: TokenSet = TokenSet::new(&[
+    T![endmethod],
+    T![endinterface],
+    T![endfunction],
+    T![endaction],
+    T![endpackage],
+    T![end],
+]);
+
 pub(super) const ITEM_RECOVERY_SET: TokenSet = TokenSet::new(&[
     T![fn],
     T![struct],
@@ -133,10 +142,10 @@ pub(super) fn item_or_macro(p: &mut Parser<'_>, stop_on_r_curly: bool) {
     // macro_rules! {};
     // macro_rules! ()
     // macro_rules! []
-    if paths::is_use_path_start(p) {
-        macro_call(p, m);
-        return;
-    }
+    // if paths::is_use_path_start(p) {
+    //     macro_call(p, m);
+    //     return;
+    // }
 
     m.abandon(p);
     match p.current() {
@@ -342,6 +351,7 @@ fn opt_item_without_modifiers(p: &mut Parser<'_>, m: Marker) -> Result<(), Marke
     match p.current() {
         T![extern] if la == T![crate] => extern_crate(p, m),
         T![import] => use_item::import_(p, m),
+        T![export] => use_item::export_(p, m),
         // T![package] => package_item(p, m),
 
         T![typedef] => typedef_(p, m),

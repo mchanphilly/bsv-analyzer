@@ -194,6 +194,12 @@ pub(crate) fn borderless_assoc_item_list(p: &mut Parser<'_>, end: SyntaxKind, si
         let item_m = p.start();
         attributes::outer_attrs_bsv(p);  // TODO BSV truly add support for outer_attrs
 
+        let item_m = expressions::opt_bsv_grave(p, item_m);
+        if p.at(end) {
+            item_m.abandon(p);
+            break;
+        }
+
         let item_m = match opt_item(p, item_m, sig_only) {
             Ok(()) => {
                 if p.at(T![;]) {

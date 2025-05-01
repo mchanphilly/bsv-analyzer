@@ -174,12 +174,8 @@ fn param(p: &mut Parser<'_>, m: Marker, flavor: Flavor) {
         }
 
         Flavor::BsvMethod | Flavor::BsvFunction => {
-            let was_fn = p.at(T![function]);
             types::type_(p);
-
-            if !was_fn {
-                patterns::pattern_single(p);
-            }
+            patterns::pattern_single(p);
         }
     }
     m.complete(p, PARAM);

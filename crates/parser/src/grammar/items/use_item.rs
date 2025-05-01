@@ -35,6 +35,22 @@ pub(super) fn import_(p: &mut Parser<'_>, m: Marker) {
     // }
 }
 
+pub(super) fn export_(p: &mut Parser<'_>, m: Marker) {
+    p.bump(T![export]);
+
+    if use_tree(p, true) {  // import FIFO::*;
+        if p.eat(T!['(']) {
+            p.expect(T![..]);
+            p.expect(T![')']);
+        }
+        p.expect(T![;]);
+        m.complete(p, UNSUPPORTED);
+    } else {
+        p.err_and_bump("expected export");
+        m.abandon(p);
+    }
+}
+
 // test use_tree
 // use outer::tree::{inner::tree};
 fn use_tree(p: &mut Parser<'_>, top_level: bool) -> bool {

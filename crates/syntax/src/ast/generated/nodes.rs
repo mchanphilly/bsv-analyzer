@@ -2365,6 +2365,23 @@ impl Union {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Unsupported {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Unsupported {
+    #[inline]
+    pub fn use_tree(&self) -> Option<UseTree> { support::child(&self.syntax) }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T!['(']) }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![')']) }
+    #[inline]
+    pub fn dotdot_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![..]) }
+    #[inline]
+    pub fn export_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![export]) }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Use {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4885,6 +4902,20 @@ impl AstNode for UnderscoreExpr {
 impl AstNode for Union {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool { kind == UNION }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode { &self.syntax }
+}
+impl AstNode for Unsupported {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool { kind == UNSUPPORTED }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         if Self::can_cast(syntax.kind()) {
@@ -7869,6 +7900,11 @@ impl std::fmt::Display for UnderscoreExpr {
     }
 }
 impl std::fmt::Display for Union {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(self.syntax(), f)
+    }
+}
+impl std::fmt::Display for Unsupported {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         std::fmt::Display::fmt(self.syntax(), f)
     }

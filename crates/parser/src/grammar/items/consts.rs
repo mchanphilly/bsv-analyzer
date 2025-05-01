@@ -12,6 +12,7 @@ pub(super) fn bsv_const(p: &mut Parser<'_>, m: Marker) {
     name_r(p, ITEM_RECOVERY_SET);
     p.expect(T![=]);
     expr(p);
+    p.expect(T![;]);
     m.complete(p, CONST);
 }
 

@@ -499,7 +499,7 @@ impl<'a> Ctx<'a> {
     fn lower_const(&mut self, konst: &ast::Const) -> FileItemTreeId<Const> {
         let name = konst.name().map(|it| it.as_name());
         let type_ref = self.lower_type_ref_opt(konst.ty());
-        let visibility = self.lower_visibility(konst);
+        let visibility = RawVisibilityId::PUB;
         let ast_id = self.source_ast_id_map.ast_id(konst);
         let res = Const { name, visibility, type_ref, ast_id, has_body: konst.body().is_some() };
         id(self.data().consts.alloc(res))
