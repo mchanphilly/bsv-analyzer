@@ -101,7 +101,7 @@ impl ProjectManifest {
     }
 
     pub fn discover(path: &AbsPath) -> io::Result<Vec<ProjectManifest>> {
-        const DEPTH: usize = 3;
+        const DEPTH: usize = 7;  // perhaps overkill
         // TODO BSV add in a way to connect things together.
         // if let Some(project_json) = find_in_parent_dirs(path, "rust-project.json") {
         //     return Ok(vec![ProjectManifest::ProjectJson(project_json)]);
